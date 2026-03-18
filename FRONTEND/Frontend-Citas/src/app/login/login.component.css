@@ -1,0 +1,374 @@
+/* Container principal con tema médico/profesional */
+.login-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  position: relative;
+}
+
+/* Patrón de fondo sutil */
+.login-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.login-wrapper {
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Tarjeta de login */
+.login-card {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 40px 35px;
+  box-shadow: 
+    0 25px 50px rgba(30, 58, 138, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.login-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 
+    0 35px 70px rgba(30, 58, 138, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+/* Header con icono */
+.login-header {
+  text-align: center;
+  margin-bottom: 35px;
+}
+
+.login-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+}
+
+.login-icon i {
+  font-size: 32px;
+  color: white;
+}
+
+.login-title {
+  color: #1e293b;
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.5px;
+}
+
+.login-subtitle {
+  color: #64748b;
+  font-size: 16px;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Formulario */
+.login-form {
+  width: 100%;
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #334155;
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+
+.form-label i {
+  color: #2563eb;
+  font-size: 18px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 16px 20px;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #f8fafc;
+  box-sizing: border-box;
+  color: #1e293b;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  background: #ffffff;
+  box-shadow: 
+    0 0 0 4px rgba(37, 99, 235, 0.1),
+    0 4px 12px rgba(37, 99, 235, 0.15);
+  transform: translateY(-2px);
+}
+
+.form-input::placeholder {
+  color: #94a3b8;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+/* Enlace de contraseña olvidada */
+.forgot-password {
+  text-align: right;
+  margin-bottom: 25px;
+}
+
+.forgot-link {
+  color: #2563eb;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.forgot-link:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+/* Botones */
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 30px;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 24px;
+  border: none;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+  width: 100%;
+  box-sizing: border-box;
+  letter-spacing: 0.5px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(37, 99, 235, 0.4);
+  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  background: #94a3b8;
+}
+
+.btn-secondary {
+  background: #f1f5f9;
+  color: #475569;
+  border: 2px solid #e2e8f0;
+}
+
+.btn-secondary:hover {
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+  color: #334155;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(71, 85, 105, 0.1);
+}
+
+/* Footer */
+.login-footer {
+  text-align: center;
+  margin-top: 30px;
+  padding-top: 25px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.footer-text {
+  color: #64748b;
+  font-size: 14px;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Mensaje de error */
+.error-message {
+  margin-top: 20px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .login-container {
+    padding: 15px;
+  }
+  
+  .login-card {
+    padding: 30px 25px;
+    border-radius: 20px;
+  }
+  
+  .login-title {
+    font-size: 28px;
+  }
+  
+  .login-icon {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .login-icon i {
+    font-size: 28px;
+  }
+  
+  .form-input {
+    font-size: 16px; /* Evita zoom en iOS */
+    padding: 14px 18px;
+  }
+  
+  .btn {
+    padding: 14px 20px;
+  }
+}
+
+/* Animaciones */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-card {
+  animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.login-header {
+  animation: slideInDown 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
+}
+
+.form-group:nth-child(1) {
+  animation: slideInDown 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both;
+}
+
+.form-group:nth-child(2) {
+  animation: slideInDown 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.4s both;
+}
+
+.button-group {
+  animation: slideInDown 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.5s both;
+}
+
+/* Estados de carga */
+.btn:disabled {
+  position: relative;
+}
+
+.btn:disabled::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  margin: auto;
+  border: 2px solid transparent;
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Efectos adicionales para tema médico */
+.form-input:valid {
+  border-color: #10b981;
+}
+
+.form-input:valid + .form-label i {
+  color: #10b981;
+}
+
+/* Hover states mejorados */
+.login-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.02), rgba(29, 78, 216, 0.02));
+  border-radius: 24px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.login-card:hover::before {
+  opacity: 1;
+}

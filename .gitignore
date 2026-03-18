@@ -1,0 +1,28 @@
+# Node.js
+node_modules/
+dist/
+.angular/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+env/
+venv/
+ENV/
+.env
+
+# Database (optional - keep it out if you want to push to GitHub without local data)
+# db.sqlite3
+
+# IDEs
+.vscode/
+.idea/
+.project
+.history/
+
+# System
+.DS_Store
+Thumbs.db

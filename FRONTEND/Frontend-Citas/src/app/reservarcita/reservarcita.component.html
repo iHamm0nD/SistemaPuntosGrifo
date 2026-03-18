@@ -1,0 +1,100 @@
+<div class="dashboard-container">
+  <!-- Título y navegación -->
+  <div class="dashboard-header">
+    <div class="welcome-section">
+      <div class="user-avatar">
+        <i class="pi pi-calendar-plus"></i>
+      </div>
+      <div class="welcome-text">
+        <h1 class="welcome-title">Reservar Cita</h1>
+        <span class="user-name">Elige especialidad, médico y fecha</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-section">
+    <div class="section-header">
+      <h2 class="section-title">
+        <i class="pi pi-check-square"></i> Formulario de reserva
+      </h2>
+    </div>
+
+    <form class="cards-container" [formGroup]="reservaForm" (ngSubmit)="reservarCita()">
+      
+      <!-- Especialidad -->
+      <div class="action-card">
+        <div class="card-content">
+          <div class="card-icon scheduled">
+            <i class="pi pi-briefcase"></i>
+          </div>
+          <div class="card-text">
+            <label>Especialidad</label><br />
+            <select formControlName="especialidad" class="custom-select" (change)="onEspecialidadSeleccionada()">
+              <option value="" disabled selected>Seleccione una especialidad</option>
+              <option *ngFor="let esp of especialidades" [value]="esp.id">{{ esp.nombre }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Médico -->
+      <div class="action-card" *ngIf="medicos.length > 0">
+        <div class="card-content">
+          <div class="card-icon scheduled">
+            <i class="pi pi-user-md"></i>
+          </div>
+          <div class="card-text">
+            <label>Médico</label><br />
+            <select formControlName="medico" class="custom-select">
+              <option value="" disabled selected>Seleccione un médico</option>
+              <option *ngFor="let med of medicos" [value]="med.id">
+                {{ med.usuario.nombre }} {{ med.usuario.apellido }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fecha -->
+      <div class="action-card">
+        <div class="card-content">
+          <div class="card-icon scheduled">
+            <i class="pi pi-calendar"></i>
+          </div>
+          <div class="card-text">
+            <label>Fecha</label><br />
+            <input type="date" formControlName="fecha" />
+          </div>
+        </div>
+      </div>
+      <!-- Hora -->
+      <div class="action-card" *ngIf="horasDisponibles.length > 0">
+        <div class="card-content">
+          <div class="card-icon scheduled">
+            <i class="pi pi-clock"></i>
+          </div>
+          <div class="card-text">
+            <label>Hora</label><br />
+            <select formControlName="hora" class="custom-select">
+              <option value="" disabled selected>Seleccione una hora</option>
+              <option *ngFor="let hora of horasDisponibles" [value]="hora">{{ hora }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Si no hay horas disponibles -->
+      <div *ngIf="horasDisponibles.length === 0 && reservaForm.get('fecha')?.value && reservaForm.get('medico')?.value" class="text-alert">
+        <p style="color: red; margin-left: 1rem;">No hay horas disponibles para esta fecha y médico.</p>
+</div>
+
+      <!-- Botón -->
+      <button type="submit" class="primary-btn" [disabled]="reservaForm.invalid">
+        <i class="pi pi-calendar-plus"></i> Reservar cita
+      </button>
+      <button class="primary-btn" [routerLink]="['/home']">
+        <i class="pi pi-sign-out"></i>Atras
+      </button>
+    </form>
+  </div>
+</div>
