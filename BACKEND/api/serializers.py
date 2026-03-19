@@ -1,5 +1,6 @@
-from rest_framework import serializers 
+from rest_framework import serializers
 from . import models
+
 
 # ========================== USUARIO ==========================
 
@@ -11,138 +12,136 @@ class UsuarioSerializers(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        # Esto asegura que se use create_user (que hashea la contraseña)
         return models.Usuario.objects.create_user(**validated_data)
 
-class PerfilUsuarioSerializer(serializers.ModelSerializer):
-    direccion = serializers.CharField(source='paciente.direccion', allow_blank=True, required=False)
 
+class PerfilUsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Usuario
-        fields = ['id', 'nombre', 'apellido', 'email', 'dni', 'telefono', 'direccion']
+        fields = ['id', 'nombre', 'apellido', 'email', 'dni', 'telefono', 'tipo_usuario']
 
     def update(self, instance, validated_data):
-        paciente_data = validated_data.pop('paciente', {})
         instance.nombre = validated_data.get('nombre', instance.nombre)
         instance.apellido = validated_data.get('apellido', instance.apellido)
         instance.email = validated_data.get('email', instance.email)
         instance.dni = validated_data.get('dni', instance.dni)
         instance.telefono = validated_data.get('telefono', instance.telefono)
         instance.save()
-
-        if hasattr(instance, 'paciente') and paciente_data:
-            instance.paciente.direccion = paciente_data.get('direccion', instance.paciente.direccion)
-            instance.paciente.save()
-
         return instance
 
-# ========================== PACIENTE ==========================
 
-class PacienteSerializers(serializers.ModelSerializer):
-    class Meta:
-        model = models.Paciente
-        fields = '__all__'
-
-class PacienteRegistroSerializer(serializers.ModelSerializer):
-    usuario = UsuarioSerializers()  
+class EmpleadoRegistroSerializer(serializers.ModelSerializer):
+    """Serializer para que un Dev o Dueño registre empleados"""
+    password = serializers.CharField(write_only=True)
 
     class Meta:
-        model = models.Paciente
-        fields = ['usuario','fecha_nacimiento', 'direccion']  
+        model = models.Usuario
+        fields = ['id', 'username', 'password', 'nombre', 'apellido', 'dni',
+                  'email', 'telefono', 'tipo_usuario']
 
     def create(self, validated_data):
-        usuario_data = validated_data.pop('usuario')
-        password = usuario_data.pop('password')
-        usuario_data['tipo_usuario'] = 'paciente'
-        user = models.Usuario.objects.create_user(password=password, **usuario_data)
-        paciente = models.Paciente.objects.create(usuario=user, **validated_data)
-        return paciente
+        return models.Usuario.objects.create_user(**validated_data)
 
-# ========================== ESPECIALIDAD ==========================
 
-class EspecialidadSerializers(serializers.ModelSerializer):
+# ========================== TIPO COMBUSTIBLE ==========================
+
+class TipoCombustibleSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.Especialidad
+        model = models.TipoCombustible
         fields = '__all__'
 
-# ========================== MÉDICO ==========================
 
-class MedicoSerializers(serializers.ModelSerializer):
-    usuario = UsuarioSerializers()
-    especialidad = EspecialidadSerializers()
+# ========================== CLIENTE ==========================
 
+class ClienteSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.Medico
+        model = models.Cliente
         fields = '__all__'
 
-class MedicoRegistroSerializer(serializers.ModelSerializer):
-    usuario = UsuarioSerializers()
-    especialidad = serializers.PrimaryKeyRelatedField(queryset=models.Especialidad.objects.all())
+
+class ClienteResumenSerializer(serializers.ModelSerializer):
+    """Serializer ligero para ranking/dashboard"""
+    total_consumos = serializers.SerializerMethodField()
 
     class Meta:
-        model = models.Medico
-        fields = ["id", "usuario", "especialidad"]
+        model = models.Cliente
+        fields = ['id', 'dni', 'nombres', 'apellidos', 'puntos_acumulados',
+                  'fecha_registro', 'total_consumos']
+
+    def get_total_consumos(self, obj):
+        return obj.consumos.count()
+
+
+# ========================== REGISTRO CONSUMO ==========================
+
+class RegistroConsumoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.RegistroConsumo
+        fields = '__all__'
+        read_only_fields = ['puntos_otorgados', 'monto_total', 'empleado']
+
+
+class RegistroConsumoReadSerializer(serializers.ModelSerializer):
+    """Serializer para lectura con datos expandidos"""
+    cliente_nombre = serializers.CharField(source='cliente.__str__', read_only=True)
+    tipo_combustible_nombre = serializers.CharField(source='tipo_combustible.nombre', read_only=True)
+    empleado_nombre = serializers.CharField(source='empleado.__str__', read_only=True)
+
+    class Meta:
+        model = models.RegistroConsumo
+        fields = ['id', 'cliente', 'cliente_nombre', 'empleado', 'empleado_nombre',
+                  'tipo_combustible', 'tipo_combustible_nombre', 'galones',
+                  'monto_total', 'puntos_otorgados', 'fecha']
+
+
+class RegistrarConsumoSerializer(serializers.Serializer):
+    """Serializer para el formulario de registro del empleado"""
+    dni = serializers.CharField(max_length=15)
+    nombres = serializers.CharField(max_length=100)
+    apellidos = serializers.CharField(max_length=100)
+    tipo_combustible = serializers.PrimaryKeyRelatedField(
+        queryset=models.TipoCombustible.objects.all())
+    monto_consumido = serializers.DecimalField(max_digits=10, decimal_places=2)
 
     def create(self, validated_data):
-        usuario_data = validated_data.pop('usuario')
-        password = usuario_data.pop('password')
-        usuario_data['tipo_usuario'] = 'medico'
-        user = models.Usuario.objects.create_user(password=password, **usuario_data)
-        return models.Medico.objects.create(usuario=user, **validated_data)
-    
+        # Buscar o crear el cliente
+        cliente, created = models.Cliente.objects.get_or_create(
+            dni=validated_data['dni'],
+            defaults={
+                'nombres': validated_data['nombres'],
+                'apellidos': validated_data['apellidos'],
+            }
+        )
 
-class MedicoPostSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Medico
-        fields = ['id', 'usuario', 'especialidad']
+        # Si el cliente ya existe, actualizar nombres por si cambió
+        if not created:
+            cliente.nombres = validated_data['nombres']
+            cliente.apellidos = validated_data['apellidos']
+            cliente.save()
 
+        # Crear el registro de consumo
+        tipo_combustible = validated_data['tipo_combustible']
+        monto = validated_data['monto_consumido']
+        
+        # Calcular galones según el monto y precios referenciales
+        galones = monto / tipo_combustible.precio_referencial
+        
+        # Calcular puntos (usamos galones enteros como base, o puedes redondear el monto como prefieras, aquí mantengo logica por galon)
+        puntos = int(galones) * tipo_combustible.puntos_por_galon
 
+        registro = models.RegistroConsumo.objects.create(
+            cliente=cliente,
+            empleado=self.context.get('empleado'),
+            tipo_combustible=tipo_combustible,
+            galones=galones,
+            puntos_otorgados=puntos,
+            monto_total=monto
+        )
 
-# ========================== HORARIO ==========================
+        # Recalcular puntos del cliente
+        cliente.puntos_acumulados = sum(
+            c.puntos_otorgados for c in cliente.consumos.all()
+        )
+        cliente.save()
 
-class HorarioSerializers(serializers.ModelSerializer):
-    medico_nombre = serializers.CharField(source='medico.usuario.nombre', read_only=True)
-
-    class Meta:
-        model = models.Horario
-        fields = '__all__'
-
-# ========================== CITA ==========================
-
-class CitaReadSerializers(serializers.ModelSerializer):
-    especialidad = EspecialidadSerializers()
-    medico = MedicoSerializers()
-
-    class Meta:
-        model = models.Cita
-        fields = '__all__'
-
-class CitaSerializers(serializers.ModelSerializer):
-    especialidad = serializers.PrimaryKeyRelatedField(queryset=models.Especialidad.objects.all())
-    medico = serializers.PrimaryKeyRelatedField(queryset=models.Medico.objects.all())
-    paciente = serializers.PrimaryKeyRelatedField(queryset=models.Paciente.objects.all())
-
-    class Meta:
-        model = models.Cita
-        fields = '__all__'
-
-# ========================== REGISTRO VISITAS ==========================
-
-class RegistroVisitasSerializers(serializers.ModelSerializer):
-    class Meta:
-        model = models.RegistroVisitas
-        fields = '__all__'
-
-# ========================== ADMINISTRADOR ==========================
-
-class AdministradorSerializers(serializers.ModelSerializer):
-    class Meta:
-        model = models.Administrador
-        fields = '__all__'
-
-# ========================== HISTORIAL MÉDICO ==========================
-
-class HistorialMedicoSerializers(serializers.ModelSerializer):
-    class Meta:
-        model = models.HistorialMedico
-        fields = '__all__'
+        return registro

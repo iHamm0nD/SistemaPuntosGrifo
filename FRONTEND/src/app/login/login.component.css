@@ -1,7 +1,7 @@
-/* Container principal con tema médico/profesional */
+/* Container principal con tema grifo (Naranja/Rojo) */
 .login-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -19,8 +19,8 @@
   right: 0;
   bottom: 0;
   background-image: 
-    radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+    radial-gradient(circle at 25% 25%, rgba(245, 158, 11, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(2ef, 68, 68, 0.03) 0%, transparent 50%);
   pointer-events: none;
 }
 
@@ -33,22 +33,22 @@
 
 /* Tarjeta de login */
 .login-card {
-  background: rgba(255, 255, 255, 0.98);
+  background: rgba(30, 41, 59, 0.85);
   backdrop-filter: blur(20px);
   border-radius: 24px;
   padding: 40px 35px;
   box-shadow: 
-    0 25px 50px rgba(30, 58, 138, 0.15),
-    0 0 0 1px rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(59, 130, 246, 0.1);
+    0 25px 50px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .login-card:hover {
   transform: translateY(-8px);
   box-shadow: 
-    0 35px 70px rgba(30, 58, 138, 0.2),
-    0 0 0 1px rgba(255, 255, 255, 0.2);
+    0 35px 70px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(245, 158, 11, 0.2);
 }
 
 /* Header con icono */
@@ -60,13 +60,13 @@
 .login-icon {
   width: 80px;
   height: 80px;
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  background: linear-gradient(135deg, #f59e0b, #ea580c);
   border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 20px;
-  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 10px 25px rgba(234, 88, 12, 0.3);
 }
 
 .login-icon i {
@@ -75,7 +75,7 @@
 }
 
 .login-title {
-  color: #1e293b;
+  color: #f8fafc;
   font-size: 32px;
   font-weight: 700;
   margin: 0 0 8px 0;
@@ -83,7 +83,7 @@
 }
 
 .login-subtitle {
-  color: #64748b;
+  color: #94a3b8;
   font-size: 16px;
   margin: 0;
   font-weight: 500;
@@ -102,63 +102,44 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #334155;
+  color: #cbd5e1;
   font-weight: 600;
   font-size: 15px;
   margin-bottom: 10px;
 }
 
 .form-label i {
-  color: #2563eb;
+  color: #f59e0b;
   font-size: 18px;
 }
 
 .form-input {
   width: 100%;
   padding: 16px 20px;
-  border: 2px solid #e2e8f0;
+  border: 2px solid #334155;
   border-radius: 16px;
   font-size: 16px;
   font-weight: 500;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: #f8fafc;
+  background: #1e293b;
   box-sizing: border-box;
-  color: #1e293b;
+  color: #f8fafc;
 }
 
 .form-input:focus {
   outline: none;
-  border-color: #2563eb;
-  background: #ffffff;
+  border-color: #f59e0b;
+  background: #0f172a;
   box-shadow: 
-    0 0 0 4px rgba(37, 99, 235, 0.1),
-    0 4px 12px rgba(37, 99, 235, 0.15);
+    0 0 0 4px rgba(245, 158, 11, 0.1),
+    0 4px 12px rgba(245, 158, 11, 0.15);
   transform: translateY(-2px);
 }
 
 .form-input::placeholder {
-  color: #94a3b8;
+  color: #64748b;
   font-size: 15px;
   font-weight: 400;
-}
-
-/* Enlace de contraseña olvidada */
-.forgot-password {
-  text-align: right;
-  margin-bottom: 25px;
-}
-
-.forgot-link {
-  color: #2563eb;
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 600;
-  transition: color 0.3s ease;
-}
-
-.forgot-link:hover {
-  color: #1d4ed8;
-  text-decoration: underline;
 }
 
 /* Botones */
@@ -188,15 +169,15 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  background: linear-gradient(135deg, #f59e0b, #ea580c);
   color: white;
-  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 8px 25px rgba(234, 88, 12, 0.3);
 }
 
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-3px);
-  box-shadow: 0 12px 35px rgba(37, 99, 235, 0.4);
-  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+  box-shadow: 0 12px 35px rgba(234, 88, 12, 0.4);
+  background: linear-gradient(135deg, #d97706, #c2410c);
 }
 
 .btn-primary:active:not(:disabled) {
@@ -207,21 +188,8 @@
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
-  background: #94a3b8;
-}
-
-.btn-secondary {
-  background: #f1f5f9;
-  color: #475569;
-  border: 2px solid #e2e8f0;
-}
-
-.btn-secondary:hover {
-  background: #e2e8f0;
-  border-color: #cbd5e1;
-  color: #334155;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(71, 85, 105, 0.1);
+  background: #475569;
+  box-shadow: none;
 }
 
 /* Footer */
@@ -229,7 +197,7 @@
   text-align: center;
   margin-top: 30px;
   padding-top: 25px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid #334155;
 }
 
 .footer-text {
@@ -271,7 +239,7 @@
   }
   
   .form-input {
-    font-size: 16px; /* Evita zoom en iOS */
+    font-size: 16px;
     padding: 14px 18px;
   }
   
@@ -323,11 +291,6 @@
   animation: slideInDown 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.5s both;
 }
 
-/* Estados de carga */
-.btn:disabled {
-  position: relative;
-}
-
 .btn:disabled::after {
   content: '';
   position: absolute;
@@ -345,30 +308,10 @@
   100% { transform: rotate(360deg); }
 }
 
-/* Efectos adicionales para tema médico */
 .form-input:valid {
-  border-color: #10b981;
+  border-color: #34d399;
 }
 
 .form-input:valid + .form-label i {
-  color: #10b981;
-}
-
-/* Hover states mejorados */
-.login-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.02), rgba(29, 78, 216, 0.02));
-  border-radius: 24px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-}
-
-.login-card:hover::before {
-  opacity: 1;
+  color: #34d399;
 }

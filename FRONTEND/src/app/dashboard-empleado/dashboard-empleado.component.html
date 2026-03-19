@@ -1,0 +1,263 @@
+<div class="dashboard-container">
+  <!-- Header -->
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <div class="logo-icon">
+        <i class="pi pi-bolt"></i>
+      </div>
+      <span class="logo-text">GrifoPuntos</span>
+    </div>
+    <div class="top-bar-right">
+      <span class="user-greeting">
+        <i class="pi pi-user"></i>
+        Hola, {{ usuario?.first_name }}
+      </span>
+      <button class="btn-logout" (click)="logout()">
+        <i class="pi pi-sign-out"></i>
+        Salir
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">
+        <i class="pi pi-plus-circle"></i>
+        Registrar Consumo
+      </h1>
+      <p class="page-subtitle">Ingresa los datos del cliente para registrar su consumo de combustible</p>
+    </div>
+
+    <!-- Formulario -->
+    <div class="form-card">
+      <form (ngSubmit)="abrirConfirmacion()">
+        <div class="form-grid">
+          <!-- DNI -->
+          <div class="form-group">
+            <label for="dni" class="form-label">
+              <i class="pi pi-id-card"></i>
+              DNI del Cliente
+            </label>
+            <input
+              id="dni"
+              type="text"
+              class="form-input"
+              [(ngModel)]="dni"
+              name="dni"
+              placeholder="Ingresa el DNI"
+              maxlength="15"
+              (blur)="buscarCliente()"
+              required>
+          </div>
+
+          <!-- Nombres -->
+          <div class="form-group">
+            <label for="nombres" class="form-label">
+              <i class="pi pi-user"></i>
+              Nombres
+            </label>
+            <input
+              id="nombres"
+              type="text"
+              class="form-input"
+              [(ngModel)]="nombres"
+              name="nombres"
+              placeholder="Nombres del cliente"
+              required>
+          </div>
+
+          <!-- Apellidos -->
+          <div class="form-group">
+            <label for="apellidos" class="form-label">
+              <i class="pi pi-user"></i>
+              Apellidos
+            </label>
+            <input
+              id="apellidos"
+              type="text"
+              class="form-input"
+              [(ngModel)]="apellidos"
+              name="apellidos"
+              placeholder="Apellidos del cliente"
+              required>
+          </div>
+
+          <!-- Tipo de Combustible -->
+          <div class="form-group">
+            <label for="combustible" class="form-label">
+              <i class="pi pi-car"></i>
+              Tipo de Combustible
+            </label>
+            <select
+              id="combustible"
+              class="form-input form-select"
+              [(ngModel)]="tipoCombustibleId"
+              name="tipoCombustible"
+              required>
+              <option [ngValue]="null" disabled>Selecciona un combustible</option>
+              <option *ngFor="let tipo of tiposCombustible" [ngValue]="tipo.id">
+                {{ tipo.nombre }} — S/.{{ tipo.precio_referencial }}/gal — {{ tipo.puntos_por_galon }} pts/gal
+              </option>
+            </select>
+          </div>
+
+          <!-- Monto -->
+          <div class="form-group">
+            <label for="monto" class="form-label">
+              <i class="pi pi-money-bill"></i>
+              Monto Consumido (S/.)
+            </label>
+            <input
+              id="monto"
+              type="number"
+              class="form-input"
+              [(ngModel)]="monto"
+              name="monto"
+              placeholder="Ingresa el monto en soles"
+              step="0.10"
+              min="0.10"
+              required>
+          </div>
+        </div>
+
+        <!-- Error -->
+        <p-message
+          *ngIf="error"
+          severity="error"
+          [text]="error"
+          class="error-msg">
+        </p-message>
+
+        <!-- Botones -->
+        <div class="form-actions">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="cargando">
+            <i class="pi pi-check-circle"></i>
+            {{ cargando ? 'Registrando...' : 'Registrar Consumo' }}
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline"
+            (click)="limpiarFormulario()">
+            <i class="pi pi-refresh"></i>
+            Limpiar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmación -->
+  <p-dialog
+    header="Confirmar Registro"
+    [(visible)]="mostrarConfirmacion"
+    [modal]="true"
+    [style]="{width: '500px'}"
+    [closable]="true"
+    [draggable]="false">
+
+    <div class="confirm-content">
+      <div class="confirm-icon">
+        <i class="pi pi-info-circle"></i>
+      </div>
+      <h3 class="confirm-title">Verifica los datos antes de confirmar</h3>
+
+      <div class="confirm-details">
+        <div class="detail-row">
+          <span class="detail-label">DNI:</span>
+          <span class="detail-value">{{ dni }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Cliente:</span>
+          <span class="detail-value">{{ nombres }} {{ apellidos }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Combustible:</span>
+          <span class="detail-value">{{ combustibleSeleccionado?.nombre }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Monto Consumido:</span>
+          <span class="detail-value">S/. {{ monto | number:'1.2-2' }}</span>
+        </div>
+        <div class="detail-row highlight">
+          <span class="detail-label">Galones aprox.:</span>
+          <span class="detail-value">{{ galonesEstimados | number:'1.2-2' }} gal</span>
+        </div>
+        <div class="detail-row highlight points">
+          <span class="detail-label">Puntos a Otorgar:</span>
+          <span class="detail-value points-value">{{ puntosEstimados }} pts</span>
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <div class="dialog-buttons">
+        <button class="btn btn-outline" (click)="cancelarConfirmacion()">
+          <i class="pi pi-times"></i>
+          Cancelar
+        </button>
+        <button class="btn btn-primary" (click)="confirmarRegistro()">
+          <i class="pi pi-check"></i>
+          Confirmar
+        </button>
+      </div>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Modal de Resultado -->
+  <p-dialog
+    header="¡Registro Exitoso!"
+    [(visible)]="mostrarResultado"
+    [modal]="true"
+    [style]="{width: '480px'}"
+    [closable]="true"
+    [draggable]="false">
+
+    <div class="result-content" *ngIf="resultadoRegistro">
+      <div class="result-icon">
+        <i class="pi pi-check-circle"></i>
+      </div>
+
+      <div class="result-details">
+        <div class="detail-row">
+          <span class="detail-label">Cliente:</span>
+          <span class="detail-value">{{ resultadoRegistro.cliente }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">DNI:</span>
+          <span class="detail-value">{{ resultadoRegistro.dni }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Combustible:</span>
+          <span class="detail-value">{{ resultadoRegistro.combustible }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Galones:</span>
+          <span class="detail-value">{{ resultadoRegistro.galones }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Monto Total:</span>
+          <span class="detail-value">S/. {{ resultadoRegistro.monto_total }}</span>
+        </div>
+        <div class="detail-row highlight points">
+          <span class="detail-label">Puntos Otorgados:</span>
+          <span class="detail-value points-value">+{{ resultadoRegistro.puntos_otorgados }} pts</span>
+        </div>
+        <div class="detail-row total-points">
+          <span class="detail-label">Puntos Acumulados:</span>
+          <span class="detail-value">{{ resultadoRegistro.puntos_acumulados }} pts</span>
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button class="btn btn-primary" (click)="cerrarResultado()">
+        <i class="pi pi-check"></i>
+        Aceptar
+      </button>
+    </ng-template>
+  </p-dialog>
+</div>

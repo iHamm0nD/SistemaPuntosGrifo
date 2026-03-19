@@ -1,191 +1,113 @@
 from django.db import models
-from django.utils import timezone  # para manejar fechas y horas
+from django.utils import timezone
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 
 
 class UsuarioManager(BaseUserManager):
-    def create_user(self,username,email,password=None,**extra_fields):
-        #Creamos un usario en base a nombre de usuario, contraseña y correo
+    def create_user(self, username, email, password=None, **extra_fields):
         if not email:
             raise ValueError('Correo es obligatorio')
         email = self.normalize_email(email)
-        user = self.model(username=username,email=email,**extra_fields)
+        user = self.model(username=username, email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
-    
-        
-    
-    def create_superuser(self,username,email,password=None,**extra_fields):
-        #Creamos un superusario en base a nombre de usuario, contraseña y correo
+
+    def create_superuser(self, username, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
         if extra_fields.get('is_staff') is not True:
             raise ValueError('El campo staff debe ser True')
-        
+
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('El campo superusuario debe ser True')
-        
-        return self.create_user(username,email,password,**extra_fields)
+
+        return self.create_user(username, email, password, **extra_fields)
 
 
-# Representa a todos los usuarios del sistema: pacientes, médicos y administradores.
 class Usuario(AbstractUser):
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
     dni = models.CharField(max_length=15, unique=True)
-    #correo = models.EmailField(unique=True)
     telefono = models.CharField(max_length=20, blank=True, null=True)
     tipo_usuario = models.CharField(max_length=20, choices=[
-        ('paciente', 'Paciente'),
-        ('medico', 'Médico'),
-        ('admin', 'Administrador')],
-        default='paciente') #CORREGIR ESTO PARA QUE DEFAULT SEA PACIENTE
+        ('empleado', 'Empleado'),
+        ('dueno', 'Dueño'),
+        ('dev', 'Desarrollador')],
+        default='empleado')
+
+    objects = UsuarioManager()
 
     def __str__(self):
         return f"{self.nombre} {self.apellido}"
 
-    # Permite actualizar atributos del usuario con los datos proporcionados
     def actualizar_perfil(self, **kwargs):
         for key, value in kwargs.items():
             setattr(self, key, value)
         self.save()
-    
-    pass
 
 
-# Representa a los pacientes del sistema, enlazado con un usuario.
-class Paciente(models.Model):
-    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)
-    fecha_nacimiento = models.DateField()
-    direccion = models.TextField()
-    
-    # Permite al paciente solicitar una cita
-    def solicitar_cita(self, especialidad, fecha, hora):
-        return Cita.objects.create(
-            fecha=fecha,
-            hora=hora,
-            especialidad=especialidad,
-            paciente=self)
-
-    # Devuelve el historial médico del paciente
-    def consultar_historial(self):
-        return self.historialmedico_set.all()
-    
-    def __str__(self):
-        return self.usuario.nombre
-
-
-# Representa una especialidad médica (ej. pediatría, cardiología).
-class Especialidad(models.Model):
-    nombre = models.CharField(max_length=100)
-    descripcion = models.TextField()
+class TipoCombustible(models.Model):
+    nombre = models.CharField(max_length=50)
+    precio_referencial = models.DecimalField(max_digits=6, decimal_places=2,
+                                              help_text="Precio referencial por galón en S/.")
+    puntos_por_galon = models.IntegerField(
+        help_text="Puntos que otorga por cada galón consumido")
 
     def __str__(self):
-        return self.nombre
+        return f"{self.nombre} - {self.puntos_por_galon} pts/gal"
+
+    class Meta:
+        verbose_name = "Tipo de Combustible"
+        verbose_name_plural = "Tipos de Combustible"
 
 
-# Representa a los médicos del sistema, enlazado con un usuario.
-class Medico(models.Model):
-    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)
-    especialidad = models.ForeignKey(Especialidad, on_delete=models.CASCADE)
-    
-    # Ya no se necesita horario_libre: lo quitamos
-
-    def ver_citas_asignadas(self):
-        return self.cita_set.all()
-
-    def registrar_atencion(self, cita, observaciones):
-        HistorialMedico.objects.create(paciente=cita.paciente, observaciones=observaciones)
-        cita.estado = 'atendida'
-        cita.save()
+class Cliente(models.Model):
+    dni = models.CharField(max_length=15, unique=True)
+    nombres = models.CharField(max_length=100)
+    apellidos = models.CharField(max_length=100)
+    telefono = models.CharField(max_length=20, blank=True, null=True)
+    puntos_acumulados = models.IntegerField(default=0)
+    fecha_registro = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return self.usuario.nombre
-    
-DIAS_SEMANA = [
-    ('lunes', 'Lunes'),
-    ('martes', 'Martes'),
-    ('miércoles', 'Miércoles'),
-    ('jueves', 'Jueves'),
-    ('viernes', 'Viernes'),
-    ('sábado', 'Sábado'),
-    ('domingo', 'Domingo'),
-]
+        return f"{self.nombres} {self.apellidos} - {self.puntos_acumulados} pts"
 
-class Horario(models.Model):
-    medico = models.ForeignKey(Medico, on_delete=models.CASCADE)
-    dia_semana = models.CharField(max_length=10, choices=DIAS_SEMANA)
-    hora_inicio = models.TimeField() 
-    hora_final = models.TimeField()
-
-    def __str__(self):
-        return f"{self.medico} - {self.dia_semana} ({self.hora_inicio} - {self.hora_final})"
+    class Meta:
+        ordering = ['-puntos_acumulados']
 
 
-
-# Representa una cita médica entre un paciente y un médico.
-class Cita(models.Model):
-    ESTADO_OPCIONES = [
-        ('pendiente', 'Pendiente'),
-        ('confirmada', 'Confirmada'),
-        ('cancelada', 'Cancelada'),
-        ('atendida', 'Atendida')]
-
-    fecha = models.DateField()
-    hora = models.TimeField()
-    especialidad = models.ForeignKey(Especialidad, on_delete=models.CASCADE)
-    estado = models.CharField(max_length=20, choices=ESTADO_OPCIONES, default='pendiente')
-    paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE)
-    medico = models.ForeignKey(Medico, on_delete=models.CASCADE)
-
-    # Cambia el estado de la cita a cancelada
-    def cancelar(self):
-        self.estado = 'cancelada'
-        self.save()
-
-    # Cambia el estado de la cita a confirmada
-    def confirmar(self):
-        self.estado = 'confirmada'
-        self.save()
-
-
-# Registra las visitas al centro médico asociadas a una cita.
-class RegistroVisitas(models.Model):
-    nombre = models.CharField(max_length=100)
-    documento = models.CharField(max_length=20)
-    hora_ingreso = models.DateTimeField(default=timezone.now)
-    motivo = models.TextField()
-    cita = models.ForeignKey(Cita, on_delete=models.CASCADE, related_name='visitas')
-
-
-# Representa a los administradores del sistema, enlazado con un usuario.
-class Administrador(models.Model):
-    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)
-
-    # Crea un nuevo usuario con los datos proporcionados
-    def crear_usuario(self, **datos_usuario):
-        return Usuario.objects.create(**datos_usuario)
-
-    # Permite modificar los datos de una cita
-    def modificar_cita(self, cita, **nuevos_datos):
-        for key, value in nuevos_datos.items():
-            setattr(cita, key, value)
-        cita.save()
-
-    # Elimina un usuario del sistema por su ID
-    def eliminar_usuario(self, usuario_id):
-        Usuario.objects.filter(id=usuario_id).delete()
-
-
-# Registra observaciones médicas relacionadas a un paciente, formando su historial clínico.
-class HistorialMedico(models.Model):
-    paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE)
-    observaciones = models.TextField()
+class RegistroConsumo(models.Model):
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name='consumos')
+    empleado = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True,
+                                  related_name='registros_realizados')
+    tipo_combustible = models.ForeignKey(TipoCombustible, on_delete=models.CASCADE)
+    galones = models.DecimalField(max_digits=8, decimal_places=2,
+                                   help_text="Cantidad de galones consumidos")
+    monto_total = models.DecimalField(max_digits=10, decimal_places=2,
+                                       help_text="Monto total de la compra en S/.")
+    puntos_otorgados = models.IntegerField(help_text="Puntos otorgados por esta transacción")
     fecha = models.DateTimeField(default=timezone.now)
 
+    def save(self, *args, **kwargs):
+        # Calcular puntos automáticamente
+        if not self.puntos_otorgados:
+            self.puntos_otorgados = int(self.galones) * self.tipo_combustible.puntos_por_galon
+        # Calcular monto total automáticamente
+        if not self.monto_total:
+            self.monto_total = self.galones * self.tipo_combustible.precio_referencial
+        super().save(*args, **kwargs)
+        # Actualizar los puntos acumulados del cliente
+        self.cliente.puntos_acumulados = sum(
+            c.puntos_otorgados for c in self.cliente.consumos.all()
+        )
+        self.cliente.save()
 
-# class UnidadMedida(models.Model):
-#     unidad = models.CharField(max_length=20)
-#     sigla = models.CharField(max_length=5)
+    def __str__(self):
+        return f"{self.cliente.nombres} - {self.tipo_combustible.nombre} - {self.puntos_otorgados} pts"
+
+    class Meta:
+        ordering = ['-fecha']
+        verbose_name = "Registro de Consumo"
+        verbose_name_plural = "Registros de Consumo"

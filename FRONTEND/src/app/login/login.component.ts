@@ -19,19 +19,15 @@ export class LoginComponent {
   login() {
     this.auth.login(this.username, this.password).subscribe({
       next: (res: any) => {
-        console.log('Respuesta del backend:', res);
-        localStorage.setItem('token', res.token);
-        localStorage.setItem('usuario', JSON.stringify(res.usuario));
-
         const tipo = res.usuario.tipo_usuario;
 
-        if (tipo === 'admin') {
-          this.router.navigate(['/panel-admin-9472']);
-        } else if (tipo === 'medico') {
-          
-          this.router.navigate(['/home']); 
+        if (tipo === 'dueno' || tipo === 'dev') {
+          this.router.navigate(['/dashboard-admin']);
+        } else if (tipo === 'empleado') {
+          this.router.navigate(['/dashboard']); 
         } else {
-          this.router.navigate(['/home']);
+          // Fallback
+          this.router.navigate(['/dashboard']);
         }
       },
 

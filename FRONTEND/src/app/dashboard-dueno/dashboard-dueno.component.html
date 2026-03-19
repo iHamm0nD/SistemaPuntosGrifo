@@ -1,0 +1,219 @@
+<div class="dashboard-container">
+  <!-- Header -->
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <div class="logo-icon">
+        <i class="pi pi-bolt"></i>
+      </div>
+      <span class="logo-text">GrifoPuntos</span>
+      <span class="badge-owner">Panel Dueño</span>
+    </div>
+    <div class="top-bar-right">
+      <button class="btn-manage" (click)="abrirModalPrecios()">
+        <i class="pi pi-cog"></i>
+        Precios
+      </button>
+      <span class="user-greeting">
+        <i class="pi pi-user"></i>
+        {{ usuario?.first_name }} {{ usuario?.last_name }}
+      </span>
+      <button class="btn-logout" (click)="logout()">
+        <i class="pi pi-sign-out"></i>
+        Salir
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-overlay" *ngIf="cargando">
+    <div class="spinner"></div>
+    <p>Cargando dashboard...</p>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content" *ngIf="!cargando">
+    <!-- Stat Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon clients-icon">
+          <i class="pi pi-users"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ totalClientes }}</span>
+          <span class="stat-label">Clientes Registrados</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon points-icon">
+          <i class="pi pi-star-fill"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ totalPuntos | number }}</span>
+          <span class="stat-label">Puntos Otorgados</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon records-icon">
+          <i class="pi pi-chart-line"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ totalConsumos }}</span>
+          <span class="stat-label">Consumos Registrados</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid Layout -->
+    <div class="dashboard-grid">
+      <!-- Ranking de Clientes -->
+      <div class="panel ranking-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">
+            <i class="pi pi-trophy"></i>
+            Ranking de Clientes
+          </h2>
+        </div>
+        <div class="panel-body">
+          <div class="ranking-list" *ngIf="topClientes.length > 0">
+            <div class="ranking-item" *ngFor="let cliente of topClientes; let i = index"
+                 [class.top-1]="i === 0" [class.top-2]="i === 1" [class.top-3]="i === 2">
+              <div class="ranking-position">
+                <span class="position-badge" [style.background]="getMedalColor(i)">
+                  {{ i + 1 }}
+                </span>
+              </div>
+              <div class="ranking-info">
+                <span class="ranking-name">{{ cliente.nombres }} {{ cliente.apellidos }}</span>
+                <span class="ranking-dni">DNI: {{ cliente.dni }}</span>
+              </div>
+              <div class="ranking-points">
+                <span class="points-value">{{ cliente.puntos_acumulados | number }}</span>
+                <span class="points-label">puntos</span>
+              </div>
+            </div>
+          </div>
+          <div class="empty-state" *ngIf="topClientes.length === 0">
+            <i class="pi pi-inbox"></i>
+            <p>No hay clientes registrados aún</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Consumo por Tipo de Combustible -->
+      <div class="panel fuel-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">
+            <i class="pi pi-chart-bar"></i>
+            Consumo por Combustible
+          </h2>
+        </div>
+        <div class="panel-body">
+          <div class="fuel-list" *ngIf="consumoPorTipo.length > 0">
+            <div class="fuel-item" *ngFor="let tipo of consumoPorTipo">
+              <div class="fuel-header">
+                <span class="fuel-name">{{ tipo.tipo_combustible__nombre }}</span>
+                <span class="fuel-records">{{ tipo.total_registros }} registros</span>
+              </div>
+              <div class="fuel-bar-container">
+                <div class="fuel-bar"
+                     [style.width.%]="(tipo.total_galones / consumoPorTipo[0].total_galones) * 100">
+                </div>
+              </div>
+              <div class="fuel-stats">
+                <span>{{ tipo.total_galones | number:'1.0-0' }} gal</span>
+                <span class="fuel-points">{{ tipo.total_puntos | number }} pts</span>
+              </div>
+            </div>
+          </div>
+          <div class="empty-state" *ngIf="consumoPorTipo.length === 0">
+            <i class="pi pi-inbox"></i>
+            <p>Sin datos de consumo</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Últimos Registros -->
+    <div class="panel recent-panel">
+      <div class="panel-header">
+        <h2 class="panel-title">
+          <i class="pi pi-clock"></i>
+          Últimos Registros
+        </h2>
+      </div>
+      <div class="panel-body">
+        <div class="table-container" *ngIf="ultimosRegistros.length > 0">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Combustible</th>
+                <th>Galones</th>
+                <th>Monto</th>
+                <th>Puntos</th>
+                <th>Registrado por</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let reg of ultimosRegistros">
+                <td>{{ reg.cliente_nombre }}</td>
+                <td>
+                  <span class="badge-fuel">{{ reg.tipo_combustible_nombre }}</span>
+                </td>
+                <td>{{ reg.galones }}</td>
+                <td>S/. {{ reg.monto_total }}</td>
+                <td>
+                  <span class="badge-points">+{{ reg.puntos_otorgados }}</span>
+                </td>
+                <td class="text-muted">{{ reg.empleado_nombre }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="empty-state" *ngIf="ultimosRegistros.length === 0">
+          <i class="pi pi-inbox"></i>
+          <p>No hay registros aún</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Gestión de Precios -->
+  <p-dialog
+    header="Gestión de Precios"
+    [(visible)]="mostrarModalPrecios"
+    [modal]="true"
+    [style]="{width: '450px'}"
+    [closable]="true"
+    [draggable]="false">
+
+    <div class="prices-content">
+      <p-message 
+        *ngIf="mensajeModal" 
+        [severity]="tipoMensaje" 
+        [text]="mensajeModal" 
+        styleClass="w-full mb-3 block">
+      </p-message>
+      
+      <div class="prices-list">
+        <div class="price-item" *ngFor="let tipo of tiposCombustible">
+          <div class="price-info">
+            <span class="price-name">{{ tipo.nombre }}</span>
+            <span class="price-points">{{ tipo.puntos_por_galon }} pts / gal</span>
+          </div>
+          <div class="price-inputs">
+            <div class="input-group">
+              <span class="currency">S/.</span>
+              <input type="number" [(ngModel)]="tipo.precio_referencial" class="price-input" step="0.10" min="0">
+            </div>
+            <button class="btn-save-price" (click)="guardarPrecio(tipo)" [disabled]="guardandoPrecios" title="Guardar">
+              <i class="pi" [ngClass]="guardandoPrecios ? 'pi-spin pi-spinner' : 'pi-save'"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </p-dialog>
+</div>

@@ -5,7 +5,6 @@ export interface Usuario {
     dni: string;
     email: string;
     telefono?: string;
-    direccion?: string;
     tipo_usuario: string;
     username: string;
     password?: string;

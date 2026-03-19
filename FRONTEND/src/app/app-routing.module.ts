@@ -3,23 +3,31 @@ import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from '../service/auth.guard';
 import { IndexComponent } from './index/index.component';
 import { LoginComponent } from './login/login.component';
-import { HomeComponent } from './home/home.component';
-import { RegistroComponent } from './registro/registro.component';
-import { ReservarCitaComponent } from './reservarcita/reservarcita.component';
-import { MiperfilComponent } from './miperfil/miperfil.component';
-import { LoginadminComponent } from './loginadmin/loginadmin.component';
-import { AdminGuard } from './guards/admin.guard';
-
+import { DashboardEmpleadoComponent } from './dashboard-empleado/dashboard-empleado.component';
+import { DashboardDuenoComponent } from './dashboard-dueno/dashboard-dueno.component';
+import { DuenoGuard } from './guards/dueno.guard';
+import { EmpleadoGuard } from './guards/empleado.guard';
 
 const routes: Routes = [
   {path: 'index', component: IndexComponent },
   {path: 'login', component: LoginComponent},
-  {path: 'registro', component: RegistroComponent},
-  {path: 'home', component: HomeComponent, canActivate: [AuthGuard]},
-  {path: 'reservarcita', component: ReservarCitaComponent, canActivate: [AuthGuard]},
-  {path: 'miperfil', component: MiperfilComponent, canActivate: [AuthGuard]},
-  {path: 'panel-admin-9472', component: LoginadminComponent, canActivate: [AdminGuard]},
-  { path: '', redirectTo: '/index', pathMatch: 'full' }
+  
+  // Dashboard para empleado
+  {
+    path: 'dashboard', 
+    component: DashboardEmpleadoComponent, 
+    canActivate: [AuthGuard, EmpleadoGuard]
+  },
+  
+  // Dashboard para dueño
+  {
+    path: 'dashboard-admin', 
+    component: DashboardDuenoComponent, 
+    canActivate: [AuthGuard, DuenoGuard]
+  },
+  
+  { path: '', redirectTo: '/index', pathMatch: 'full' },
+  { path: '**', redirectTo: '/index' }
 ];
 
 @NgModule({

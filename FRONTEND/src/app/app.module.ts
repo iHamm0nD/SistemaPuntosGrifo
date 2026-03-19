@@ -24,12 +24,8 @@ import { TokenInterceptor } from '../service/token.interceptor';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { IndexComponent } from './index/index.component';
-import { HomeComponent } from './home/home.component';
-import { RegistroComponent } from './registro/registro.component';
-import { ReservarCitaComponent } from './reservarcita/reservarcita.component';
-import { MiperfilComponent } from './miperfil/miperfil.component';
-import { LoginadminComponent } from './loginadmin/loginadmin.component';
-import { CitasprogramadasComponent } from './citasprogramadas/citasprogramadas.component';
+import { DashboardEmpleadoComponent } from './dashboard-empleado/dashboard-empleado.component';
+import { DashboardDuenoComponent } from './dashboard-dueno/dashboard-dueno.component';
 
 
 @NgModule({
@@ -37,13 +33,8 @@ import { CitasprogramadasComponent } from './citasprogramadas/citasprogramadas.c
     AppComponent,
     IndexComponent,
     LoginComponent,
-    HomeComponent,
-    RegistroComponent,
-    ReservarCitaComponent,
-    MiperfilComponent,
-    LoginadminComponent,
-    CitasprogramadasComponent,
-  
+    DashboardEmpleadoComponent,
+    DashboardDuenoComponent
   ],
   imports: [
     BrowserModule,
@@ -69,7 +60,7 @@ import { CitasprogramadasComponent } from './citasprogramadas/citasprogramadas.c
           preset: Lara,
           options: {
             colorScheme: 'light',
-            primaryColor: '#00bcd4',
+            primaryColor: '#f59e0b',
           }
       }
     })
