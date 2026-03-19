@@ -7,7 +7,8 @@ from django.contrib.auth import authenticate
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.authtoken.models import Token
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, Q
+from rest_framework.pagination import PageNumberPagination
 
 from . import models, serializers
 
@@ -43,6 +44,13 @@ class LoginView(APIView):
 class UsuarioViewsets(viewsets.ModelViewSet):
     queryset = models.Usuario.objects.all()
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        tipo = self.request.query_params.get('tipo', None)
+        if tipo:
+            queryset = queryset.filter(tipo_usuario=tipo)
+        return queryset
 
     def get_serializer_class(self):
         if self.action in ['update', 'partial_update']:
@@ -85,9 +93,26 @@ class ClienteViewSet(viewsets.ModelViewSet):
             return Response({'error': 'Cliente no encontrado'}, status=status.HTTP_404_NOT_FOUND)
 
 
+class ConsumoPagination(PageNumberPagination):
+    page_size = 25
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
 class RegistroConsumoViewSet(viewsets.ModelViewSet):
-    queryset = models.RegistroConsumo.objects.all()
+    queryset = models.RegistroConsumo.objects.all().order_by('-fecha')
     permission_classes = [IsAuthenticated]
+    pagination_class = ConsumoPagination
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search = self.request.query_params.get('search', None)
+        if search:
+            queryset = queryset.filter(
+                Q(cliente__dni__icontains=search) | 
+                Q(cliente__nombres__icontains=search) | 
+                Q(cliente__apellidos__icontains=search)
+            )
+        return queryset
 
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:
@@ -136,8 +161,8 @@ class DashboardView(APIView):
             total=Sum('puntos_acumulados'))['total'] or 0
         total_consumos = models.RegistroConsumo.objects.count()
 
-        # Top 10 clientes
-        top_clientes = models.Cliente.objects.order_by('-puntos_acumulados')[:10]
+        # Top 5 clientes
+        top_clientes = models.Cliente.objects.order_by('-puntos_acumulados')[:5]
         top_serializer = serializers.ClienteResumenSerializer(top_clientes, many=True)
 
         # Consumo por tipo de combustible

@@ -24,6 +24,10 @@ export class ApiService {
         return this.http.get<Usuario[]>(this.ApiUrl + 'usuario/');
     }
 
+    public getUsuariosPorTipo(tipo: string): Observable<Usuario[]> {
+        return this.http.get<Usuario[]>(this.ApiUrl + 'usuario/?tipo=' + tipo);
+    }
+
     public deleteUsuario(id: string): Observable<void> {
         return this.http.delete<void>(this.ApiUrl + 'usuario/' + id + "/");
     }
@@ -77,6 +81,18 @@ export class ApiService {
             data,
             this.httpOptions
         );
+    }
+
+    public getRegistrosConsumo(page: number = 1, search: string = ''): Observable<any> {
+        let url = this.ApiUrl + 'registro-consumo/?page=' + page;
+        if (search) {
+            url += '&search=' + search;
+        }
+        return this.http.get<any>(url);
+    }
+
+    public deleteRegistroConsumo(id: number): Observable<void> {
+        return this.http.delete<void>(this.ApiUrl + 'registro-consumo/' + id + '/');
     }
 
     // =============================== DASHBOARD ================================

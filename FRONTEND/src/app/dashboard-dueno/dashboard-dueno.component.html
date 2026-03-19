@@ -9,6 +9,10 @@
       <span class="badge-owner">Panel Dueño</span>
     </div>
     <div class="top-bar-right">
+      <button class="btn-manage" (click)="abrirModalEmpleados()">
+        <i class="pi pi-users"></i>
+        Empleados
+      </button>
       <button class="btn-manage" (click)="abrirModalPrecios()">
         <i class="pi pi-cog"></i>
         Precios
@@ -73,6 +77,9 @@
           <h2 class="panel-title">
             <i class="pi pi-trophy"></i>
             Ranking de Clientes
+            <button class="btn-ver-todos" (click)="abrirModalRanking()" style="margin-left: 10px; font-size: 0.8rem; padding: 5px 10px; border-radius: 4px; border: 1px solid #4ade80; background: transparent; color: #4ade80; cursor: pointer;">
+              Ver todos
+            </button>
           </h2>
         </div>
         <div class="panel-body">
@@ -137,42 +144,69 @@
 
     <!-- Últimos Registros -->
     <div class="panel recent-panel">
-      <div class="panel-header">
+      <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center;">
         <h2 class="panel-title">
           <i class="pi pi-clock"></i>
           Últimos Registros
         </h2>
+        <div class="search-bar" style="display: flex; gap: 10px;">
+          <input type="text" [ngModel]="busquedaRegistro" (ngModelChange)="onSearchChange($event)" placeholder="Buscar DNI o Nombre..." class="form-input" style="padding: 5px; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: white; width: 250px;">
+        </div>
       </div>
       <div class="panel-body">
-        <div class="table-container" *ngIf="ultimosRegistros.length > 0">
+        <div class="table-container" *ngIf="registrosPaginados.length > 0">
           <table class="data-table">
             <thead>
-              <tr>
+              <tr style="white-space: nowrap;">
+                <th>Acción</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>DNI</th>
                 <th>Cliente</th>
                 <th>Combustible</th>
                 <th>Galones</th>
                 <th>Monto</th>
-                <th>Puntos</th>
+                <th>Ptos</th>
                 <th>Registrado por</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let reg of ultimosRegistros">
+              <tr *ngFor="let reg of registrosPaginados" style="white-space: nowrap;">
+                <td>
+                  <button (click)="eliminarRegistro(reg.id)" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;" title="Eliminar registro">
+                    <i class="pi pi-trash"></i>
+                  </button>
+                </td>
+                <td style="font-size: 0.9em; color: #94a3b8;">{{ reg.fecha | date:'dd/MM/yyyy' }}</td>
+                <td style="font-size: 0.9em; color: #94a3b8;">{{ reg.fecha | date:'HH:mm' }}</td>
+                <td>{{ reg.cliente_dni }}</td>
                 <td>{{ reg.cliente_nombre }}</td>
                 <td>
                   <span class="badge-fuel">{{ reg.tipo_combustible_nombre }}</span>
                 </td>
-                <td>{{ reg.galones }}</td>
-                <td>S/. {{ reg.monto_total }}</td>
+                <td>{{ reg.galones | number:'1.2-2' }}</td>
+                <td>S/. {{ reg.monto_total | number:'1.2-2' }}</td>
                 <td>
                   <span class="badge-points">+{{ reg.puntos_otorgados }}</span>
                 </td>
-                <td class="text-muted">{{ reg.empleado_nombre }}</td>
+                <td style="color: white;">{{ reg.empleado_nombre }}</td>
               </tr>
             </tbody>
           </table>
         </div>
-        <div class="empty-state" *ngIf="ultimosRegistros.length === 0">
+        
+        <!-- Paginación -->
+        <div class="pagination-controls" *ngIf="totalPaginas > 1" style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 15px;">
+          <button (click)="cambiarPagina(-1)" [disabled]="paginaActual === 1" class="btn-manage" [style.opacity]="paginaActual === 1 ? '0.5' : '1'">
+            <i class="pi pi-chevron-left"></i> Anterior
+          </button>
+          <span style="color: white;">Página {{ paginaActual }} de {{ totalPaginas }}</span>
+          <button (click)="cambiarPagina(1)" [disabled]="paginaActual === totalPaginas" class="btn-manage" [style.opacity]="paginaActual === totalPaginas ? '0.5' : '1'">
+            Siguiente <i class="pi pi-chevron-right"></i>
+          </button>
+        </div>
+
+        <div class="empty-state" *ngIf="registrosPaginados.length === 0">
           <i class="pi pi-inbox"></i>
           <p>No hay registros aún</p>
         </div>
@@ -213,6 +247,90 @@
             </button>
           </div>
         </div>
+      </div>
+    </div>
+  </p-dialog>
+
+  <!-- Modal de Gestión de Empleados -->
+  <p-dialog
+    header="Gestión de Empleados"
+    [(visible)]="mostrarModalEmpleados"
+    [modal]="true"
+    [style]="{width: '600px'}"
+    [closable]="true"
+    [draggable]="false">
+    
+    <div class="employees-content">
+      <div class="add-employee-form" style="margin-bottom: 20px; padding: 15px; border: 1px solid #334155; border-radius: 8px; background: #1e293b;">
+        <h3 style="margin-top: 0; color: #f8fafc;">Agregar Nuevo Empleado</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <input type="text" [(ngModel)]="nuevoEmpleado.nombre" placeholder="Nombres" class="form-input" style="padding: 8px; border-radius: 4px; border: 1px solid #334155; background: #0f172a; color: white;">
+          <input type="text" [(ngModel)]="nuevoEmpleado.apellido" placeholder="Apellidos" class="form-input" style="padding: 8px; border-radius: 4px; border: 1px solid #334155; background: #0f172a; color: white;">
+          <input type="text" [(ngModel)]="nuevoEmpleado.dni" placeholder="DNI (Será el usuario)" class="form-input" style="padding: 8px; border-radius: 4px; border: 1px solid #334155; background: #0f172a; color: white;">
+          <input type="password" [(ngModel)]="nuevoEmpleado.password" placeholder="Contraseña" class="form-input" style="padding: 8px; border-radius: 4px; border: 1px solid #334155; background: #0f172a; color: white;">
+        </div>
+        <button (click)="guardarEmpleado()" class="btn-manage" style="margin-top: 10px; width: 100%;">Registrar Empleado</button>
+      </div>
+
+      <div class="employees-list" style="max-height: 250px; overflow-y: auto;">
+        <table class="data-table" style="width: 100%; text-align: left;">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>DNI (User)</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let emp of empleados">
+              <td>{{ emp.nombre }} {{ emp.apellido }}</td>
+              <td>{{ emp.dni }}</td>
+              <td>
+                <button (click)="eliminarEmpleado(emp.id)" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                  <i class="pi pi-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div *ngIf="empleados.length === 0" style="text-align: center; color: #94a3b8; padding: 20px;">
+          No hay empleados registrados.
+        </div>
+      </div>
+    </div>
+  </p-dialog>
+
+  <!-- Modal de Ranking de Clientes (Ver Todos) -->
+  <p-dialog
+    header="Ranking Completo de Clientes"
+    [(visible)]="mostrarModalRanking"
+    [modal]="true"
+    [style]="{width: '500px'}"
+    [closable]="true"
+    [draggable]="false">
+    
+    <div class="ranking-content" style="max-height: 400px; overflow-y: auto;">
+      <div class="ranking-list" *ngIf="todosClientes.length > 0">
+        <div class="ranking-item" *ngFor="let cliente of todosClientes; let i = index"
+             [class.top-1]="i === 0" [class.top-2]="i === 1" [class.top-3]="i === 2"
+             style="display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #334155;">
+          <div class="ranking-position" style="width: 40px;">
+            <span class="position-badge" [style.background]="getMedalColor(i)" style="color: white; padding: 4px 8px; border-radius: 50%; font-weight: bold;">
+              {{ i + 1 }}
+            </span>
+          </div>
+          <div class="ranking-info" style="flex: 1;">
+            <span class="ranking-name" style="font-weight: bold; color: #f8fafc; display: block;">{{ cliente.nombres }} {{ cliente.apellidos }}</span>
+            <span class="ranking-dni" style="font-size: 0.8em; color: #94a3b8;">DNI: {{ cliente.dni }}</span>
+          </div>
+          <div class="ranking-points" style="text-align: right;">
+            <span class="points-value" style="font-size: 1.1em; font-weight: bold; color: #f8fafc;">{{ cliente.puntos_acumulados | number }}</span>
+            <span class="points-label" style="font-size: 0.8em; color: #94a3b8; display: block;">puntos</span>
+          </div>
+        </div>
+      </div>
+      <div class="empty-state" *ngIf="todosClientes.length === 0" style="text-align: center; color: #94a3b8; padding: 20px;">
+        No hay clientes registrados aún.
       </div>
     </div>
   </p-dialog>

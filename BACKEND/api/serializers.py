@@ -83,15 +83,20 @@ class RegistroConsumoSerializer(serializers.ModelSerializer):
 
 class RegistroConsumoReadSerializer(serializers.ModelSerializer):
     """Serializer para lectura con datos expandidos"""
-    cliente_nombre = serializers.CharField(source='cliente.__str__', read_only=True)
+    cliente_dni = serializers.CharField(source='cliente.dni', read_only=True)
+    cliente_nombre = serializers.SerializerMethodField()
+    cliente_puntos = serializers.IntegerField(source='cliente.puntos_acumulados', read_only=True)
     tipo_combustible_nombre = serializers.CharField(source='tipo_combustible.nombre', read_only=True)
     empleado_nombre = serializers.CharField(source='empleado.__str__', read_only=True)
 
     class Meta:
         model = models.RegistroConsumo
-        fields = ['id', 'cliente', 'cliente_nombre', 'empleado', 'empleado_nombre',
+        fields = ['id', 'cliente', 'cliente_dni', 'cliente_nombre', 'cliente_puntos', 'empleado', 'empleado_nombre',
                   'tipo_combustible', 'tipo_combustible_nombre', 'galones',
                   'monto_total', 'puntos_otorgados', 'fecha']
+
+    def get_cliente_nombre(self, obj):
+        return f"{obj.cliente.nombres} {obj.cliente.apellidos}"
 
 
 class RegistrarConsumoSerializer(serializers.Serializer):

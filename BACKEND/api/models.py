@@ -107,6 +107,15 @@ class RegistroConsumo(models.Model):
     def __str__(self):
         return f"{self.cliente.nombres} - {self.tipo_combustible.nombre} - {self.puntos_otorgados} pts"
 
+    def delete(self, *args, **kwargs):
+        cliente = self.cliente
+        super().delete(*args, **kwargs)
+        # Recalcular puntos del cliente
+        cliente.puntos_acumulados = sum(
+            c.puntos_otorgados for c in cliente.consumos.all()
+        )
+        cliente.save()
+
     class Meta:
         ordering = ['-fecha']
         verbose_name = "Registro de Consumo"

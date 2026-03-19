@@ -1,6 +1,7 @@
 export interface RegistroConsumo {
     id?: number;
     cliente: number;
+    cliente_dni?: string;
     cliente_nombre?: string;
     empleado?: number;
     empleado_nombre?: string;
