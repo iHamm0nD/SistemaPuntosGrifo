@@ -5,13 +5,14 @@ import { Usuario } from "../models/usuario.models";
 import { TipoCombustible } from "../models/combustible.models";
 import { Cliente } from "../models/cliente.models";
 import { RegistrarConsumoRequest, RegistrarConsumoResponse, DashboardData } from "../models/consumo.models";
+import { environment } from "../environments/environment";
 
 @Injectable({
     providedIn: 'root'
 })
 export class ApiService {
 
-    private ApiUrl = 'http://127.0.0.1:8000/api/';
+    private ApiUrl = environment.apiUrl;
     private httpOptions = {
         headers: new HttpHeaders({
             'Content-Type': 'application/json',

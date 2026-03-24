@@ -1,19 +1,26 @@
+import environ
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+# Initialize environ
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
+
+# Reading .env file
+environ.Env.read_env(BASE_DIR / '.env')
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-os%ek$=l$cf!8$pnn#fwuj9^#hf0b=iavp6-dvc*77x2s1m%3h'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['127.0.0.1', 'localhost'])
 
 AUTH_USER_MODEL = 'api.Usuario'
 
@@ -55,12 +62,9 @@ MIDDLEWARE = [
     #'api.middleware.ApiKeyMiddleware',
 ]
 
-API_KEY = 'iEpeJsgQbWzbNEirdKEWnYPf'
+API_KEY = env('API_KEY', default='')
 
-CORS_ALLOWED_ORIGINS = [
-    'http://127.0.0.1:8000',
-    'http://localhost:4200',
-]
+CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[])
 
 CORS_ALLOW_HEADERS = [
     'accept',
@@ -108,10 +112,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': env.db('DATABASE_URL', default='sqlite:///db.sqlite3')
 }
 
 
@@ -137,9 +138,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-pe'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Lima'
 
 USE_I18N = True
 

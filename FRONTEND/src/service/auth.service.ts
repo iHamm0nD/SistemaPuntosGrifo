@@ -4,11 +4,13 @@ import { Observable } from "rxjs";
 import { tap } from 'rxjs/operators';
 import { LoginResponse } from "../models/loginresponse.models";
 
+import { environment } from "../environments/environment";
+
 @Injectable({
     providedIn: 'root'
 })
 export class AuthService {
-    private loginUrl = 'http://127.0.0.1:8000/api/login/';
+    private loginUrl = `${environment.apiUrl}login/`;
 
     constructor(private http: HttpClient) {}
 
