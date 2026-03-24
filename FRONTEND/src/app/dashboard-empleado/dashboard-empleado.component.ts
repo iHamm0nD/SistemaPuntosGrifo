@@ -37,6 +37,9 @@ export class DashboardEmpleadoComponent implements OnInit {
   error = '';
   cargando = false;
 
+  fechaActual: Date = new Date();
+  intentoSubmit = false;
+
   constructor(
     private api: ApiService,
     private auth: AuthService,
@@ -75,14 +78,24 @@ export class DashboardEmpleadoComponent implements OnInit {
 
   abrirConfirmacion() {
     this.error = '';
+    this.intentoSubmit = true;
 
     if (!this.dni || !this.nombres || !this.apellidos || !this.tipoCombustibleId || !this.monto) {
-      this.error = 'Todos los campos son obligatorios';
       return;
     }
 
-    if (this.monto <= 0) {
-      this.error = 'El monto debe ser mayor a 0';
+    if (this.dni.length < 8 || this.dni.length > 9) {
+      return;
+    }
+
+    if (this.dni && /[^0-9]/.test(this.dni)) {
+      return;
+    }
+
+    this.nombres = this.nombres.trim().toUpperCase();
+    this.apellidos = this.apellidos.trim().toUpperCase();
+
+    if (this.monto !== null && this.monto <= 0) {
       return;
     }
 
@@ -115,6 +128,7 @@ export class DashboardEmpleadoComponent implements OnInit {
     }).subscribe({
       next: (res) => {
         this.cargando = false;
+        this.fechaActual = new Date();
         this.resultadoRegistro = res.detalle;
         this.mostrarResultado = true;
         this.limpiarFormulario();
@@ -132,6 +146,7 @@ export class DashboardEmpleadoComponent implements OnInit {
   }
 
   limpiarFormulario() {
+    this.intentoSubmit = false;
     this.dni = '';
     this.nombres = '';
     this.apellidos = '';

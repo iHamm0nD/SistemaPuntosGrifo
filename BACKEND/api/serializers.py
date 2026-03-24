@@ -87,7 +87,7 @@ class RegistroConsumoReadSerializer(serializers.ModelSerializer):
     cliente_nombre = serializers.SerializerMethodField()
     cliente_puntos = serializers.IntegerField(source='cliente.puntos_acumulados', read_only=True)
     tipo_combustible_nombre = serializers.CharField(source='tipo_combustible.nombre', read_only=True)
-    empleado_nombre = serializers.CharField(source='empleado.__str__', read_only=True)
+    empleado_nombre = serializers.SerializerMethodField()
 
     class Meta:
         model = models.RegistroConsumo
@@ -97,6 +97,13 @@ class RegistroConsumoReadSerializer(serializers.ModelSerializer):
 
     def get_cliente_nombre(self, obj):
         return f"{obj.cliente.nombres} {obj.cliente.apellidos}"
+
+    def get_empleado_nombre(self, obj):
+        if obj.empleado:
+            primer_nombre = obj.empleado.nombre.split()[0] if obj.empleado.nombre else ""
+            primer_apellido = obj.empleado.apellido.split()[0] if obj.empleado.apellido else ""
+            return f"{primer_nombre} {primer_apellido}".strip()
+        return "Empleado Eliminado"
 
 
 class RegistrarConsumoSerializer(serializers.Serializer):

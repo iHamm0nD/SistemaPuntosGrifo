@@ -9,7 +9,6 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.authtoken.models import Token
 from django.db.models import Sum, Count, Q
 from rest_framework.pagination import PageNumberPagination
-
 from . import models, serializers
 
 
@@ -151,6 +150,27 @@ class RegistrarConsumoView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class CambiarPasswordView(APIView):
+    """Permite al dueño cambiar la contraseña de un empleado"""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        usuario_id = request.data.get('usuario_id')
+        nueva_password = request.data.get('nueva_password')
+
+        if not usuario_id or not nueva_password:
+            return Response({'error': 'Faltan datos requeridos.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            usuario = models.Usuario.objects.get(id=usuario_id)
+        except models.Usuario.DoesNotExist:
+            return Response({'error': 'Usuario no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+
+        usuario.set_password(nueva_password)
+        usuario.save()
+        return Response({'mensaje': 'Contraseña actualizada correctamente.'}, status=status.HTTP_200_OK)
+
+
 class DashboardView(APIView):
     """Dashboard con estadísticas para el dueño"""
     permission_classes = [IsAuthenticated]
@@ -174,15 +194,10 @@ class DashboardView(APIView):
             total_puntos=Sum('puntos_otorgados')
         ).order_by('-total_galones')
 
-        # Últimos 10 registros
-        ultimos = models.RegistroConsumo.objects.order_by('-fecha')[:10]
-        ultimos_serializer = serializers.RegistroConsumoReadSerializer(ultimos, many=True)
-
         return Response({
             'total_clientes': total_clientes,
             'total_puntos_otorgados': total_puntos,
             'total_consumos': total_consumos,
             'top_clientes': top_serializer.data,
             'consumo_por_tipo': list(consumo_por_tipo),
-            'ultimos_registros': ultimos_serializer.data,
         })

@@ -19,7 +19,6 @@ export class DashboardDuenoComponent implements OnInit {
   totalConsumos = 0;
   topClientes: any[] = [];
   consumoPorTipo: any[] = [];
-  ultimosRegistros: any[] = [];
   cargando = true;
 
   // Manejo de combustibles
@@ -39,6 +38,16 @@ export class DashboardDuenoComponent implements OnInit {
 
   // Gestión de Empleados
   mostrarModalEmpleados = false;
+  mostrarModalAgregarEmpleado = false;
+  mostrarResumenNuevoEmpleado = false;
+  mostrarModalCredenciales = false;
+  resumenEmpleadoConstruido: any = null;
+  empCredencialesVisible: any = null;
+  editandoPassword = false;
+  nuevaPasswordEmp = '';
+  mensajePasswordError = '';
+  mensajePasswordOk = '';
+  passwordMostrada = '';
   empleados: any[] = [];
   cargandoEmpleados = false;
   nuevoEmpleado: any = { username: '', password: '', nombre: '', apellido: '', dni: '', email: 'empleado@grifo.com', telefono: '', tipo_usuario: 'empleado' };
@@ -78,7 +87,6 @@ export class DashboardDuenoComponent implements OnInit {
         this.totalConsumos = data.total_consumos;
         this.topClientes = data.top_clientes;
         this.consumoPorTipo = data.consumo_por_tipo;
-        this.ultimosRegistros = data.ultimos_registros;
         this.cargando = false;
       },
       error: () => {
@@ -209,6 +217,20 @@ export class DashboardDuenoComponent implements OnInit {
   }
 
   // ===== Gestión de Empleados =====
+  abrirModalAgregarEmpleado() {
+    this.mostrarModalAgregarEmpleado = true;
+    this.nuevoEmpleado = { username: '', password: '', nombre: '', apellido: '', dni: '', email: 'empleado@grifo.com', telefono: '', tipo_usuario: 'empleado' };
+  }
+
+  cerrarResumenEmpleado() {
+    this.mostrarResumenNuevoEmpleado = false;
+  }
+
+  limpiarLetrasNombres() {
+    this.nuevoEmpleado.nombre = this.nuevoEmpleado.nombre.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+    this.nuevoEmpleado.apellido = this.nuevoEmpleado.apellido.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+  }
+
   abrirModalEmpleados() {
     this.mostrarModalEmpleados = true;
     this.cargarEmpleados();
@@ -229,17 +251,94 @@ export class DashboardDuenoComponent implements OnInit {
     });
   }
 
-  guardarEmpleado() {
-    if (!this.nuevoEmpleado.dni || !this.nuevoEmpleado.password || !this.nuevoEmpleado.nombre || !this.nuevoEmpleado.apellido) {
-      alert("Por favor, complete los campos obligatorios: Nombres, Apellidos, DNI y Contraseña.");
+  limpiarDniEmpleado() {
+    this.nuevoEmpleado.dni = this.nuevoEmpleado.dni.replace(/[^0-9]/g, '');
+  }
+
+  toggleCredenciales(emp: any) {
+    this.empCredencialesVisible = emp;
+    this.editandoPassword = false;
+    this.nuevaPasswordEmp = '';
+    this.mensajePasswordError = '';
+    this.mensajePasswordOk = '';
+    this.passwordMostrada = this.generarPasswordEmpleado(emp);
+    this.mostrarModalCredenciales = true;
+  }
+
+  guardarNuevaPassword() {
+    if (!this.nuevaPasswordEmp.trim()) {
+      this.mensajePasswordError = 'La contraseña no puede estar vacía.';
       return;
     }
+    this.mensajePasswordError = '';
+    this.mensajePasswordOk = '';
+    this.api.cambiarPasswordEmpleado(this.empCredencialesVisible.id, this.nuevaPasswordEmp).subscribe({
+      next: () => {
+        this.passwordMostrada = this.nuevaPasswordEmp;
+        this.mensajePasswordOk = '✔ Contraseña actualizada correctamente.';
+        this.editandoPassword = false;
+        this.nuevaPasswordEmp = '';
+        setTimeout(() => this.mensajePasswordOk = '', 4000);
+      },
+      error: () => {
+        this.mensajePasswordError = 'Error al actualizar. Intenta de nuevo.';
+      }
+    });
+  }
+
+  generarPasswordEmpleado(emp: any): string {
+    if (!emp.nombre || !emp.apellido || !emp.dni) return '—';
+    const inicial = emp.nombre.charAt(0).toLowerCase();
+    let apellido = emp.apellido.toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z]/g, '');
+    const ultimos4 = emp.dni.slice(-4);
+    return `${inicial}${apellido}${ultimos4}`;
+  }
+
+  guardarEmpleado() {
+    if (!this.nuevoEmpleado.dni || !this.nuevoEmpleado.nombre || !this.nuevoEmpleado.apellido) {
+      alert("Por favor, complete los campos obligatorios: Nombres, Apellidos y DNI.");
+      return;
+    }
+    
+    if (this.nuevoEmpleado.dni.length < 8 || this.nuevoEmpleado.dni.length > 9) {
+      alert("El DNI debe tener 8 o 9 dígitos numéricos.");
+      return;
+    }
+
+    if (/[^0-9]/.test(this.nuevoEmpleado.dni)) {
+      alert("El DNI solo debe contener números.");
+      return;
+    }
+
+    if (/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/.test(this.nuevoEmpleado.nombre) || /[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/.test(this.nuevoEmpleado.apellido)) {
+      alert("Nombres y Apellidos solo deben contener letras.");
+      return;
+    }
+
+    this.nuevoEmpleado.nombre = this.nuevoEmpleado.nombre.trim().toUpperCase();
+    this.nuevoEmpleado.apellido = this.nuevoEmpleado.apellido.trim().toUpperCase();
     this.nuevoEmpleado.username = this.nuevoEmpleado.dni;
+    
+    // Generate Password
+    const primeraLetraNombre = this.nuevoEmpleado.nombre.charAt(0).toLowerCase();
+    
+    let apellidoLimpio = this.nuevoEmpleado.apellido.toLowerCase();
+    apellidoLimpio = apellidoLimpio.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Remove accents
+    apellidoLimpio = apellidoLimpio.replace(/[^a-z]/g, ""); // Remove everything else like spaces
+    
+    const ultimos4DNI = this.nuevoEmpleado.dni.slice(-4);
+    
+    this.nuevoEmpleado.password = `${primeraLetraNombre}${apellidoLimpio}${ultimos4DNI}`;
+
     this.api.postUsuario(this.nuevoEmpleado).subscribe({
       next: () => {
         this.cargarEmpleados();
+        this.resumenEmpleadoConstruido = { ...this.nuevoEmpleado };
+        this.mostrarModalAgregarEmpleado = false;
+        this.mostrarResumenNuevoEmpleado = true;
         this.nuevoEmpleado = { username: '', password: '', nombre: '', apellido: '', dni: '', email: 'empleado@grifo.com', telefono: '', tipo_usuario: 'empleado' };
-        alert('Empleado creado exitosamente');
       },
       error: (err) => {
         alert('Error al crear empleado. Verifique si el DNI ya existe.');

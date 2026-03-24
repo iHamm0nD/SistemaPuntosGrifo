@@ -99,4 +99,12 @@ export class ApiService {
     public getDashboard(): Observable<DashboardData> {
         return this.http.get<DashboardData>(this.ApiUrl + 'dashboard/');
     }
+
+    public cambiarPasswordEmpleado(usuarioId: number, nuevaPassword: string): Observable<any> {
+        return this.http.post<any>(
+            this.ApiUrl + 'cambiar-password/',
+            { usuario_id: usuarioId, nueva_password: nuevaPassword },
+            this.httpOptions
+        );
+    }
 }

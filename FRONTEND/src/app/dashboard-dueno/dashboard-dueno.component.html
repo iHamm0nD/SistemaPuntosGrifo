@@ -9,9 +9,13 @@
       <span class="badge-owner">Panel Dueño</span>
     </div>
     <div class="top-bar-right">
+      <button class="btn-manage" (click)="abrirModalAgregarEmpleado()">
+        <i class="pi pi-user-plus"></i>
+        Nuevo Empleado
+      </button>
       <button class="btn-manage" (click)="abrirModalEmpleados()">
         <i class="pi pi-users"></i>
-        Empleados
+        Lista Empleados
       </button>
       <button class="btn-manage" (click)="abrirModalPrecios()">
         <i class="pi pi-cog"></i>
@@ -77,15 +81,16 @@
           <h2 class="panel-title">
             <i class="pi pi-trophy"></i>
             Ranking de Clientes
-            <button class="btn-ver-todos" (click)="abrirModalRanking()" style="margin-left: 10px; font-size: 0.8rem; padding: 5px 10px; border-radius: 4px; border: 1px solid #4ade80; background: transparent; color: #4ade80; cursor: pointer;">
+            <button class="btn-ver-todos" (click)="abrirModalRanking()"
+              style="margin-left: 10px; font-size: 0.8rem; padding: 5px 10px; border-radius: 4px; border: 1px solid #4ade80; background: transparent; color: #4ade80; cursor: pointer;">
               Ver todos
             </button>
           </h2>
         </div>
         <div class="panel-body">
           <div class="ranking-list" *ngIf="topClientes.length > 0">
-            <div class="ranking-item" *ngFor="let cliente of topClientes; let i = index"
-                 [class.top-1]="i === 0" [class.top-2]="i === 1" [class.top-3]="i === 2">
+            <div class="ranking-item" *ngFor="let cliente of topClientes; let i = index" [class.top-1]="i === 0"
+              [class.top-2]="i === 1" [class.top-3]="i === 2">
               <div class="ranking-position">
                 <span class="position-badge" [style.background]="getMedalColor(i)">
                   {{ i + 1 }}
@@ -124,8 +129,7 @@
                 <span class="fuel-records">{{ tipo.total_registros }} registros</span>
               </div>
               <div class="fuel-bar-container">
-                <div class="fuel-bar"
-                     [style.width.%]="(tipo.total_galones / consumoPorTipo[0].total_galones) * 100">
+                <div class="fuel-bar" [style.width.%]="(tipo.total_galones / consumoPorTipo[0].total_galones) * 100">
                 </div>
               </div>
               <div class="fuel-stats">
@@ -150,7 +154,9 @@
           Últimos Registros
         </h2>
         <div class="search-bar" style="display: flex; gap: 10px;">
-          <input type="text" [ngModel]="busquedaRegistro" (ngModelChange)="onSearchChange($event)" placeholder="Buscar DNI o Nombre..." class="form-input" style="padding: 5px; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: white; width: 250px;">
+          <input type="text" [ngModel]="busquedaRegistro" (ngModelChange)="onSearchChange($event)"
+            placeholder="Buscar DNI o Nombre..." class="form-input"
+            style="padding: 5px; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: white; width: 250px;">
         </div>
       </div>
       <div class="panel-body">
@@ -173,7 +179,9 @@
             <tbody>
               <tr *ngFor="let reg of registrosPaginados" style="white-space: nowrap;">
                 <td>
-                  <button (click)="eliminarRegistro(reg.id)" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;" title="Eliminar registro">
+                  <button (click)="eliminarRegistro(reg.id)"
+                    style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;"
+                    title="Eliminar registro">
                     <i class="pi pi-trash"></i>
                   </button>
                 </td>
@@ -194,14 +202,17 @@
             </tbody>
           </table>
         </div>
-        
+
         <!-- Paginación -->
-        <div class="pagination-controls" *ngIf="totalPaginas > 1" style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 15px;">
-          <button (click)="cambiarPagina(-1)" [disabled]="paginaActual === 1" class="btn-manage" [style.opacity]="paginaActual === 1 ? '0.5' : '1'">
+        <div class="pagination-controls" *ngIf="totalPaginas > 1"
+          style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 15px;">
+          <button (click)="cambiarPagina(-1)" [disabled]="paginaActual === 1" class="btn-manage"
+            [style.opacity]="paginaActual === 1 ? '0.5' : '1'">
             <i class="pi pi-chevron-left"></i> Anterior
           </button>
           <span style="color: white;">Página {{ paginaActual }} de {{ totalPaginas }}</span>
-          <button (click)="cambiarPagina(1)" [disabled]="paginaActual === totalPaginas" class="btn-manage" [style.opacity]="paginaActual === totalPaginas ? '0.5' : '1'">
+          <button (click)="cambiarPagina(1)" [disabled]="paginaActual === totalPaginas" class="btn-manage"
+            [style.opacity]="paginaActual === totalPaginas ? '0.5' : '1'">
             Siguiente <i class="pi pi-chevron-right"></i>
           </button>
         </div>
@@ -215,22 +226,13 @@
   </div>
 
   <!-- Modal de Gestión de Precios -->
-  <p-dialog
-    header="Gestión de Precios"
-    [(visible)]="mostrarModalPrecios"
-    [modal]="true"
-    [style]="{width: '450px'}"
-    [closable]="true"
-    [draggable]="false">
+  <p-dialog header="Gestión de Precios" [(visible)]="mostrarModalPrecios" [modal]="true" [style]="{width: '450px'}"
+    [closable]="true" [draggable]="false">
 
     <div class="prices-content">
-      <p-message 
-        *ngIf="mensajeModal" 
-        [severity]="tipoMensaje" 
-        [text]="mensajeModal" 
-        styleClass="w-full mb-3 block">
+      <p-message *ngIf="mensajeModal" [severity]="tipoMensaje" [text]="mensajeModal" styleClass="w-full mb-3 block">
       </p-message>
-      
+
       <div class="prices-list">
         <div class="price-item" *ngFor="let tipo of tiposCombustible">
           <div class="price-info">
@@ -251,42 +253,130 @@
     </div>
   </p-dialog>
 
-  <!-- Modal de Gestión de Empleados -->
-  <p-dialog
-    header="Gestión de Empleados"
-    [(visible)]="mostrarModalEmpleados"
-    [modal]="true"
-    [style]="{width: '600px'}"
-    [closable]="true"
-    [draggable]="false">
-    
-    <div class="employees-content">
-      <div class="add-employee-form" style="margin-bottom: 20px; padding: 15px; border: 1px solid #334155; border-radius: 8px; background: #1e293b;">
-        <h3 style="margin-top: 0; color: #f8fafc;">Agregar Nuevo Empleado</h3>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-          <input type="text" [(ngModel)]="nuevoEmpleado.nombre" placeholder="Nombres" class="form-input" style="padding: 8px; border-radius: 4px; border: 1px solid #334155; background: #0f172a; color: white;">
-          <input type="text" [(ngModel)]="nuevoEmpleado.apellido" placeholder="Apellidos" class="form-input" style="padding: 8px; border-radius: 4px; border: 1px solid #334155; background: #0f172a; color: white;">
-          <input type="text" [(ngModel)]="nuevoEmpleado.dni" placeholder="DNI (Será el usuario)" class="form-input" style="padding: 8px; border-radius: 4px; border: 1px solid #334155; background: #0f172a; color: white;">
-          <input type="password" [(ngModel)]="nuevoEmpleado.password" placeholder="Contraseña" class="form-input" style="padding: 8px; border-radius: 4px; border: 1px solid #334155; background: #0f172a; color: white;">
-        </div>
-        <button (click)="guardarEmpleado()" class="btn-manage" style="margin-top: 10px; width: 100%;">Registrar Empleado</button>
-      </div>
+  <!-- Modal de Agregar Nuevo Empleado -->
+  <p-dialog header="Añadir Nuevo Empleado" [(visible)]="mostrarModalAgregarEmpleado" [modal]="true"
+    [style]="{width: '450px'}" [closable]="true" [draggable]="false">
 
-      <div class="employees-list" style="max-height: 250px; overflow-y: auto;">
+    <div class="add-employee-detailed-form" style="padding: 10px 0;">
+      <p style="color: #94a3b8; font-size: 13px; margin-bottom: 16px; margin-top: 0;">Rellena los datos para crear una
+        nueva cuenta. Los campos con <span style="color: #ef4444;">*</span> son obligatorios.</p>
+
+      <div style="display: flex; flex-direction: column; gap: 15px;">
+        <div>
+          <label style="color: #cbd5e1; font-size: 13px; margin-bottom: 5px; display: block;">DNI del Empleado <span
+              style="color: #ef4444;">*</span></label>
+          <input type="text" [(ngModel)]="nuevoEmpleado.dni" (input)="limpiarDniEmpleado()" maxlength="9" minlength="8"
+            placeholder="Ingresa DNI" class="form-input"
+            style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;">
+        </div>
+
+        <div>
+          <label style="color: #cbd5e1; font-size: 13px; margin-bottom: 5px; display: block;">Nombres <span
+              style="color: #ef4444;">*</span></label>
+          <input type="text" [(ngModel)]="nuevoEmpleado.nombre" (input)="limpiarLetrasNombres()" placeholder="Nombres"
+            class="form-input"
+            style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;">
+        </div>
+
+        <div>
+          <label style="color: #cbd5e1; font-size: 13px; margin-bottom: 5px; display: block;">Apellidos <span
+              style="color: #ef4444;">*</span></label>
+          <input type="text" [(ngModel)]="nuevoEmpleado.apellido" (input)="limpiarLetrasNombres()"
+            placeholder="Apellidos" class="form-input"
+            style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;">
+        </div>
+
+        <div>
+          <label style="color: #cbd5e1; font-size: 13px; margin-bottom: 5px; display: block;">Teléfono
+            (Opcional)</label>
+          <input type="text" [(ngModel)]="nuevoEmpleado.telefono" placeholder="Número de celular" class="form-input"
+            style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;">
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button (click)="guardarEmpleado()" class="btn btn-primary"
+        style="width: 100%; background: linear-gradient(135deg, #f59e0b, #d97706); color: #1e293b; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">Crear
+        Cuenta de Empleado</button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Modal de Resumen / Confirmación Nuevo Empleado -->
+  <p-dialog header="¡Empleado Añadido!" [(visible)]="mostrarResumenNuevoEmpleado" [modal]="true"
+    [style]="{width: '450px'}" [closable]="false" [draggable]="false">
+
+    <div class="result-content" *ngIf="resumenEmpleadoConstruido">
+      <div class="result-icon"
+        style="width: 64px; height: 64px; background: rgba(34, 197, 94, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+        <i class="pi pi-check-circle" style="font-size: 32px; color: #22c55e;"></i>
+      </div>
+      <h3 style="text-align: center; color: #22c55e; margin-top: 0;">Cuenta Creada Exitosamente</h3>
+
+      <div class="result-details"
+        style="background: #f8fafc; border-radius: 8px; padding: 15px; border: 1px solid #e2e8f0; text-align: left;">
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding: 8px 0;">
+          <span style="color: #64748b; font-size: 14px; font-weight: 500;">Empleado:</span>
+          <span style="color: #1e293b; font-size: 14px; font-weight: bold;">{{ resumenEmpleadoConstruido.nombre }} {{
+            resumenEmpleadoConstruido.apellido }}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding: 8px 0;">
+          <span style="color: #64748b; font-size: 14px; font-weight: 500;">DNI:</span>
+          <span style="color: #1e293b; font-size: 14px; font-weight: bold;">{{ resumenEmpleadoConstruido.dni }}</span>
+        </div>
+        <div
+          style="display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding: 8px 0; background: #f0fdf4;">
+          <span style="color: #64748b; font-size: 14px; font-weight: 500;">Usuario (Login):</span>
+          <span style="color: #16a34a; font-size: 14px; font-weight: bold;">{{ resumenEmpleadoConstruido.username
+            }}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 8px 0; background: #f0fdf4;">
+          <span style="color: #64748b; font-size: 14px; font-weight: 500;">Contraseña gen.:</span>
+          <span style="color: #16a34a; font-size: 14px; font-weight: bold;">{{ resumenEmpleadoConstruido.password
+            }}</span>
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button class="btn btn-primary"
+        style="width: 100%; background: #22c55e; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;"
+        (click)="cerrarResumenEmpleado()">
+        Aceptar
+      </button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Modal de Gestión de Empleados -->
+  <p-dialog header="Gestión de Empleados" [(visible)]="mostrarModalEmpleados" [modal]="true" [style]="{width: '600px'}"
+    [closable]="true" [draggable]="false">
+
+    <div class="employees-content">
+      <div class="employees-list" style="max-height: 400px; overflow-y: auto;">
         <table class="data-table" style="width: 100%; text-align: left;">
           <thead>
             <tr>
-              <th>Nombre</th>
-              <th>DNI (User)</th>
-              <th>Acción</th>
+              <th>DNI</th>
+              <th>Nombres</th>
+              <th>Apellidos</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let emp of empleados">
-              <td>{{ emp.nombre }} {{ emp.apellido }}</td>
               <td>{{ emp.dni }}</td>
-              <td>
-                <button (click)="eliminarEmpleado(emp.id)" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+              <td>{{ emp.nombre }}</td>
+              <td>{{ emp.apellido }}</td>
+              <td style="white-space: nowrap;">
+                <!-- Botón Ver Credenciales -->
+                <button (click)="toggleCredenciales(emp)"
+                  title="Ver credenciales"
+                  style="background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 6px;">
+                  <i class="pi pi-eye"></i>
+                </button>
+                <!-- Botón Eliminar -->
+                <button (click)="eliminarEmpleado(emp.id)"
+                  style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
                   <i class="pi pi-trash"></i>
                 </button>
               </td>
@@ -301,37 +391,91 @@
   </p-dialog>
 
   <!-- Modal de Ranking de Clientes (Ver Todos) -->
-  <p-dialog
-    header="Ranking Completo de Clientes"
-    [(visible)]="mostrarModalRanking"
-    [modal]="true"
-    [style]="{width: '500px'}"
-    [closable]="true"
-    [draggable]="false">
-    
+  <p-dialog header="Ranking Completo de Clientes" [(visible)]="mostrarModalRanking" [modal]="true"
+    [style]="{width: '500px'}" [closable]="true" [draggable]="false">
+
     <div class="ranking-content" style="max-height: 400px; overflow-y: auto;">
       <div class="ranking-list" *ngIf="todosClientes.length > 0">
-        <div class="ranking-item" *ngFor="let cliente of todosClientes; let i = index"
-             [class.top-1]="i === 0" [class.top-2]="i === 1" [class.top-3]="i === 2"
-             style="display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #334155;">
+        <div class="ranking-item" *ngFor="let cliente of todosClientes; let i = index" [class.top-1]="i === 0"
+          [class.top-2]="i === 1" [class.top-3]="i === 2"
+          style="display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #334155;">
           <div class="ranking-position" style="width: 40px;">
-            <span class="position-badge" [style.background]="getMedalColor(i)" style="color: white; padding: 4px 8px; border-radius: 50%; font-weight: bold;">
+            <span class="position-badge" [style.background]="getMedalColor(i)"
+              style="color: white; padding: 4px 8px; border-radius: 50%; font-weight: bold;">
               {{ i + 1 }}
             </span>
           </div>
           <div class="ranking-info" style="flex: 1;">
-            <span class="ranking-name" style="font-weight: bold; color: #f8fafc; display: block;">{{ cliente.nombres }} {{ cliente.apellidos }}</span>
+            <span class="ranking-name" style="font-weight: bold; color: #f8fafc; display: block;">{{ cliente.nombres }}
+              {{ cliente.apellidos }}</span>
             <span class="ranking-dni" style="font-size: 0.8em; color: #94a3b8;">DNI: {{ cliente.dni }}</span>
           </div>
           <div class="ranking-points" style="text-align: right;">
-            <span class="points-value" style="font-size: 1.1em; font-weight: bold; color: #f8fafc;">{{ cliente.puntos_acumulados | number }}</span>
+            <span class="points-value" style="font-size: 1.1em; font-weight: bold; color: #f8fafc;">{{
+              cliente.puntos_acumulados | number }}</span>
             <span class="points-label" style="font-size: 0.8em; color: #94a3b8; display: block;">puntos</span>
           </div>
         </div>
       </div>
-      <div class="empty-state" *ngIf="todosClientes.length === 0" style="text-align: center; color: #94a3b8; padding: 20px;">
+      <div class="empty-state" *ngIf="todosClientes.length === 0"
+        style="text-align: center; color: #94a3b8; padding: 20px;">
         No hay clientes registrados aún.
       </div>
     </div>
   </p-dialog>
+
+  <!-- Modal Credenciales de Empleado -->
+  <p-dialog header="Credenciales del Empleado" [(visible)]="mostrarModalCredenciales"
+    [modal]="true" [style]="{width: '380px'}" [closable]="true" [draggable]="false">
+
+    <div *ngIf="empCredencialesVisible" style="padding: 8px 0;">
+      <!-- Nombre completo -->
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #334155;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #6366f1); display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; font-weight: bold; flex-shrink: 0;">
+          {{ empCredencialesVisible.nombre?.charAt(0) }}
+        </div>
+        <div>
+          <p style="margin: 0; color: #f8fafc; font-weight: bold; font-size: 15px;">{{ empCredencialesVisible.nombre }} {{ empCredencialesVisible.apellido }}</p>
+          <p style="margin: 0; color: #64748b; font-size: 12px;">Empleado</p>
+        </div>
+      </div>
+
+      <!-- Credenciales -->
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <!-- Usuario -->
+        <div style="background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 12px 16px;">
+          <p style="margin: 0 0 4px; color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;">Usuario (Login)</p>
+          <p style="margin: 0; color: #f8fafc; font-family: monospace; font-size: 16px; font-weight: bold; letter-spacing: 1px;">{{ empCredencialesVisible.dni }}</p>
+        </div>
+
+        <!-- Contraseña -->
+        <div style="background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 12px 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <p style="margin: 0; color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;">Contraseña</p>
+            <button (click)="editandoPassword = !editandoPassword; nuevaPasswordEmp = ''" title="Editar contraseña"
+              style="background: transparent; border: 1px solid #475569; border-radius: 4px; color: #94a3b8; padding: 3px 8px; cursor: pointer; font-size: 12px;">
+              <i class="pi" [ngClass]="editandoPassword ? 'pi-times' : 'pi-pencil'"></i>
+              {{ editandoPassword ? 'Cancelar' : 'Editar' }}
+            </button>
+          </div>
+
+          <!-- Modo vista -->
+          <p *ngIf="!editandoPassword" style="margin: 0; color: #4ade80; font-family: monospace; font-size: 16px; font-weight: bold; letter-spacing: 1px;">{{ passwordMostrada }}</p>
+
+          <!-- Modo edición -->
+          <div *ngIf="editandoPassword" style="margin-top: 8px; display: flex; gap: 8px;">
+            <input type="text" [(ngModel)]="nuevaPasswordEmp" placeholder="Nueva contraseña"
+              style="flex: 1; padding: 8px 10px; border-radius: 6px; border: 1px solid #3b82f6; background: #1e293b; color: #f8fafc; font-family: monospace; font-size: 14px; outline: none;">
+            <button (click)="guardarNuevaPassword()"
+              style="background: #22c55e; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold;">
+              <i class="pi pi-check"></i>
+            </button>
+          </div>
+          <p *ngIf="mensajePasswordError" style="margin: 6px 0 0; color: #ef4444; font-size: 12px;">{{ mensajePasswordError }}</p>
+          <p *ngIf="mensajePasswordOk" style="margin: 6px 0 0; color: #4ade80; font-size: 12px;">{{ mensajePasswordOk }}</p>
+        </div>
+      </div>
+    </div>
+  </p-dialog>
+
 </div>

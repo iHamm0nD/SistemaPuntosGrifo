@@ -40,5 +40,4 @@ export interface DashboardData {
     total_consumos: number;
     top_clientes: any[];
     consumo_por_tipo: any[];
-    ultimos_registros: any[];
 }

@@ -19,7 +19,7 @@
     </div>
   </div>
 
-  <!-- Main Content -->
+  <!-- Contenido Principal -->
   <div class="main-content">
     <div class="page-header">
       <h1 class="page-title">
@@ -31,24 +31,28 @@
 
     <!-- Formulario -->
     <div class="form-card">
-      <form (ngSubmit)="abrirConfirmacion()">
+      <form #consumoForm="ngForm" (ngSubmit)="abrirConfirmacion()">
         <div class="form-grid">
           <!-- DNI -->
           <div class="form-group">
             <label for="dni" class="form-label">
               <i class="pi pi-id-card"></i>
-              DNI del Cliente
+              DNI del Cliente <span style="color: #ef4444; margin-left: 4px;">*</span>
             </label>
-            <input
-              id="dni"
-              type="text"
-              class="form-input"
-              [(ngModel)]="dni"
-              name="dni"
-              placeholder="Ingresa el DNI"
-              maxlength="15"
-              (blur)="buscarCliente()"
-              required>
+            <input id="dni" type="text" class="form-input" [(ngModel)]="dni" name="dni" #dniRef="ngModel"
+              placeholder="Ingresa el DNI" maxlength="9" minlength="8" pattern="^[0-9]+$"
+              (input)="intentoSubmit = false" (blur)="buscarCliente()"
+              [style.border-color]="(dniRef.invalid && intentoSubmit) ? '#ef4444' : null" required>
+            <small *ngIf="dniRef.invalid && intentoSubmit"
+              style="color: #ef4444; margin-top: 6px; font-size: 12.5px; font-weight: 500; display: flex; align-items: center; gap: 4px;">
+              <i class="pi pi-exclamation-circle" style="font-size: 12px;"></i>
+              <span *ngIf="dniRef.errors?.['required']">Rellenar este campo es obligatorio.</span>
+              <span *ngIf="dniRef.errors?.['pattern'] && !dniRef.errors?.['required']">Solo se permiten números en el
+                DNI.</span>
+              <span
+                *ngIf="dniRef.errors?.['minlength'] && !dniRef.errors?.['required'] && !dniRef.errors?.['pattern']">El
+                DNI debe tener al menos 8 dígitos numéricos.</span>
+            </small>
           </div>
 
           <!-- Nombres -->
@@ -57,14 +61,8 @@
               <i class="pi pi-user"></i>
               Nombres
             </label>
-            <input
-              id="nombres"
-              type="text"
-              class="form-input"
-              [(ngModel)]="nombres"
-              name="nombres"
-              placeholder="Nombres del cliente"
-              required>
+            <input id="nombres" type="text" class="form-input" [(ngModel)]="nombres" name="nombres"
+              placeholder="Nombres del cliente" required>
           </div>
 
           <!-- Apellidos -->
@@ -73,75 +71,67 @@
               <i class="pi pi-user"></i>
               Apellidos
             </label>
-            <input
-              id="apellidos"
-              type="text"
-              class="form-input"
-              [(ngModel)]="apellidos"
-              name="apellidos"
-              placeholder="Apellidos del cliente"
-              required>
+            <input id="apellidos" type="text" class="form-input" [(ngModel)]="apellidos" name="apellidos"
+              placeholder="Apellidos del cliente" required>
           </div>
 
           <!-- Tipo de Combustible -->
           <div class="form-group">
             <label for="combustible" class="form-label">
               <i class="pi pi-car"></i>
-              Tipo de Combustible
+              Tipo de Combustible <span style="color: #ef4444; margin-left: 4px;">*</span>
             </label>
-            <select
-              id="combustible"
-              class="form-input form-select"
-              [(ngModel)]="tipoCombustibleId"
-              name="tipoCombustible"
-              required>
+            <select id="combustible" class="form-input form-select" [(ngModel)]="tipoCombustibleId"
+              name="tipoCombustible" #combustibleRef="ngModel" (change)="intentoSubmit = false"
+              [style.border-color]="(combustibleRef.invalid && intentoSubmit) ? '#ef4444' : null" required>
               <option [ngValue]="null" disabled>Selecciona un combustible</option>
               <option *ngFor="let tipo of tiposCombustible" [ngValue]="tipo.id">
                 {{ tipo.nombre }} — S/.{{ tipo.precio_referencial }}/gal — {{ tipo.puntos_por_galon }} pts/gal
               </option>
             </select>
+            <small *ngIf="combustibleRef.invalid && intentoSubmit"
+              style="color: #ef4444; margin-top: 6px; font-size: 12.5px; font-weight: 500; display: flex; align-items: center; gap: 4px;">
+              <i class="pi pi-exclamation-circle" style="font-size: 12px;"></i>
+              <span>Debes seleccionar un tipo de combustible.</span>
+            </small>
           </div>
 
           <!-- Monto -->
           <div class="form-group">
             <label for="monto" class="form-label">
               <i class="pi pi-money-bill"></i>
-              Monto Consumido (S/.)
+              Monto Consumido (S/.) <span style="color: #ef4444; margin-left: 4px;">*</span>
             </label>
-            <input
-              id="monto"
-              type="number"
-              class="form-input"
-              [(ngModel)]="monto"
-              name="monto"
-              placeholder="Ingresa el monto en soles"
-              step="0.10"
-              min="0.10"
-              required>
+            <input id="monto" type="number" class="form-input" [(ngModel)]="monto" name="monto" #montoRef="ngModel"
+              placeholder="Ingresa el monto en soles" step="0.10" min="0.10" (input)="intentoSubmit = false"
+              [style.border-color]="(montoRef.invalid && intentoSubmit) ? '#ef4444' : null" required>
+            <small *ngIf="montoRef.invalid && intentoSubmit"
+              style="color: #ef4444; margin-top: 6px; font-size: 12.5px; font-weight: 500; display: flex; align-items: center; gap: 4px;">
+              <i class="pi pi-exclamation-circle" style="font-size: 12px;"></i>
+              <span *ngIf="montoRef.errors?.['required']">Rellenar este campo es obligatorio.</span>
+              <span *ngIf="montoRef.errors?.['min'] && !montoRef.errors?.['required']">El monto debe ser mayor a
+                0.</span>
+            </small>
           </div>
         </div>
 
         <!-- Error -->
-        <p-message
-          *ngIf="error"
-          severity="error"
-          [text]="error"
-          class="error-msg">
+        <p-message *ngIf="error" severity="error" [text]="error" class="error-msg">
         </p-message>
+
+        <div style="text-align: left; margin-top: -8px; margin-bottom: 12px;">
+          <span style="color: #475569; font-size: 11.5px; font-style: italic;">
+            Los campos marcados con <span style="color: #ef4444; font-weight: bold;">*</span> son obligatorios.
+          </span>
+        </div>
 
         <!-- Botones -->
         <div class="form-actions">
-          <button
-            type="submit"
-            class="btn btn-primary"
-            [disabled]="cargando">
+          <button type="submit" class="btn btn-primary" [disabled]="cargando">
             <i class="pi pi-check-circle"></i>
             {{ cargando ? 'Registrando...' : 'Registrar Consumo' }}
           </button>
-          <button
-            type="button"
-            class="btn btn-outline"
-            (click)="limpiarFormulario()">
+          <button type="button" class="btn btn-outline" (click)="limpiarFormulario()">
             <i class="pi pi-refresh"></i>
             Limpiar
           </button>
@@ -151,13 +141,8 @@
   </div>
 
   <!-- Modal de Confirmación -->
-  <p-dialog
-    header="Confirmar Registro"
-    [(visible)]="mostrarConfirmacion"
-    [modal]="true"
-    [style]="{width: '500px'}"
-    [closable]="true"
-    [draggable]="false">
+  <p-dialog header="Confirmar Registro" [(visible)]="mostrarConfirmacion" [modal]="true" [style]="{width: '500px'}"
+    [closable]="true" [draggable]="false">
 
     <div class="confirm-content">
       <div class="confirm-icon">
@@ -208,13 +193,8 @@
   </p-dialog>
 
   <!-- Modal de Resultado -->
-  <p-dialog
-    header="¡Registro Exitoso!"
-    [(visible)]="mostrarResultado"
-    [modal]="true"
-    [style]="{width: '480px'}"
-    [closable]="true"
-    [draggable]="false">
+  <p-dialog header="¡Registro Exitoso!" [(visible)]="mostrarResultado" [modal]="true" [style]="{width: '480px'}"
+    [closable]="true" [draggable]="false">
 
     <div class="result-content" *ngIf="resultadoRegistro">
       <div class="result-icon">
@@ -222,6 +202,10 @@
       </div>
 
       <div class="result-details">
+        <div class="detail-row">
+          <span class="detail-label">Fecha del Registro:</span>
+          <span class="detail-value">{{ fechaActual | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
         <div class="detail-row">
           <span class="detail-label">Cliente:</span>
           <span class="detail-value">{{ resultadoRegistro.cliente }}</span>
@@ -236,11 +220,11 @@
         </div>
         <div class="detail-row">
           <span class="detail-label">Galones:</span>
-          <span class="detail-value">{{ resultadoRegistro.galones }}</span>
+          <span class="detail-value">{{ resultadoRegistro.galones | number:'1.2-2' }}</span>
         </div>
         <div class="detail-row">
           <span class="detail-label">Monto Total:</span>
-          <span class="detail-value">S/. {{ resultadoRegistro.monto_total }}</span>
+          <span class="detail-value">S/. {{ resultadoRegistro.monto_total | number:'1.2-2' }}</span>
         </div>
         <div class="detail-row highlight points">
           <span class="detail-label">Puntos Otorgados:</span>
@@ -254,10 +238,16 @@
     </div>
 
     <ng-template pTemplate="footer">
-      <button class="btn btn-primary" (click)="cerrarResultado()">
-        <i class="pi pi-check"></i>
-        Aceptar
-      </button>
+      <div style="display: flex; flex-direction: column; gap: 8px; width: 100%;">
+        <button class="btn btn-primary" style="width: 100%; justify-content: center;" (click)="cerrarResultado()">
+          <i class="pi pi-check"></i>
+          Aceptar
+        </button>
+        <button class="btn btn-print" style="width: 100%; justify-content: center;" type="button">
+          <i class="pi pi-print"></i>
+          Imprimir
+        </button>
+      </div>
     </ng-template>
   </p-dialog>
 </div>
