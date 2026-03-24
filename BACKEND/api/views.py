@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.authtoken.models import Token
 from django.db.models import Sum, Count, Q
 from rest_framework.pagination import PageNumberPagination
-from . import models, serializers
+from . import models, serializers, permissions
 
 
 class LoginView(APIView):
@@ -42,9 +42,14 @@ class LoginView(APIView):
 
 class UsuarioViewsets(viewsets.ModelViewSet):
     queryset = models.Usuario.objects.all()
-    permission_classes = [IsAuthenticated]
+    # Solo Dueños/Devs pueden gestionar usuarios en general
+    permission_classes = [permissions.IsDueno]
 
     def get_queryset(self):
+        # Si por alguna razón un empleado llega aquí, solo vería su propio usuario
+        if self.request.user.tipo_usuario == 'empleado':
+            return self.queryset.filter(id=self.request.user.id)
+        
         queryset = super().get_queryset()
         tipo = self.request.query_params.get('tipo', None)
         if tipo:
@@ -62,13 +67,23 @@ class UsuarioViewsets(viewsets.ModelViewSet):
 class TipoCombustibleViewSet(viewsets.ModelViewSet):
     queryset = models.TipoCombustible.objects.all()
     serializer_class = serializers.TipoCombustibleSerializer
-    permission_classes = [IsAuthenticated]
+    
+    def get_permissions(self):
+        # Todos pueden ver, pero solo Dueños pueden modificar
+        if self.action in ['list', 'retrieve']:
+            return [IsAuthenticated()]
+        return [permissions.IsDueno()]
 
 
 class ClienteViewSet(viewsets.ModelViewSet):
     queryset = models.Cliente.objects.all()
     serializer_class = serializers.ClienteSerializer
-    permission_classes = [IsAuthenticated]
+    
+    def get_permissions(self):
+        # Solo Dueños pueden eliminar clientes
+        if self.action == 'destroy':
+            return [permissions.IsDueno()]
+        return [IsAuthenticated()]
 
     @action(detail=False, methods=['get'], url_path='ranking')
     def ranking(self, request):
@@ -101,6 +116,12 @@ class RegistroConsumoViewSet(viewsets.ModelViewSet):
     queryset = models.RegistroConsumo.objects.all().order_by('-fecha')
     permission_classes = [IsAuthenticated]
     pagination_class = ConsumoPagination
+
+    def get_permissions(self):
+        # Solo Dueños pueden eliminar consumos
+        if self.action == 'destroy':
+            return [permissions.IsDueno()]
+        return [IsAuthenticated()]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -152,7 +173,7 @@ class RegistrarConsumoView(APIView):
 
 class CambiarPasswordView(APIView):
     """Permite al dueño cambiar la contraseña de un empleado"""
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsDueno]
 
     def post(self, request):
         usuario_id = request.data.get('usuario_id')
@@ -163,6 +184,13 @@ class CambiarPasswordView(APIView):
 
         try:
             usuario = models.Usuario.objects.get(id=usuario_id)
+            
+            # Seguridad extra: Un Dueño no puede cambiar la clave de un Dev 
+            # (opcional, pero recomendado)
+            if usuario.tipo_usuario == 'dev' and request.user.tipo_usuario != 'dev':
+                return Response({'error': 'No tienes permiso para cambiar la clave de un Desarrollador.'}, 
+                                status=status.HTTP_403_FORBIDDEN)
+                                
         except models.Usuario.DoesNotExist:
             return Response({'error': 'Usuario no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -173,7 +201,7 @@ class CambiarPasswordView(APIView):
 
 class DashboardView(APIView):
     """Dashboard con estadísticas para el dueño"""
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsDueno]
 
     def get(self, request):
         total_clientes = models.Cliente.objects.count()

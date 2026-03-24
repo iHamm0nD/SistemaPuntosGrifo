@@ -348,17 +348,18 @@
   </p-dialog>
 
   <!-- Modal de Gestión de Empleados -->
-  <p-dialog header="Gestión de Empleados" [(visible)]="mostrarModalEmpleados" [modal]="true" [style]="{width: '600px'}"
+  <p-dialog header="Gestión de Empleados" [(visible)]="mostrarModalEmpleados" [modal]="true" [style]="{width: '750px'}"
     [closable]="true" [draggable]="false">
 
     <div class="employees-content">
       <div class="employees-list" style="max-height: 400px; overflow-y: auto;">
         <table class="data-table" style="width: 100%; text-align: left;">
           <thead>
-            <tr>
+            <tr style="white-space: nowrap;">
               <th>DNI</th>
               <th>Nombres</th>
               <th>Apellidos</th>
+              <th>Teléfono</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -367,10 +368,17 @@
               <td>{{ emp.dni }}</td>
               <td>{{ emp.nombre }}</td>
               <td>{{ emp.apellido }}</td>
+              <td [ngStyle]="{'color': emp.telefono ? '#f8fafc' : '#475569', 'font-style': emp.telefono ? 'normal' : 'italic'}">
+                {{ emp.telefono || 'Telf no añadido' }}
+              </td>
               <td style="white-space: nowrap;">
+                <!-- Botón Editar -->
+                <button (click)="abrirEdicionEmpleado(emp)" title="Editar empleado"
+                  style="background: #f59e0b; color: #1e293b; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 6px; font-weight: bold;">
+                  <i class="pi pi-user-edit"></i>
+                </button>
                 <!-- Botón Ver Credenciales -->
-                <button (click)="toggleCredenciales(emp)"
-                  title="Ver credenciales"
+                <button (click)="toggleCredenciales(emp)" title="Ver credenciales"
                   style="background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 6px;">
                   <i class="pi pi-eye"></i>
                 </button>
@@ -388,6 +396,48 @@
         </div>
       </div>
     </div>
+  </p-dialog>
+
+  <!-- Modal Editar Empleado -->
+  <p-dialog header="Editar Datos del Empleado" [(visible)]="mostrarModalEditarEmpleado"
+    [modal]="true" [style]="{width: '420px'}" [closable]="true" [draggable]="false">
+
+    <div *ngIf="empleadoEditando" style="padding: 8px 0;">
+      <p style="color: #94a3b8; font-size: 13px; margin-bottom: 16px; margin-top: 0;">Modifica los campos que desees. Los campos con <span style="color: #ef4444;">*</span> son obligatorios.</p>
+
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div>
+          <label style="color: #cbd5e1; font-size: 13px; margin-bottom: 5px; display: block;">DNI <span style="color: #ef4444;">*</span></label>
+          <input type="text" [(ngModel)]="empleadoEditando.dni" (input)="limpiarDniEdicion()" maxlength="9"
+            placeholder="DNI del empleado" class="form-input"
+            style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;">
+        </div>
+        <div>
+          <label style="color: #cbd5e1; font-size: 13px; margin-bottom: 5px; display: block;">Nombres <span style="color: #ef4444;">*</span></label>
+          <input type="text" [(ngModel)]="empleadoEditando.nombre" (input)="limpiarLetrasEdicion()" placeholder="Nombres"
+            class="form-input" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;">
+        </div>
+        <div>
+          <label style="color: #cbd5e1; font-size: 13px; margin-bottom: 5px; display: block;">Apellidos <span style="color: #ef4444;">*</span></label>
+          <input type="text" [(ngModel)]="empleadoEditando.apellido" (input)="limpiarLetrasEdicion()" placeholder="Apellidos"
+            class="form-input" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;">
+        </div>
+        <div>
+          <label style="color: #cbd5e1; font-size: 13px; margin-bottom: 5px; display: block;">Teléfono (Opcional)</label>
+          <input type="text" [(ngModel)]="empleadoEditando.telefono" placeholder="Número de celular"
+            class="form-input" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;">
+        </div>
+        <p *ngIf="errorEdicionEmpleado" style="color: #ef4444; font-size: 13px; margin: 0;">{{ errorEdicionEmpleado }}</p>
+        <p *ngIf="okEdicionEmpleado" style="color: #22c55e; font-size: 13px; margin: 0;">{{ okEdicionEmpleado }}</p>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button (click)="guardarEdicionEmpleado()" class="btn btn-primary"
+        style="width: 100%; background: linear-gradient(135deg, #f59e0b, #d97706); color: #1e293b; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">
+        <i class="pi pi-save" style="margin-right: 6px;"></i> Guardar Cambios
+      </button>
+    </ng-template>
   </p-dialog>
 
   <!-- Modal de Ranking de Clientes (Ver Todos) -->

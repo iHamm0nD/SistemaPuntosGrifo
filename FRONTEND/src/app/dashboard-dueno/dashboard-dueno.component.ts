@@ -41,8 +41,12 @@ export class DashboardDuenoComponent implements OnInit {
   mostrarModalAgregarEmpleado = false;
   mostrarResumenNuevoEmpleado = false;
   mostrarModalCredenciales = false;
+  mostrarModalEditarEmpleado = false;
   resumenEmpleadoConstruido: any = null;
   empCredencialesVisible: any = null;
+  empleadoEditando: any = null;
+  errorEdicionEmpleado = '';
+  okEdicionEmpleado = '';
   editandoPassword = false;
   nuevaPasswordEmp = '';
   mensajePasswordError = '';
@@ -342,6 +346,56 @@ export class DashboardDuenoComponent implements OnInit {
       },
       error: (err) => {
         alert('Error al crear empleado. Verifique si el DNI ya existe.');
+      }
+    });
+  }
+
+  abrirEdicionEmpleado(emp: any) {
+    // Copia profunda para no mutar la lista mientras se edita
+    this.empleadoEditando = { ...emp };
+    this.errorEdicionEmpleado = '';
+    this.okEdicionEmpleado = '';
+    this.mostrarModalEditarEmpleado = true;
+  }
+
+  limpiarDniEdicion() {
+    this.empleadoEditando.dni = this.empleadoEditando.dni.replace(/[^0-9]/g, '');
+  }
+
+  limpiarLetrasEdicion() {
+    this.empleadoEditando.nombre = this.empleadoEditando.nombre.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+    this.empleadoEditando.apellido = this.empleadoEditando.apellido.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+  }
+
+  guardarEdicionEmpleado() {
+    this.errorEdicionEmpleado = '';
+    this.okEdicionEmpleado = '';
+
+    if (!this.empleadoEditando.dni || !this.empleadoEditando.nombre || !this.empleadoEditando.apellido) {
+      this.errorEdicionEmpleado = 'DNI, Nombres y Apellidos son obligatorios.';
+      return;
+    }
+    if (this.empleadoEditando.dni.length < 8 || this.empleadoEditando.dni.length > 9) {
+      this.errorEdicionEmpleado = 'El DNI debe tener 8 o 9 dígitos.';
+      return;
+    }
+
+    this.empleadoEditando.nombre = this.empleadoEditando.nombre.trim().toUpperCase();
+    this.empleadoEditando.apellido = this.empleadoEditando.apellido.trim().toUpperCase();
+    // El username (login) siempre es el DNI
+    this.empleadoEditando.username = this.empleadoEditando.dni;
+
+    this.api.putUsuario(this.empleadoEditando).subscribe({
+      next: () => {
+        this.okEdicionEmpleado = '✔ Datos actualizados correctamente.';
+        this.cargarEmpleados();
+        setTimeout(() => {
+          this.okEdicionEmpleado = '';
+          this.mostrarModalEditarEmpleado = false;
+        }, 1500);
+      },
+      error: () => {
+        this.errorEdicionEmpleado = 'Error al guardar. Verifica que el DNI no esté en uso por otro empleado.';
       }
     });
   }
