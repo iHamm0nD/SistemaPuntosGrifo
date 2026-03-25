@@ -97,8 +97,8 @@ export class ApiService {
     }
 
     // =============================== DASHBOARD ================================
-    public getDashboard(): Observable<DashboardData> {
-        return this.http.get<DashboardData>(this.ApiUrl + 'dashboard/');
+    public getDashboard(periodo: string = 'total'): Observable<DashboardData> {
+        return this.http.get<DashboardData>(`${this.ApiUrl}dashboard/?periodo=${periodo}`);
     }
 
     public cambiarPasswordEmpleado(usuarioId: number, nuevaPassword: string): Observable<any> {
@@ -107,5 +107,10 @@ export class ApiService {
             { usuario_id: usuarioId, nueva_password: nuevaPassword },
             this.httpOptions
         );
+    }
+
+    // =============================== EXTERNAL APIS =================================
+    public consultarDNI(dni: string): Observable<any> {
+        return this.http.get<any>(`${this.ApiUrl}consultar-dni/${dni}/`);
     }
 }

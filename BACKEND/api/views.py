@@ -127,11 +127,7 @@ class RegistroConsumoViewSet(viewsets.ModelViewSet):
         queryset = super().get_queryset()
         search = self.request.query_params.get('search', None)
         if search:
-            queryset = queryset.filter(
-                Q(cliente__dni__icontains=search) | 
-                Q(cliente__nombres__icontains=search) | 
-                Q(cliente__apellidos__icontains=search)
-            )
+            queryset = queryset.filter(cliente__dni__icontains=search)
         return queryset
 
     def get_serializer_class(self):
@@ -204,6 +200,9 @@ class DashboardView(APIView):
     permission_classes = [permissions.IsDueno]
 
     def get(self, request):
+        from django.utils import timezone
+        from datetime import timedelta
+
         total_clientes = models.Cliente.objects.count()
         total_puntos = models.Cliente.objects.aggregate(
             total=Sum('puntos_acumulados'))['total'] or 0
@@ -213,8 +212,22 @@ class DashboardView(APIView):
         top_clientes = models.Cliente.objects.order_by('-puntos_acumulados')[:5]
         top_serializer = serializers.ClienteResumenSerializer(top_clientes, many=True)
 
+        # Filtro de período para consumo por combustible
+        periodo = request.query_params.get('periodo', 'total')  # dia, semana, mes, total
+        consumo_qs = models.RegistroConsumo.objects.all()
+        ahora = timezone.localtime(timezone.now())  # Hora local de Lima, no UTC
+
+        if periodo == 'dia':
+            consumo_qs = consumo_qs.filter(fecha__date=ahora.date())
+        elif periodo == 'semana':
+            inicio_semana = ahora - timedelta(days=7)
+            consumo_qs = consumo_qs.filter(fecha__gte=inicio_semana)
+        elif periodo == 'mes':
+            inicio_mes = ahora - timedelta(days=30)
+            consumo_qs = consumo_qs.filter(fecha__gte=inicio_mes)
+
         # Consumo por tipo de combustible
-        consumo_por_tipo = models.RegistroConsumo.objects.values(
+        consumo_por_tipo = consumo_qs.values(
             'tipo_combustible__nombre'
         ).annotate(
             total_galones=Sum('galones'),
@@ -229,3 +242,34 @@ class DashboardView(APIView):
             'top_clientes': top_serializer.data,
             'consumo_por_tipo': list(consumo_por_tipo),
         })
+
+class ConsultarDNIApiView(APIView):
+    """
+    Proxy para consumir dniruc.apisperu.com y evitar bloqueos CORS
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, dni):
+        import urllib.request
+        import urllib.error
+        import json
+        from rest_framework import status
+        
+        token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImhhbW1vbmQyNDA1QGdtYWlsLmNvbSJ9.rDBsr_l-BD9Lihy0B2ZmOOexBjkvGzlgKa3jZikj2P0"
+        url = f"https://dniruc.apisperu.com/api/v1/dni/{dni}?token={token}"
+        
+        try:
+            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+            response = urllib.request.urlopen(req, timeout=10)
+            data = json.loads(response.read().decode('utf-8'))
+            return Response(data, status=status.HTTP_200_OK)
+        except Exception as e:
+            try:
+                from rest_framework import status
+                if hasattr(e, 'read'):
+                    error_data = json.loads(e.read().decode('utf-8'))
+                    return Response(error_data, status=e.code)
+            except:
+                pass
+            from rest_framework import status
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

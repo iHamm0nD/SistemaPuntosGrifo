@@ -15,4 +15,5 @@ urlpatterns = [
     path('registrar-consumo/', views.RegistrarConsumoView.as_view(), name='registrar-consumo'),
     path('dashboard/', views.DashboardView.as_view(), name='dashboard'),
     path('cambiar-password/', views.CambiarPasswordView.as_view(), name='cambiar-password'),
+    path('consultar-dni/<str:dni>/', views.ConsultarDNIApiView.as_view(), name='consultar-dni'),
 ]

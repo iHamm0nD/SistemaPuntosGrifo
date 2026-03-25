@@ -20,6 +20,8 @@ export class DashboardDuenoComponent implements OnInit {
   topClientes: any[] = [];
   consumoPorTipo: any[] = [];
   cargando = true;
+  filtroPeriodo: string = 'total'; // dia, semana, mes, total
+  cargandoConsumo = false;
 
   // Manejo de combustibles
   tiposCombustible: TipoCombustible[] = [];
@@ -54,6 +56,8 @@ export class DashboardDuenoComponent implements OnInit {
   passwordMostrada = '';
   empleados: any[] = [];
   cargandoEmpleados = false;
+  buscandoDni = false;
+  errorDni = '';
   nuevoEmpleado: any = { username: '', password: '', nombre: '', apellido: '', dni: '', email: 'empleado@grifo.com', telefono: '', tipo_usuario: 'empleado' };
 
   // Ranking Modal
@@ -84,7 +88,7 @@ export class DashboardDuenoComponent implements OnInit {
     if (mostrarLoader) {
       this.cargando = true;
     }
-    this.api.getDashboard().subscribe({
+    this.api.getDashboard(this.filtroPeriodo).subscribe({
       next: (data) => {
         this.totalClientes = data.total_clientes;
         this.totalPuntos = data.total_puntos_otorgados;
@@ -95,6 +99,20 @@ export class DashboardDuenoComponent implements OnInit {
       },
       error: () => {
         this.cargando = false;
+      }
+    });
+  }
+
+  cambiarFiltroPeriodo(periodo: string) {
+    this.filtroPeriodo = periodo;
+    this.cargandoConsumo = true;
+    this.api.getDashboard(periodo).subscribe({
+      next: (data) => {
+        this.consumoPorTipo = data.consumo_por_tipo;
+        this.cargandoConsumo = false;
+      },
+      error: () => {
+        this.cargandoConsumo = false;
       }
     });
   }
@@ -257,6 +275,40 @@ export class DashboardDuenoComponent implements OnInit {
 
   limpiarDniEmpleado() {
     this.nuevoEmpleado.dni = this.nuevoEmpleado.dni.replace(/[^0-9]/g, '');
+    this.errorDni = '';
+    
+    if (this.nuevoEmpleado.dni.length === 8) {
+      this.buscarDniEnApi();
+    }
+  }
+
+  buscarDniEnApi() {
+    this.buscandoDni = true;
+    this.errorDni = '';
+    this.api.consultarDNI(this.nuevoEmpleado.dni).subscribe({
+      next: (res) => {
+        if (res && res.nombres) {
+          this.nuevoEmpleado.nombre = res.nombres;
+          this.nuevoEmpleado.apellido = `${res.apellidoPaterno} ${res.apellidoMaterno}`;
+        } else if (res && res.nombre) {
+          // Algunos endpoints devuelven {nombre: ...}
+          this.nuevoEmpleado.nombre = res.nombre;
+          this.nuevoEmpleado.apellido = res.apellido || '';
+        } else {
+          this.errorDni = res.message || 'DNI no encontrado en RENIEC.';
+        }
+        this.buscandoDni = false;
+      },
+      error: (err) => {
+        this.buscandoDni = false;
+        // Solo mostramos error si el status no es 0 (que indica un problema de CORS o conexión si no hay token aún)
+        if (err.status === 401 || err.status === 403) {
+           this.errorDni = 'Falta o es inválido el Token de la API.';
+        } else {
+           this.errorDni = 'No se pudo consultar el DNI.';
+        }
+      }
+    });
   }
 
   toggleCredenciales(emp: any) {

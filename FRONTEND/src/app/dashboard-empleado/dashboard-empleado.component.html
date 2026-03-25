@@ -39,10 +39,19 @@
               <i class="pi pi-id-card"></i>
               DNI del Cliente <span style="color: #ef4444; margin-left: 4px;">*</span>
             </label>
-            <input id="dni" type="text" class="form-input" [(ngModel)]="dni" name="dni" #dniRef="ngModel"
-              placeholder="Ingresa el DNI" maxlength="9" minlength="8" pattern="^[0-9]+$"
-              (input)="intentoSubmit = false" (blur)="buscarCliente()"
-              [style.border-color]="(dniRef.invalid && intentoSubmit) ? '#ef4444' : null" required>
+            <div style="position: relative; display: flex; align-items: center;">
+              <input id="dni" type="text" class="form-input" [(ngModel)]="dni" (ngModelChange)="buscarCliente()"
+                name="dni" #dniRef="ngModel" placeholder="Ingresa el DNI" maxlength="9" minlength="8" pattern="^[0-9]+$"
+                (input)="intentoSubmit = false"
+                [style.border-color]="(dniRef.invalid && intentoSubmit) ? '#ef4444' : null" required>
+              <i *ngIf="buscandoDni" class="pi pi-spinner pi-spin"
+                style="position: absolute; right: 10px; color: #3b82f6;"></i>
+            </div>
+            <small *ngIf="errorDni"
+              style="color: #ef4444; margin-top: 6px; font-size: 12.5px; font-weight: 500; display: flex; align-items: center; gap: 4px;">
+              <i class="pi pi-exclamation-circle" style="font-size: 12px;"></i>
+              <span>{{ errorDni }}</span>
+            </small>
             <small *ngIf="dniRef.invalid && intentoSubmit"
               style="color: #ef4444; margin-top: 6px; font-size: 12.5px; font-weight: 500; display: flex; align-items: center; gap: 4px;">
               <i class="pi pi-exclamation-circle" style="font-size: 12px;"></i>
@@ -86,7 +95,7 @@
               [style.border-color]="(combustibleRef.invalid && intentoSubmit) ? '#ef4444' : null" required>
               <option [ngValue]="null" disabled>Selecciona un combustible</option>
               <option *ngFor="let tipo of tiposCombustible" [ngValue]="tipo.id">
-                {{ tipo.nombre }} — S/.{{ tipo.precio_referencial }}/gal — {{ tipo.puntos_por_galon }} pts/gal
+                {{ tipo.nombre }}
               </option>
             </select>
             <small *ngIf="combustibleRef.invalid && intentoSubmit"

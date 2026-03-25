@@ -62,15 +62,53 @@ export class DashboardEmpleadoComponent implements OnInit {
     });
   }
 
+  // Estado para la búsqueda externa de DNI
+  buscandoDni = false;
+  errorDni = '';
+
   buscarCliente() {
-    if (this.dni.length >= 8) {
+    this.nombres = '';
+    this.apellidos = '';
+    this.errorDni = '';
+    
+    // Buscar tanto para 8 (DNI) como para 9 (Carnet de extranjería) dígitos
+    if (this.dni.length >= 8 && this.dni.length <= 9) {
+      if (/[^0-9]/.test(this.dni)) return;
+      
       this.api.buscarClientePorDni(this.dni).subscribe({
         next: (cliente) => {
           this.nombres = cliente.nombres;
           this.apellidos = cliente.apellidos;
         },
         error: () => {
-          // Cliente no encontrado, el empleado escribirá los datos
+          // Cliente no encontrado en bd local. 
+          // Solo buscamos en RENIEC (API Externa) si es DNI (8 dígitos)
+          if (this.dni.length === 8) {
+            this.buscandoDni = true;
+            this.errorDni = '';
+            this.api.consultarDNI(this.dni).subscribe({
+              next: (res) => {
+                this.buscandoDni = false;
+                if (res && res.nombres) {
+                  this.nombres = res.nombres;
+                  this.apellidos = `${res.apellidoPaterno} ${res.apellidoMaterno}`;
+                } else if (res && res.nombre) {
+                  this.nombres = res.nombre;
+                  this.apellidos = res.apellido || '';
+                } else {
+                  this.errorDni = res.message || 'DNI no encontrado en RENIEC.';
+                }
+              },
+              error: (err) => {
+                this.buscandoDni = false;
+                if (err.status === 401 || err.status === 403) {
+                   this.errorDni = 'Falta o es inválido el Token de la API.';
+                } else {
+                   this.errorDni = 'No se pudo consultar el DNI.';
+                }
+              }
+            });
+          }
         }
       });
     }
