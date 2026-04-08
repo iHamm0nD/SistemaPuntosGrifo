@@ -30,12 +30,106 @@
 
     <div class="hero-buttons">
       <p-button 
+        label="Consultar Mis Puntos" 
+        icon="pi pi-star"
+        styleClass="hero-btn-secondary"
+        (onClick)="abrirModalConsultarPuntos()">
+      </p-button>
+
+      <p-button 
         label="Ingresar al Sistema" 
         icon="pi pi-sign-in"
         styleClass="hero-btn-primary"
         [routerLink]="['/login']">
       </p-button>
-
     </div>
   </div>
 </div>
+
+<!-- Modal Consultar Puntos -->
+<p-dialog 
+  [(visible)]="mostrarModalPuntos" 
+  [modal]="true" 
+  [style]="{width: '90vw', maxWidth: '480px'}" 
+  [draggable]="false" 
+  [resizable]="false"
+  [showHeader]="false"
+  [closeOnEscape]="true"
+  [dismissableMask]="true"
+  styleClass="elegant-dialog">
+  
+  <div class="elegant-dialog-content">
+    
+    <!-- Botón de cerrar personalizado -->
+    <button class="custom-close-btn" (click)="mostrarModalPuntos = false">
+      <i class="pi pi-times"></i>
+    </button>
+
+    <!-- Header personalizado -->
+    <div class="elegant-header">
+      <div class="icon-wrapper">
+        <i class="pi pi-star-fill glow-icon"></i>
+      </div>
+      <h2 class="elegant-title">Mis Puntos</h2>
+      <p class="elegant-subtitle">Ingresa tu DNI para conocer tus beneficios acumulados</p>
+    </div>
+
+    <!-- Buscador -->
+    <div class="search-section">
+      <div class="elegant-input-group" [class.has-error]="mensajeError">
+        <i class="pi pi-id-card input-icon"></i>
+        <input 
+          id="dniConsulta"
+          type="text" 
+          [(ngModel)]="dniConsulta" 
+          placeholder="Número de DNI (8 dígitos)" 
+          maxlength="8"
+          (keyup.enter)="consultarPuntos()"
+          [disabled]="cargando"
+          class="elegant-input">
+        <button 
+          class="elegant-submit-btn" 
+          (click)="consultarPuntos()" 
+          [disabled]="cargando || dniConsulta.length !== 8 || enCooldown">
+          <i class="pi pi-arrow-right" *ngIf="!cargando && !enCooldown"></i>
+          <i class="pi pi-spinner pi-spin" *ngIf="cargando"></i>
+          <span *ngIf="enCooldown" class="text-sm font-semibold">{{ segundosCooldown }}s</span>
+        </button>
+      </div>
+      
+      <div class="error-wrapper" *ngIf="mensajeError">
+        <i class="pi pi-exclamation-circle"></i>
+        <span>{{ mensajeError }}</span>
+      </div>
+    </div>
+
+    <!-- Resultado (estado éxito) -->
+    <div class="result-section" *ngIf="puntosCliente !== null">
+      <div class="result-card">
+        <div class="user-greeting">
+          <span class="greeting-text">¡Hola,</span>
+          <span class="greeting-name">{{ nombreCliente }}!</span>
+        </div>
+        
+        <div class="animated-points">
+          <div class="points-ring">
+            <div class="points-circle-elegant">
+              <span class="value">{{ puntosCliente }}</span>
+              <span class="label">PUNTOS</span>
+            </div>
+            <!-- Elementos decorativos (partículas) -->
+            <div class="sparkle s1"></div>
+            <div class="sparkle s2"></div>
+            <div class="sparkle s3"></div>
+          </div>
+        </div>
+        
+        <div class="result-footer">
+          <div class="footer-badge">
+            <i class="pi pi-gift"></i> Sigue acumulando
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>

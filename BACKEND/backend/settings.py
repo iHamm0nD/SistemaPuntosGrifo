@@ -47,7 +47,15 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '20/minute',
+        'user': '1000/day'
+    }
 }
 
 MIDDLEWARE = [
@@ -63,6 +71,8 @@ MIDDLEWARE = [
 ]
 
 API_KEY = env('API_KEY', default='')
+DNI_API_TOKEN = env('DNI_API_TOKEN', default='eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImhhbW1vbmQyNDA1QGdtYWlsLmNvbSJ9.rDBsr_l-BD9Lihy0B2ZmOOexBjkvGzlgKa3jZikj2P0')
+
 
 CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[])
 

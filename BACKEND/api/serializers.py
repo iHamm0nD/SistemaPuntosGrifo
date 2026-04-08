@@ -57,6 +57,7 @@ class ClienteSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Cliente
         fields = '__all__'
+        read_only_fields = ['puntos_acumulados']
 
 
 class ClienteResumenSerializer(serializers.ModelSerializer):

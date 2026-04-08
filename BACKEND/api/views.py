@@ -80,9 +80,12 @@ class ClienteViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ClienteSerializer
     
     def get_permissions(self):
-        # Solo Dueños pueden eliminar clientes
-        if self.action == 'destroy':
+        # Solo Dueños pueden modificar o eliminar clientes directamente desde la API
+        if self.action in ['destroy', 'update', 'partial_update', 'create']:
             return [permissions.IsDueno()]
+        # Permitir que la acción 'buscar_por_dni' sea pública
+        if self.action == 'buscar_por_dni':
+            return [AllowAny()]
         return [IsAuthenticated()]
 
     @action(detail=False, methods=['get'], url_path='ranking')
@@ -118,8 +121,8 @@ class RegistroConsumoViewSet(viewsets.ModelViewSet):
     pagination_class = ConsumoPagination
 
     def get_permissions(self):
-        # Solo Dueños pueden eliminar consumos
-        if self.action == 'destroy':
+        # Solo Dueños pueden eliminar o modificar consumos directamente
+        if self.action in ['destroy', 'update', 'partial_update']:
             return [permissions.IsDueno()]
         return [IsAuthenticated()]
 
@@ -254,8 +257,9 @@ class ConsultarDNIApiView(APIView):
         import urllib.error
         import json
         from rest_framework import status
+        from django.conf import settings
         
-        token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImhhbW1vbmQyNDA1QGdtYWlsLmNvbSJ9.rDBsr_l-BD9Lihy0B2ZmOOexBjkvGzlgKa3jZikj2P0"
+        token = settings.DNI_API_TOKEN
         url = f"https://dniruc.apisperu.com/api/v1/dni/{dni}?token={token}"
         
         try:
