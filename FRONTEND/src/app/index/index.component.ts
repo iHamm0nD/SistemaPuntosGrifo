@@ -19,7 +19,7 @@ export class IndexComponent implements OnDestroy {
   segundosCooldown: number = 0;
   intervaloCooldown: any;
 
-  constructor(private apiService: ApiService) {}
+  constructor(private apiService: ApiService) { }
 
   abrirModalConsultarPuntos() {
     this.mostrarModalPuntos = true;
@@ -52,7 +52,7 @@ export class IndexComponent implements OnDestroy {
 
     this.cargando = true;
     this.mensajeError = '';
-    
+
     this.apiService.buscarClientePorDni(this.dniConsulta).subscribe({
       next: (cliente) => {
         this.puntosCliente = cliente.puntos_acumulados;
@@ -63,7 +63,7 @@ export class IndexComponent implements OnDestroy {
       },
       error: (err) => {
         if (err.status === 404) {
-          this.mensajeError = 'No se encontró un cliente con este DNI.';
+          this.mensajeError = 'Aún no te encuentras registrado.';
         } else {
           this.mensajeError = 'Error al consultar los puntos. Intente de nuevo.';
         }

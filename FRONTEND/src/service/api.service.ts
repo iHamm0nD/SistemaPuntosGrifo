@@ -109,6 +109,14 @@ export class ApiService {
         );
     }
 
+    public validarPassword(password: string): Observable<any> {
+        return this.http.post<any>(
+            this.ApiUrl + 'validar-password/',
+            { password: password },
+            this.httpOptions
+        );
+    }
+
     // =============================== EXTERNAL APIS =================================
     public consultarDNI(dni: string): Observable<any> {
         return this.http.get<any>(`${this.ApiUrl}consultar-dni/${dni}/`);

@@ -19,6 +19,7 @@ export interface RegistrarConsumoRequest {
     apellidos: string;
     tipo_combustible: number;
     monto_consumido: number;
+    tanque_lleno?: boolean;
 }
 
 export interface RegistrarConsumoResponse {

@@ -2,7 +2,8 @@ from rest_framework import serializers
 from . import models
 
 
-# ========================== USUARIO ==========================
+# ========================== USUARIOS ==========================
+# Serializadores encargados de convertir los objetos de Usuario a JSON y viceversa
 
 class UsuarioSerializers(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -18,12 +19,12 @@ class UsuarioSerializers(serializers.ModelSerializer):
 class PerfilUsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Usuario
-        fields = ['id', 'nombre', 'apellido', 'email', 'dni', 'telefono', 'tipo_usuario']
+        fields = ['id', 'nombre', 'apellido', 'dni', 'telefono', 'tipo_usuario']
 
     def update(self, instance, validated_data):
+        # Sobrescribimos el método update para guardar cambios de perfil
         instance.nombre = validated_data.get('nombre', instance.nombre)
         instance.apellido = validated_data.get('apellido', instance.apellido)
-        instance.email = validated_data.get('email', instance.email)
         instance.dni = validated_data.get('dni', instance.dni)
         instance.telefono = validated_data.get('telefono', instance.telefono)
         instance.save()
@@ -31,19 +32,18 @@ class PerfilUsuarioSerializer(serializers.ModelSerializer):
 
 
 class EmpleadoRegistroSerializer(serializers.ModelSerializer):
-    """Serializer para que un Dev o Dueño registre empleados"""
+    """Serializer especial para que un Dev o Dueño registre y de alta a nuevos empleados"""
     password = serializers.CharField(write_only=True)
 
     class Meta:
         model = models.Usuario
-        fields = ['id', 'username', 'password', 'nombre', 'apellido', 'dni',
-                  'email', 'telefono', 'tipo_usuario']
+        fields = ['id', 'username', 'password', 'nombre', 'apellido', 'dni', 'telefono', 'tipo_usuario']
 
     def create(self, validated_data):
         return models.Usuario.objects.create_user(**validated_data)
 
 
-# ========================== TIPO COMBUSTIBLE ==========================
+# ========================== COMBUSTIBLES ==========================
 
 class TipoCombustibleSerializer(serializers.ModelSerializer):
     class Meta:
@@ -52,6 +52,7 @@ class TipoCombustibleSerializer(serializers.ModelSerializer):
 
 
 # ========================== CLIENTE ==========================
+# Encargados de enviar y validar datos sobre los clientes (DNI y puntos).
 
 class ClienteSerializer(serializers.ModelSerializer):
     class Meta:
@@ -61,7 +62,7 @@ class ClienteSerializer(serializers.ModelSerializer):
 
 
 class ClienteResumenSerializer(serializers.ModelSerializer):
-    """Serializer ligero para ranking/dashboard"""
+    """Serializer ligero diseñado específicamente para el dashboard y los ránkings de clientes"""
     total_consumos = serializers.SerializerMethodField()
 
     class Meta:
@@ -70,10 +71,13 @@ class ClienteResumenSerializer(serializers.ModelSerializer):
                   'fecha_registro', 'total_consumos']
 
     def get_total_consumos(self, obj):
+        if hasattr(obj, 'total_consumos_annotated'):
+            return obj.total_consumos_annotated
         return obj.consumos.count()
 
 
-# ========================== REGISTRO CONSUMO ==========================
+# ========================== CONSUMOS ==========================
+# Administra la carga e interfaz de cada compra y cuántos puntos recibe
 
 class RegistroConsumoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -83,10 +87,10 @@ class RegistroConsumoSerializer(serializers.ModelSerializer):
 
 
 class RegistroConsumoReadSerializer(serializers.ModelSerializer):
-    """Serializer para lectura con datos expandidos"""
+    """Versión expandida del serializador de lectura. Incluye nombres anidados en lugar de simples IDs"""
     cliente_dni = serializers.CharField(source='cliente.dni', read_only=True)
     cliente_nombre = serializers.SerializerMethodField()
-    cliente_puntos = serializers.IntegerField(source='cliente.puntos_acumulados', read_only=True)
+    cliente_puntos = serializers.DecimalField(source='cliente.puntos_acumulados', max_digits=10, decimal_places=2, read_only=True)
     tipo_combustible_nombre = serializers.CharField(source='tipo_combustible.nombre', read_only=True)
     empleado_nombre = serializers.SerializerMethodField()
 
@@ -108,16 +112,17 @@ class RegistroConsumoReadSerializer(serializers.ModelSerializer):
 
 
 class RegistrarConsumoSerializer(serializers.Serializer):
-    """Serializer para el formulario de registro del empleado"""
+    """Serializer principal usado por la interfaz de Empleado (Front) al registrar un tanqueo."""
     dni = serializers.CharField(max_length=15)
     nombres = serializers.CharField(max_length=100)
     apellidos = serializers.CharField(max_length=100)
     tipo_combustible = serializers.PrimaryKeyRelatedField(
         queryset=models.TipoCombustible.objects.all())
     monto_consumido = serializers.DecimalField(max_digits=10, decimal_places=2)
+    tanque_lleno = serializers.BooleanField(default=False)
 
     def create(self, validated_data):
-        # Buscar o crear el cliente
+        # Busca en la BD el cliente con ese DNI; si no lo encuentra, lo crea automáticamente
         cliente, created = models.Cliente.objects.get_or_create(
             dni=validated_data['dni'],
             defaults={
@@ -126,21 +131,29 @@ class RegistrarConsumoSerializer(serializers.Serializer):
             }
         )
 
-        # Si el cliente ya existe, actualizar nombres por si cambió
+        # En caso el cliente ya existiese pero tenga diferentes nombres en RENIEC se corrigen u actualizan
         if not created:
             cliente.nombres = validated_data['nombres']
             cliente.apellidos = validated_data['apellidos']
             cliente.save()
 
-        # Crear el registro de consumo
+        # Asigna la relación de combustible y dinero abonado
         tipo_combustible = validated_data['tipo_combustible']
         monto = validated_data['monto_consumido']
+        tanque_lleno = validated_data.get('tanque_lleno', False)
         
-        # Calcular galones según el monto y precios referenciales
+        # Calcula indirectamente la cantidad de galones según el precio tarifario
         galones = monto / tipo_combustible.precio_referencial
         
-        # Calcular puntos (usamos galones enteros como base, o puedes redondear el monto como prefieras, aquí mantengo logica por galon)
-        puntos = int(galones) * tipo_combustible.puntos_por_galon
+        from decimal import Decimal
+        is_premium = 'premium' in tipo_combustible.nombre.lower()
+        
+        # Calcular los bloques de 10 soles completados (ej: 18 soles = 1 bloque, 20 soles = 2 bloques)
+        tramos_de_10 = int(monto // Decimal('10.0'))
+        
+        base_points = Decimal(str(tramos_de_10)) * (Decimal('2.5') if is_premium else Decimal('2.0'))
+        puntos = base_points + (Decimal('2.0') if tanque_lleno else Decimal('0.0'))
+        puntos = round(puntos, 2)
 
         registro = models.RegistroConsumo.objects.create(
             cliente=cliente,
@@ -151,10 +164,12 @@ class RegistrarConsumoSerializer(serializers.Serializer):
             monto_total=monto
         )
 
-        # Recalcular puntos del cliente
-        cliente.puntos_acumulados = sum(
-            c.puntos_otorgados for c in cliente.consumos.all()
-        )
+        # Usamos anotaciones nativas de la DB para recalcular el puntaje de todo el expediente del cliente
+        from django.db.models import Sum
+        total_puntos = cliente.consumos.aggregate(
+            total=Sum('puntos_otorgados')
+        )['total'] or 0
+        cliente.puntos_acumulados = total_puntos
         cliente.save()
 
         return registro

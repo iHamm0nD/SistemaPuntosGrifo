@@ -123,27 +123,31 @@
           <!-- Botones de filtro de período -->
           <div style="display: flex; gap: 6px;">
             <button (click)="cambiarFiltroPeriodo('dia')"
-              [style.background]="filtroPeriodo === 'dia' ? '#3b82f6' : 'transparent'"
-              [style.border-color]="filtroPeriodo === 'dia' ? '#3b82f6' : '#334155'"
-              style="font-size: 12px; padding: 4px 10px; border-radius: 5px; border: 1px solid #334155; color: white; cursor: pointer; transition: all 0.2s;">
+              [style.background]="filtroPeriodo === 'dia' ? 'rgba(255, 159, 74, 0.2)' : 'transparent'"
+              [style.border-color]="filtroPeriodo === 'dia' ? '#ff9f4a' : 'rgba(72, 72, 71, 0.3)'"
+              [style.color]="filtroPeriodo === 'dia' ? '#ff9f4a' : '#adaaaa'"
+              style="font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(72, 72, 71, 0.3); cursor: pointer; transition: all 0.2s;">
               Hoy
             </button>
             <button (click)="cambiarFiltroPeriodo('semana')"
-              [style.background]="filtroPeriodo === 'semana' ? '#3b82f6' : 'transparent'"
-              [style.border-color]="filtroPeriodo === 'semana' ? '#3b82f6' : '#334155'"
-              style="font-size: 12px; padding: 4px 10px; border-radius: 5px; border: 1px solid #334155; color: white; cursor: pointer; transition: all 0.2s;">
+              [style.background]="filtroPeriodo === 'semana' ? 'rgba(255, 159, 74, 0.2)' : 'transparent'"
+              [style.border-color]="filtroPeriodo === 'semana' ? '#ff9f4a' : 'rgba(72, 72, 71, 0.3)'"
+              [style.color]="filtroPeriodo === 'semana' ? '#ff9f4a' : '#adaaaa'"
+              style="font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(72, 72, 71, 0.3); cursor: pointer; transition: all 0.2s;">
               7 días
             </button>
             <button (click)="cambiarFiltroPeriodo('mes')"
-              [style.background]="filtroPeriodo === 'mes' ? '#3b82f6' : 'transparent'"
-              [style.border-color]="filtroPeriodo === 'mes' ? '#3b82f6' : '#334155'"
-              style="font-size: 12px; padding: 4px 10px; border-radius: 5px; border: 1px solid #334155; color: white; cursor: pointer; transition: all 0.2s;">
+              [style.background]="filtroPeriodo === 'mes' ? 'rgba(255, 159, 74, 0.2)' : 'transparent'"
+              [style.border-color]="filtroPeriodo === 'mes' ? '#ff9f4a' : 'rgba(72, 72, 71, 0.3)'"
+              [style.color]="filtroPeriodo === 'mes' ? '#ff9f4a' : '#adaaaa'"
+              style="font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(72, 72, 71, 0.3); cursor: pointer; transition: all 0.2s;">
               30 días
             </button>
             <button (click)="cambiarFiltroPeriodo('total')"
-              [style.background]="filtroPeriodo === 'total' ? '#3b82f6' : 'transparent'"
-              [style.border-color]="filtroPeriodo === 'total' ? '#3b82f6' : '#334155'"
-              style="font-size: 12px; padding: 4px 10px; border-radius: 5px; border: 1px solid #334155; color: white; cursor: pointer; transition: all 0.2s;">
+              [style.background]="filtroPeriodo === 'total' ? 'rgba(255, 159, 74, 0.2)' : 'transparent'"
+              [style.border-color]="filtroPeriodo === 'total' ? '#ff9f4a' : 'rgba(72, 72, 71, 0.3)'"
+              [style.color]="filtroPeriodo === 'total' ? '#ff9f4a' : '#adaaaa'"
+              style="font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(72, 72, 71, 0.3); cursor: pointer; transition: all 0.2s;">
               Total
             </button>
           </div>
@@ -151,7 +155,7 @@
         <div class="panel-body">
           <!-- Loading del gráfico -->
           <div *ngIf="cargandoConsumo" style="display: flex; justify-content: center; align-items: center; height: 80px;">
-            <i class="pi pi-spinner pi-spin" style="color: #3b82f6; font-size: 24px;"></i>
+            <i class="pi pi-spinner pi-spin" style="color: #ff9f4a; font-size: 24px;"></i>
           </div>
           <div class="fuel-list" *ngIf="!cargandoConsumo && consumoPorTipo.length > 0">
             <div class="fuel-item" *ngFor="let tipo of consumoPorTipo">
@@ -186,7 +190,7 @@
         <div class="search-bar" style="display: flex; gap: 10px;">
           <input type="text" [ngModel]="busquedaRegistro" (ngModelChange)="onSearchChange($event)"
             placeholder="Buscar DNI" class="form-input"
-            style="padding: 5px; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: white; width: 250px;">
+            style="padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #262626; color: white; width: 250px;">
         </div>
       </div>
       <div class="panel-body">
@@ -256,7 +260,7 @@
   </div>
 
   <!-- Modal de Gestión de Precios -->
-  <p-dialog header="Gestión de Precios" [(visible)]="mostrarModalPrecios" [modal]="true" [style]="{width: '450px'}"
+  <p-dialog header="Gestión de Precios" [(visible)]="mostrarModalPrecios" [modal]="true" [style]="{width: '95vw', maxWidth: '450px'}"
     [closable]="true" [draggable]="false">
 
     <div class="prices-content">
@@ -285,7 +289,7 @@
 
   <!-- Modal de Agregar Nuevo Empleado -->
   <p-dialog header="Añadir Nuevo Empleado" [(visible)]="mostrarModalAgregarEmpleado" [modal]="true"
-    [style]="{width: '450px'}" [closable]="true" [draggable]="false">
+    [style]="{width: '95vw', maxWidth: '450px'}" [closable]="true" [draggable]="false">
 
     <div class="add-employee-detailed-form" style="padding: 10px 0;">
       <p style="color: #94a3b8; font-size: 13px; margin-bottom: 16px; margin-top: 0;">Rellena los datos para crear una
@@ -298,9 +302,9 @@
           <div style="position: relative; display: flex; align-items: center;">
             <input type="text" [(ngModel)]="nuevoEmpleado.dni" (input)="limpiarDniEmpleado()" maxlength="9" minlength="8"
               placeholder="Ingresa DNI" class="form-input"
-              style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;"
+              style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #262626; color: white; outline: none;"
               [disabled]="buscandoDni">
-            <i *ngIf="buscandoDni" class="pi pi-spinner pi-spin" style="position: absolute; right: 10px; color: #3b82f6;"></i>
+            <i *ngIf="buscandoDni" class="pi pi-spinner pi-spin" style="position: absolute; right: 10px; color: #ff9f4a;"></i>
           </div>
           <p *ngIf="errorDni" style="color: #ef4444; font-size: 11px; margin: 4px 0 0;">{{ errorDni }} <a href="https://apis.net.pe" target="_blank" style="color: #3b82f6; text-decoration: underline;" *ngIf="errorDni.includes('Token')">Obtener token gratis</a></p>
         </div>
@@ -310,7 +314,7 @@
               style="color: #ef4444;">*</span></label>
           <input type="text" [(ngModel)]="nuevoEmpleado.nombre" (input)="limpiarLetrasNombres()" placeholder="Nombres"
             class="form-input"
-            style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;">
+            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #262626; color: white; outline: none;">
         </div>
 
         <div>
@@ -318,14 +322,14 @@
               style="color: #ef4444;">*</span></label>
           <input type="text" [(ngModel)]="nuevoEmpleado.apellido" (input)="limpiarLetrasNombres()"
             placeholder="Apellidos" class="form-input"
-            style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;">
+            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #262626; color: white; outline: none;">
         </div>
 
         <div>
           <label style="color: #cbd5e1; font-size: 13px; margin-bottom: 5px; display: block;">Teléfono
             (Opcional)</label>
           <input type="text" [(ngModel)]="nuevoEmpleado.telefono" placeholder="Número de celular" class="form-input"
-            style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;">
+            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #262626; color: white; outline: none;">
         </div>
       </div>
     </div>
@@ -339,7 +343,7 @@
 
   <!-- Modal de Resumen / Confirmación Nuevo Empleado -->
   <p-dialog header="¡Empleado Añadido!" [(visible)]="mostrarResumenNuevoEmpleado" [modal]="true"
-    [style]="{width: '450px'}" [closable]="false" [draggable]="false">
+    [style]="{width: '95vw', maxWidth: '450px'}" [closable]="false" [draggable]="false">
 
     <div class="result-content" *ngIf="resumenEmpleadoConstruido">
       <div class="result-icon"
@@ -383,7 +387,7 @@
   </p-dialog>
 
   <!-- Modal de Gestión de Empleados -->
-  <p-dialog header="Gestión de Empleados" [(visible)]="mostrarModalEmpleados" [modal]="true" [style]="{width: '750px'}"
+  <p-dialog header="Gestión de Empleados" [(visible)]="mostrarModalEmpleados" [modal]="true" [style]="{width: '95vw', maxWidth: '750px'}"
     [closable]="true" [draggable]="false">
 
     <div class="employees-content">
@@ -436,7 +440,7 @@
 
   <!-- Modal Editar Empleado -->
   <p-dialog header="Editar Datos del Empleado" [(visible)]="mostrarModalEditarEmpleado" [modal]="true"
-    [style]="{width: '420px'}" [closable]="true" [draggable]="false">
+    [style]="{width: '95vw', maxWidth: '420px'}" [closable]="true" [draggable]="false">
 
     <div *ngIf="empleadoEditando" style="padding: 8px 0;">
       <p style="color: #94a3b8; font-size: 13px; margin-bottom: 16px; margin-top: 0;">Modifica los campos que desees.
@@ -448,27 +452,27 @@
               style="color: #ef4444;">*</span></label>
           <input type="text" [(ngModel)]="empleadoEditando.dni" (input)="limpiarDniEdicion()" maxlength="9"
             placeholder="DNI del empleado" class="form-input"
-            style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;">
+            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #262626; color: white; outline: none;">
         </div>
         <div>
           <label style="color: #cbd5e1; font-size: 13px; margin-bottom: 5px; display: block;">Nombres <span
               style="color: #ef4444;">*</span></label>
           <input type="text" [(ngModel)]="empleadoEditando.nombre" (input)="limpiarLetrasEdicion()"
             placeholder="Nombres" class="form-input"
-            style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;">
+            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #262626; color: white; outline: none;">
         </div>
         <div>
           <label style="color: #cbd5e1; font-size: 13px; margin-bottom: 5px; display: block;">Apellidos <span
               style="color: #ef4444;">*</span></label>
           <input type="text" [(ngModel)]="empleadoEditando.apellido" (input)="limpiarLetrasEdicion()"
             placeholder="Apellidos" class="form-input"
-            style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;">
+            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #262626; color: white; outline: none;">
         </div>
         <div>
           <label style="color: #cbd5e1; font-size: 13px; margin-bottom: 5px; display: block;">Teléfono
             (Opcional)</label>
           <input type="text" [(ngModel)]="empleadoEditando.telefono" placeholder="Número de celular" class="form-input"
-            style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;">
+            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #262626; color: white; outline: none;">
         </div>
         <p *ngIf="errorEdicionEmpleado" style="color: #ef4444; font-size: 13px; margin: 0;">{{ errorEdicionEmpleado }}
         </p>
@@ -486,7 +490,7 @@
 
   <!-- Modal de Ranking de Clientes (Ver Todos) -->
   <p-dialog header="Ranking Completo de Clientes" [(visible)]="mostrarModalRanking" [modal]="true"
-    [style]="{width: '500px'}" [closable]="true" [draggable]="false">
+    [style]="{width: '95vw', maxWidth: '500px'}" [closable]="true" [draggable]="false">
 
     <div class="ranking-content" style="max-height: 400px; overflow-y: auto;">
       <div class="ranking-list" *ngIf="todosClientes.length > 0">
@@ -520,7 +524,7 @@
 
   <!-- Modal Credenciales de Empleado -->
   <p-dialog header="Credenciales del Empleado" [(visible)]="mostrarModalCredenciales" [modal]="true"
-    [style]="{width: '380px'}" [closable]="true" [draggable]="false">
+    [style]="{width: '95vw', maxWidth: '380px'}" [closable]="true" [draggable]="false">
 
     <div *ngIf="empCredencialesVisible" style="padding: 8px 0;">
       <!-- Nombre completo -->
@@ -569,19 +573,61 @@
           <!-- Modo edición -->
           <div *ngIf="editandoPassword" style="margin-top: 8px; display: flex; gap: 8px;">
             <input type="text" [(ngModel)]="nuevaPasswordEmp" placeholder="Nueva contraseña"
-              style="flex: 1; padding: 8px 10px; border-radius: 6px; border: 1px solid #3b82f6; background: #1e293b; color: #f8fafc; font-family: monospace; font-size: 14px; outline: none;">
+              style="flex: 1; padding: 8px 10px; border-radius: 6px; border: 1px solid #ff9f4a; background: #262626; color: #f8fafc; font-family: monospace; font-size: 14px; outline: none;">
             <button (click)="guardarNuevaPassword()"
               style="background: #22c55e; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold;">
               <i class="pi pi-check"></i>
             </button>
           </div>
-          <p *ngIf="mensajePasswordError" style="margin: 6px 0 0; color: #ef4444; font-size: 12px;">{{
+          <p *ngIf="mensajePasswordError" style="margin: 6px 0 0; color: #ff7351; font-size: 12px;">{{
             mensajePasswordError }}</p>
-          <p *ngIf="mensajePasswordOk" style="margin: 6px 0 0; color: #4ade80; font-size: 12px;">{{ mensajePasswordOk }}
+          <p *ngIf="mensajePasswordOk" style="margin: 6px 0 0; color: #48ffa8; font-size: 12px;">{{ mensajePasswordOk }}
           </p>
         </div>
       </div>
     </div>
+  </p-dialog>
+
+  <!-- Modal de Verificación de Seguridad Maestra -->
+  <p-dialog header="Verificación de Seguridad" [(visible)]="mostrarModalVerificarPassword" [modal]="true" [style]="{width: '95vw', maxWidth: '380px'}"
+    [closable]="true" [draggable]="false" (onHide)="passwordVerificacion = ''; errorVerificacion = ''">
+    
+    <div style="padding: 10px 0; text-align: center;">
+      <div style="display: flex; justify-content: center; margin-bottom: 15px;">
+        <div style="width: 50px; height: 50px; border-radius: 50%; background: rgba(239, 68, 68, 0.1); color: #ef4444; display: flex; justify-content: center; align-items: center; font-size: 24px;">
+          <i class="pi pi-shield"></i>
+        </div>
+      </div>
+      <h3 style="margin: 0 0 10px; color: #f8fafc;">Acción Protegida</h3>
+      <p style="color: #94a3b8; font-size: 13px; line-height: 1.5; margin-bottom: 20px;">
+        {{ mensajeVerificacion }}
+      </p>
+
+      <form (ngSubmit)="confirmarPassword()" style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="position: relative;">
+          <input type="password" [(ngModel)]="passwordVerificacion" name="passwordVerificacion"
+            placeholder="Contraseña del dueño" class="form-input" 
+            style="width: 100%; padding: 12px 14px; padding-left: 40px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #262626; color: white; outline: none; transition: border-color 0.2s;" [style.border-color]="errorVerificacion ? '#ef4444' : 'rgba(72, 72, 71, 0.3)'">
+          <i class="pi pi-lock" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+        </div>
+        <p *ngIf="errorVerificacion" style="margin: 0; color: #ef4444; font-size: 12px; text-align: left;"><i class="pi pi-info-circle"></i> {{ errorVerificacion }}</p>
+      </form>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <div style="display: flex; gap: 10px; width: 100%;">
+        <button class="btn" style="flex: 1; padding: 10px; border-radius: 8px; background: transparent; border: 1px solid #475569; color: #cbd5e1; cursor: pointer; font-weight: bold;"
+          (click)="mostrarModalVerificarPassword = false" [disabled]="verificandoPassword">
+          Cancelar
+        </button>
+        <button class="btn btn-primary" style="flex: 1; padding: 10px; border-radius: 8px; background: #ef4444; border: none; color: white; cursor: pointer; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px;"
+          (click)="confirmarPassword()" [disabled]="verificandoPassword || !passwordVerificacion">
+          <i class="pi pi-check" *ngIf="!verificandoPassword"></i>
+          <i class="pi pi-spinner pi-spin" *ngIf="verificandoPassword"></i>
+          Confirmar
+        </button>
+      </div>
+    </ng-template>
   </p-dialog>
 
 </div>

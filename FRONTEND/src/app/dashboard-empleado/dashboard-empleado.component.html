@@ -45,7 +45,7 @@
                 (input)="intentoSubmit = false"
                 [style.border-color]="(dniRef.invalid && intentoSubmit) ? '#ef4444' : null" required>
               <i *ngIf="buscandoDni" class="pi pi-spinner pi-spin"
-                style="position: absolute; right: 10px; color: #3b82f6;"></i>
+                style="position: absolute; right: 10px; color: #ff9f4a;"></i>
             </div>
             <small *ngIf="errorDni"
               style="color: #ef4444; margin-top: 6px; font-size: 12.5px; font-weight: 500; display: flex; align-items: center; gap: 4px;">
@@ -122,6 +122,16 @@
                 0.</span>
             </small>
           </div>
+
+          <!-- Tanque Lleno -->
+          <div class="form-group" style="grid-column: 1 / -1; margin-top: 10px;">
+            <label class="form-label"
+              style="display: flex; align-items: center; gap: 8px; cursor: pointer; text-transform:none; font-weight: normal;">
+              <input type="checkbox" [(ngModel)]="tanqueLleno" name="tanqueLleno" (change)="intentoSubmit = false"
+                style="width: 18px; height: 18px; accent-color: #ff9f4a;">
+              <span>¿Tanque lleno?</span>
+            </label>
+          </div>
         </div>
 
         <!-- Error -->
@@ -150,8 +160,8 @@
   </div>
 
   <!-- Modal de Confirmación -->
-  <p-dialog header="Confirmar Registro" [(visible)]="mostrarConfirmacion" [modal]="true" [style]="{width: '500px'}"
-    [closable]="true" [draggable]="false">
+  <p-dialog header="Confirmar Registro" [(visible)]="mostrarConfirmacion" [modal]="true"
+    [style]="{width: '95vw', maxWidth: '500px'}" [closable]="true" [draggable]="false">
 
     <div class="confirm-content">
       <div class="confirm-icon">
@@ -161,12 +171,12 @@
 
       <div class="confirm-details">
         <div class="detail-row">
-          <span class="detail-label">DNI:</span>
-          <span class="detail-value">{{ dni }}</span>
-        </div>
-        <div class="detail-row">
           <span class="detail-label">Cliente:</span>
           <span class="detail-value">{{ nombres }} {{ apellidos }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">DNI:</span>
+          <span class="detail-value">{{ dni }}</span>
         </div>
         <div class="detail-row">
           <span class="detail-label">Combustible:</span>
@@ -175,10 +185,6 @@
         <div class="detail-row">
           <span class="detail-label">Monto Consumido:</span>
           <span class="detail-value">S/. {{ monto | number:'1.2-2' }}</span>
-        </div>
-        <div class="detail-row highlight">
-          <span class="detail-label">Galones aprox.:</span>
-          <span class="detail-value">{{ galonesEstimados | number:'1.2-2' }} gal</span>
         </div>
         <div class="detail-row highlight points">
           <span class="detail-label">Puntos a Otorgar:</span>
@@ -202,8 +208,8 @@
   </p-dialog>
 
   <!-- Modal de Resultado -->
-  <p-dialog header="¡Registro Exitoso!" [(visible)]="mostrarResultado" [modal]="true" [style]="{width: '480px'}"
-    [closable]="true" [draggable]="false">
+  <p-dialog header="¡Registro Exitoso!" [(visible)]="mostrarResultado" [modal]="true"
+    [style]="{width: '95vw', maxWidth: '480px'}" [closable]="true" [draggable]="false">
 
     <div class="result-content" *ngIf="resultadoRegistro">
       <div class="result-icon">
@@ -252,7 +258,7 @@
           <i class="pi pi-check"></i>
           Aceptar
         </button>
-        <button class="btn btn-print" style="width: 100%; justify-content: center;" type="button">
+        <button class="btn btn-print" style="width: 100%; justify-content: center;" type="button" (click)="imprimirTicket()">
           <i class="pi pi-print"></i>
           Imprimir
         </button>

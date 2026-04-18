@@ -65,11 +65,51 @@ export class DashboardDuenoComponent implements OnInit {
   todosClientes: any[] = [];
   cargandoRanking = false;
 
+  // Verificación de credenciales extra
+  mostrarModalVerificarPassword = false;
+  verificandoPassword = false;
+  passwordVerificacion = '';
+  errorVerificacion = '';
+  mensajeVerificacion = '';
+  accionProtegidaPendiente: Function | null = null;
+
   constructor(
     private api: ApiService,
     private auth: AuthService,
     private router: Router
   ) {}
+
+  solicitarVerificacionPassword(accion: Function, mensaje: string = 'Por seguridad, ingrese su contraseña para continuar.') {
+    this.accionProtegidaPendiente = accion;
+    this.mensajeVerificacion = mensaje;
+    this.passwordVerificacion = '';
+    this.errorVerificacion = '';
+    this.mostrarModalVerificarPassword = true;
+  }
+
+  confirmarPassword() {
+    if (!this.passwordVerificacion) return;
+    this.verificandoPassword = true;
+    this.errorVerificacion = '';
+    this.api.validarPassword(this.passwordVerificacion).subscribe({
+      next: () => {
+        this.verificandoPassword = false;
+        this.mostrarModalVerificarPassword = false;
+        if (this.accionProtegidaPendiente) {
+          this.accionProtegidaPendiente();
+          this.accionProtegidaPendiente = null;
+        }
+      },
+      error: (err) => {
+        this.verificandoPassword = false;
+        if (err.status === 401) {
+            this.errorVerificacion = 'Contraseña incorrecta.';
+        } else {
+            this.errorVerificacion = 'Hubo un error del servidor. Inténtelo más tarde.';
+        }
+      }
+    });
+  }
 
   ngOnInit() {
     this.usuario = this.auth.getUsuario();
@@ -210,7 +250,7 @@ export class DashboardDuenoComponent implements OnInit {
   }
 
   eliminarRegistro(id: number) {
-    if (confirm('¿Estás seguro de eliminar este registro? Los puntos relacionados serán descontados del cliente.')) {
+    this.solicitarVerificacionPassword(() => {
       this.api.deleteRegistroConsumo(id).subscribe({
         next: () => {
           this.cargarRegistros(this.paginaActual);
@@ -218,7 +258,7 @@ export class DashboardDuenoComponent implements OnInit {
         },
         error: () => alert('Error al eliminar registro')
       });
-    }
+    }, 'Por favor ingrese su contraseña para confirmar la eliminación de este registro y restaurar los puntos de dicho consumo.');
   }
 
   // ===== Ranking Completo =====
@@ -312,13 +352,15 @@ export class DashboardDuenoComponent implements OnInit {
   }
 
   toggleCredenciales(emp: any) {
-    this.empCredencialesVisible = emp;
-    this.editandoPassword = false;
-    this.nuevaPasswordEmp = '';
-    this.mensajePasswordError = '';
-    this.mensajePasswordOk = '';
-    this.passwordMostrada = this.generarPasswordEmpleado(emp);
-    this.mostrarModalCredenciales = true;
+    this.solicitarVerificacionPassword(() => {
+        this.empCredencialesVisible = emp;
+        this.editandoPassword = false;
+        this.nuevaPasswordEmp = '';
+        this.mensajePasswordError = '';
+        this.mensajePasswordOk = '';
+        this.passwordMostrada = this.generarPasswordEmpleado(emp);
+        this.mostrarModalCredenciales = true;
+    }, 'Se requiere su contraseña maestra para poder ver o editar credenciales de otros empleados.');
   }
 
   guardarNuevaPassword() {
@@ -437,27 +479,29 @@ export class DashboardDuenoComponent implements OnInit {
     // El username (login) siempre es el DNI
     this.empleadoEditando.username = this.empleadoEditando.dni;
 
-    this.api.putUsuario(this.empleadoEditando).subscribe({
-      next: () => {
-        this.okEdicionEmpleado = '✔ Datos actualizados correctamente.';
-        this.cargarEmpleados();
-        setTimeout(() => {
-          this.okEdicionEmpleado = '';
-          this.mostrarModalEditarEmpleado = false;
-        }, 1500);
-      },
-      error: () => {
-        this.errorEdicionEmpleado = 'Error al guardar. Verifica que el DNI no esté en uso por otro empleado.';
-      }
-    });
+    this.solicitarVerificacionPassword(() => {
+        this.api.putUsuario(this.empleadoEditando).subscribe({
+          next: () => {
+            this.okEdicionEmpleado = '✔ Datos actualizados correctamente.';
+            this.cargarEmpleados();
+            setTimeout(() => {
+              this.okEdicionEmpleado = '';
+              this.mostrarModalEditarEmpleado = false;
+            }, 1500);
+          },
+          error: () => {
+            this.errorEdicionEmpleado = 'Error al guardar. Verifica que el DNI no esté en uso por otro empleado.';
+          }
+        });
+    }, 'Ingrese su contraseña para confirmar y guardar la modificación de los datos de este empleado.');
   }
 
   eliminarEmpleado(id: string) {
-    if (confirm('¿Estás seguro de eliminar este empleado?')) {
-      this.api.deleteUsuario(id).subscribe({
-        next: () => this.cargarEmpleados(),
-        error: () => alert('Error al eliminar empleado')
-      });
-    }
+    this.solicitarVerificacionPassword(() => {
+        this.api.deleteUsuario(id).subscribe({
+          next: () => this.cargarEmpleados(),
+          error: () => alert('Error al eliminar empleado')
+        });
+    }, 'Aviso: Ingrese su contraseña para confirmar y ejecutar la eliminación permanente de esta cuenta.');
   }
 }

@@ -30,7 +30,6 @@ class LoginView(APIView):
                     'username': user.username,
                     'first_name': user.nombre,
                     'last_name': user.apellido,
-                    'email': user.email,
                     'dni': user.dni,
                     'telefono': user.telefono,
                     'tipo_usuario': user.tipo_usuario
@@ -46,12 +45,14 @@ class UsuarioViewsets(viewsets.ModelViewSet):
     permission_classes = [permissions.IsDueno]
 
     def get_queryset(self):
-        # Si por alguna razón un empleado llega aquí, solo vería su propio usuario
+        # Filtrado de seguridad: si un empleado logra consultar este endpoint, solo vera su info
         if self.request.user.tipo_usuario == 'empleado':
             return self.queryset.filter(id=self.request.user.id)
         
         queryset = super().get_queryset()
         tipo = self.request.query_params.get('tipo', None)
+        
+        # Filtra si la lista es de empleados o de dueños
         if tipo:
             queryset = queryset.filter(tipo_usuario=tipo)
         return queryset
@@ -92,7 +93,9 @@ class ClienteViewSet(viewsets.ModelViewSet):
     def ranking(self, request):
         """Top clientes por puntos acumulados"""
         top = request.query_params.get('top', 20)
-        clientes = models.Cliente.objects.order_by('-puntos_acumulados')[:int(top)]
+        clientes = models.Cliente.objects.annotate(
+            total_consumos_annotated=Count('consumos')
+        ).order_by('-puntos_acumulados')[:int(top)]
         serializer = serializers.ClienteResumenSerializer(clientes, many=True)
         return Response(serializer.data)
 
@@ -116,7 +119,7 @@ class ConsumoPagination(PageNumberPagination):
     max_page_size = 100
 
 class RegistroConsumoViewSet(viewsets.ModelViewSet):
-    queryset = models.RegistroConsumo.objects.all().order_by('-fecha')
+    queryset = models.RegistroConsumo.objects.select_related('cliente', 'empleado', 'tipo_combustible').order_by('-fecha')
     permission_classes = [IsAuthenticated]
     pagination_class = ConsumoPagination
 
@@ -142,9 +145,9 @@ class RegistroConsumoViewSet(viewsets.ModelViewSet):
 @method_decorator(csrf_exempt, name='dispatch')
 class RegistrarConsumoView(APIView):
     """
-    Endpoint principal para que un empleado registre un consumo.
-    Recibe: dni, nombres, apellidos, tipo_combustible, galones
-    Busca o crea el cliente, registra el consumo y calcula puntos.
+    Endpoint principal para que un empleado registre una nueva compra.
+    Recibe: dni, nombres, apellidos, tipo_combustible, monto.
+    Automáticamente vincula al cliente (o lo crea) y determina galones y puntaje a sumar.
     """
     permission_classes = [IsAuthenticated]
 
@@ -198,6 +201,21 @@ class CambiarPasswordView(APIView):
         return Response({'mensaje': 'Contraseña actualizada correctamente.'}, status=status.HTTP_200_OK)
 
 
+class ValidarPasswordView(APIView):
+    """Verifica si la contraseña dada coincide con la del usuario logueado. Útil para permisos críticos."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        password = request.data.get('password')
+        if not password:
+            return Response({'error': 'La contraseña es requerida.'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        user = authenticate(username=request.user.username, password=password)
+        if user is not None:
+            return Response({'mensaje': 'Contraseña válida.'}, status=status.HTTP_200_OK)
+            
+        return Response({'error': 'Contraseña incorrecta.'}, status=status.HTTP_401_UNAUTHORIZED)
+
 class DashboardView(APIView):
     """Dashboard con estadísticas para el dueño"""
     permission_classes = [permissions.IsDueno]
@@ -212,7 +230,9 @@ class DashboardView(APIView):
         total_consumos = models.RegistroConsumo.objects.count()
 
         # Top 5 clientes
-        top_clientes = models.Cliente.objects.order_by('-puntos_acumulados')[:5]
+        top_clientes = models.Cliente.objects.annotate(
+            total_consumos_annotated=Count('consumos')
+        ).order_by('-puntos_acumulados')[:5]
         top_serializer = serializers.ClienteResumenSerializer(top_clientes, many=True)
 
         # Filtro de período para consumo por combustible
@@ -248,9 +268,10 @@ class DashboardView(APIView):
 
 class ConsultarDNIApiView(APIView):
     """
-    Proxy para consumir dniruc.apisperu.com y evitar bloqueos CORS
+    Proxy y puente para consumir ApisPeru (dniruc) evadiendo bloqueos de CORS o límites.
+    Busca por DNI en la RENIEC pùblica.
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get(self, request, dni):
         import urllib.request
@@ -260,20 +281,28 @@ class ConsultarDNIApiView(APIView):
         from django.conf import settings
         
         token = settings.DNI_API_TOKEN
-        url = f"https://dniruc.apisperu.com/api/v1/dni/{dni}?token={token}"
         
-        try:
-            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-            response = urllib.request.urlopen(req, timeout=10)
-            data = json.loads(response.read().decode('utf-8'))
-            return Response(data, status=status.HTTP_200_OK)
-        except Exception as e:
+        url_1 = f"https://dniruc.apisperu.com/api/v1/dni/{dni}?token={token}"
+        url_2 = f"https://api.apis.net.pe/v2/reniec/dni?numero={dni}"
+        
+        def fetch_api(url, use_bearer):
+            headers = {'User-Agent': 'Mozilla/5.0'}
+            if use_bearer:
+                headers['Authorization'] = f"Bearer {token}"
             try:
-                from rest_framework import status
-                if hasattr(e, 'read'):
-                    error_data = json.loads(e.read().decode('utf-8'))
-                    return Response(error_data, status=e.code)
-            except:
-                pass
-            from rest_framework import status
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                req = urllib.request.Request(url, headers=headers)
+                response = urllib.request.urlopen(req, timeout=10)
+                return json.loads(response.read().decode('utf-8'))
+            except Exception:
+                # Si una de las URLs proxy falla, retonar nulo para permitir fallo silencioso a la otra URL
+                return None
+
+        data = fetch_api(url_1, use_bearer=False)
+        if data and (data.get('success') or data.get('nombres')):
+            return Response(data, status=status.HTTP_200_OK)
+
+        data = fetch_api(url_2, use_bearer=True)
+        if data and data.get('nombres'):
+            return Response(data, status=status.HTTP_200_OK)
+
+        return Response({'error': 'No se pudo consultar el DNI o el token es inválido', 'message': 'DNI no encontrado'}, status=status.HTTP_404_NOT_FOUND)

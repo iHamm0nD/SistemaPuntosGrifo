@@ -4,16 +4,16 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 
 
 class UsuarioManager(BaseUserManager):
-    def create_user(self, username, email, password=None, **extra_fields):
-        if not email:
-            raise ValueError('Correo es obligatorio')
-        email = self.normalize_email(email)
-        user = self.model(username=username, email=email, **extra_fields)
+    # Gestor personalizado para el modelo Usuario
+    def create_user(self, username, password=None, **extra_fields):
+        # Crea y guarda un usuario con un nombre de usuario y contraseña
+        user = self.model(username=username, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, username, email, password=None, **extra_fields):
+    def create_superuser(self, username, password=None, **extra_fields):
+        # Crea y guarda un superusuario con permisos totales
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
@@ -23,10 +23,11 @@ class UsuarioManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('El campo superusuario debe ser True')
 
-        return self.create_user(username, email, password, **extra_fields)
+        return self.create_user(username, password, **extra_fields)
 
 
 class Usuario(AbstractUser):
+    # Modelo para dueños, empleados y desarrolladores
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
     dni = models.CharField(max_length=15, unique=True)
@@ -64,11 +65,12 @@ class TipoCombustible(models.Model):
 
 
 class Cliente(models.Model):
+    # Modelo que almacena la información del cliente y sus puntos acumulados
     dni = models.CharField(max_length=15, unique=True)
     nombres = models.CharField(max_length=100)
     apellidos = models.CharField(max_length=100)
     telefono = models.CharField(max_length=20, blank=True, null=True)
-    puntos_acumulados = models.IntegerField(default=0)
+    puntos_acumulados = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     fecha_registro = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
@@ -87,33 +89,37 @@ class RegistroConsumo(models.Model):
                                    help_text="Cantidad de galones consumidos")
     monto_total = models.DecimalField(max_digits=10, decimal_places=2,
                                        help_text="Monto total de la compra en S/.")
-    puntos_otorgados = models.IntegerField(help_text="Puntos otorgados por esta transacción")
+    puntos_otorgados = models.DecimalField(max_digits=10, decimal_places=2, help_text="Puntos otorgados por esta transacción")
     fecha = models.DateTimeField(default=timezone.now)
 
     def save(self, *args, **kwargs):
-        # Calcular puntos automáticamente
-        if not self.puntos_otorgados:
-            self.puntos_otorgados = int(self.galones) * self.tipo_combustible.puntos_por_galon
-        # Calcular monto total automáticamente
+        # Calcular puntos y monto antes de guardar si no se proporcionaron
         if not self.monto_total:
             self.monto_total = self.galones * self.tipo_combustible.precio_referencial
+            
         super().save(*args, **kwargs)
-        # Actualizar los puntos acumulados del cliente
-        self.cliente.puntos_acumulados = sum(
-            c.puntos_otorgados for c in self.cliente.consumos.all()
-        )
+        
+        # Una vez guardado el consumo, sumamos todos los consumos del cliente para actualizar sus puntos totales
+        from django.db.models import Sum
+        total_puntos = self.cliente.consumos.aggregate(
+            total=Sum('puntos_otorgados')
+        )['total'] or 0
+        self.cliente.puntos_acumulados = total_puntos
         self.cliente.save()
 
     def __str__(self):
         return f"{self.cliente.nombres} - {self.tipo_combustible.nombre} - {self.puntos_otorgados} pts"
 
     def delete(self, *args, **kwargs):
+        # Al eliminar un consumo, debemos restar los puntos que le otorgó al cliente
         cliente = self.cliente
         super().delete(*args, **kwargs)
-        # Recalcular puntos del cliente
-        cliente.puntos_acumulados = sum(
-            c.puntos_otorgados for c in cliente.consumos.all()
-        )
+        # Recalcular saldo de puntos mediante suma de registros restantes
+        from django.db.models import Sum
+        total_puntos = cliente.consumos.aggregate(
+            total=Sum('puntos_otorgados')
+        )['total'] or 0
+        cliente.puntos_acumulados = total_puntos
         cliente.save()
 
     class Meta:

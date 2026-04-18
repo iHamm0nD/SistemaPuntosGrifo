@@ -1,30 +1,31 @@
 import environ
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Quick-start development settings - unsuitable for production
-# Initialize environ
+# ================= REGLAS DE DESARROLLO =================
+# ADVERTENCIA: ¡No usar esta configuración tal cual en producción!
+# Inicializamos variables de entorno
+
 env = environ.Env(
     # set casting, default value
     DEBUG=(bool, False)
 )
 
-# Reading .env file
+# Cargar el archivo secreto .env
 environ.Env.read_env(BASE_DIR / '.env')
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# ADVERTENCIA: ¡mantén la SECRET_KEY en secreto en producción!
 SECRET_KEY = env('SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# ADVERTENCIA: ¡Desactiva el modo DEBUG (True->False) en producción!
 DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['127.0.0.1', 'localhost'])
 
 AUTH_USER_MODEL = 'api.Usuario'
 
-# Application definition
+# ================= APLICACIONES Y LIBRERIAS =================
 
 INSTALLED_APPS = [
     'api',
@@ -118,26 +119,18 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+# ================= BASE DE DATOS =================
+# OBLIGATORIO: Utiliza PostgreSQL mediante la variable DATABASE_URL en el archivo .env
 
-if env('DATABASE_URL', default=None):
-    DATABASES = {
-        'default': env.db('DATABASE_URL')
-    }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+DATABASES = {
+    'default': env.db('DATABASE_URL')
+}
 
 CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=['http://localhost:4200', 'http://127.0.0.1:4200'])
 
 
-# Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
+# ================= VALIDACION DE CONTRASEÑAS =================
+# Reglas que el sistema de Django impone a las contraseñas
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -155,8 +148,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
+# Para configurar el idioma a español peruano y la hora a Lima
 
 LANGUAGE_CODE = 'es-pe'
 
@@ -167,12 +159,11 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
+# ================= ARCHIVOS ESTATICOS =================
+# Ruta principal para recursos como CSS y JS
 
 STATIC_URL = 'static/'
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+# Llave primaria por defecto de todos los modelos de BDD
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
