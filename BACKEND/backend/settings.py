@@ -71,7 +71,7 @@ MIDDLEWARE = [
 ]
 
 API_KEY = env('API_KEY', default='')
-DNI_API_TOKEN = env('DNI_API_TOKEN', default='eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImhhbW1vbmQyNDA1QGdtYWlsLmNvbSJ9.rDBsr_l-BD9Lihy0B2ZmOOexBjkvGzlgKa3jZikj2P0')
+DNI_API_TOKEN = env('DNI_API_TOKEN', default='')
 
 
 CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[])
