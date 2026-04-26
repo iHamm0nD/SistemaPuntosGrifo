@@ -253,10 +253,10 @@ class DashboardView(APIView):
         consumo_por_tipo = consumo_qs.values(
             'tipo_combustible__nombre'
         ).annotate(
-            total_galones=Sum('galones'),
+            total_monto=Sum('monto_total'),
             total_registros=Count('id'),
             total_puntos=Sum('puntos_otorgados')
-        ).order_by('-total_galones')
+        ).order_by('-total_monto')
 
         return Response({
             'total_clientes': total_clientes,
@@ -271,7 +271,7 @@ class ConsultarDNIApiView(APIView):
     Proxy y puente para consumir ApisPeru (dniruc) evadiendo bloqueos de CORS o límites.
     Busca por DNI en la RENIEC pùblica.
     """
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, dni):
         import urllib.request
@@ -306,3 +306,63 @@ class ConsultarDNIApiView(APIView):
             return Response(data, status=status.HTTP_200_OK)
 
         return Response({'error': 'No se pudo consultar el DNI o el token es inválido', 'message': 'DNI no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class CanjearPuntosView(APIView):
+    """Permite al dueño canjear (reducir) puntos de un cliente por DNI."""
+    permission_classes = [permissions.IsDueno]
+
+    def post(self, request):
+        dni = request.data.get('dni')
+        puntos_a_canjear = request.data.get('puntos')
+
+        if not dni:
+            return Response({'error': 'El DNI es requerido.'}, status=status.HTTP_400_BAD_REQUEST)
+        if not puntos_a_canjear:
+            return Response({'error': 'Los puntos a canjear son requeridos.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            puntos_a_canjear = float(puntos_a_canjear)
+        except (ValueError, TypeError):
+            return Response({'error': 'El valor de puntos no es válido.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if puntos_a_canjear <= 0:
+            return Response({'error': 'Los puntos a canjear deben ser mayor a 0.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            cliente = models.Cliente.objects.get(dni=dni)
+        except models.Cliente.DoesNotExist:
+            return Response({'error': 'Este cliente no tiene consumos registrados en el sistema.'}, status=status.HTTP_404_NOT_FOUND)
+
+        puntos_actuales = float(cliente.puntos_acumulados)
+        if puntos_a_canjear > puntos_actuales:
+            return Response({'error': f'El cliente solo tiene {puntos_actuales} puntos disponibles.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        from decimal import Decimal
+        puntos_a_canjear_decimal = Decimal(str(puntos_a_canjear))
+
+        # Crear un tipo de combustible ficticio si no existe para registrar el canje
+        tipo_canje, _ = models.TipoCombustible.objects.get_or_create(
+            nombre='CANJE DE PUNTOS',
+            defaults={'precio_referencial': 0, 'puntos_por_galon': 0}
+        )
+
+        import uuid
+        models.RegistroConsumo.objects.create(
+            nro_boleta=f"CANJE-{uuid.uuid4().hex[:8].upper()}",
+            cliente=cliente,
+            empleado=request.user,
+            tipo_combustible=tipo_canje,
+            galones=0,
+            monto_total=0,
+            puntos_otorgados=-puntos_a_canjear_decimal
+        )
+
+        # La propia acción de guardar el RegistroConsumo ya actualiza el saldo del cliente
+        cliente.refresh_from_db()
+
+        return Response({
+            'mensaje': f'Se canjearon {puntos_a_canjear} puntos correctamente.',
+            'cliente': f'{cliente.nombres} {cliente.apellidos}',
+            'puntos_restantes': float(cliente.puntos_acumulados)
+        }, status=status.HTTP_200_OK)
