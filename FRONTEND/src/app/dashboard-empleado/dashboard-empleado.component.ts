@@ -18,6 +18,8 @@ export class DashboardEmpleadoComponent implements OnInit {
   apellidos = '';
   monto: number | null = null;
   tipoCombustibleId: number | null = null;
+  nroBoleta = '';
+  tipoComprobante: 'BO' | 'FA' = 'BO';
 
   // Datos del sistema
   tiposCombustible: TipoCombustible[] = [];
@@ -119,7 +121,7 @@ export class DashboardEmpleadoComponent implements OnInit {
     this.error = '';
     this.intentoSubmit = true;
 
-    if (!this.dni || !this.nombres || !this.apellidos || !this.tipoCombustibleId || !this.monto) {
+    if (!this.dni || !this.nombres || !this.apellidos || !this.tipoCombustibleId || !this.monto || !this.nroBoleta?.trim()) {
       return;
     }
 
@@ -166,6 +168,7 @@ export class DashboardEmpleadoComponent implements OnInit {
     this.mostrarConfirmacion = false;
 
     this.api.registrarConsumo({
+      nro_boleta: `${this.tipoComprobante}-${this.nroBoleta.trim()}`,
       dni: this.dni,
       nombres: this.nombres,
       apellidos: this.apellidos,
@@ -182,7 +185,13 @@ export class DashboardEmpleadoComponent implements OnInit {
       },
       error: (err) => {
         this.cargando = false;
-        this.error = err.error?.error || 'Error al registrar consumo';
+        // Extraer error de nro_boleta duplicado u otro error del backend
+        const errData = err.error;
+        if (errData?.nro_boleta) {
+          this.error = errData.nro_boleta[0];
+        } else {
+          this.error = errData?.error || errData?.detail || 'Error al registrar consumo';
+        }
       }
     });
   }
@@ -200,6 +209,8 @@ export class DashboardEmpleadoComponent implements OnInit {
     this.monto = null;
     this.tipoCombustibleId = null;
     this.tanqueLleno = false;
+    this.nroBoleta = '';
+    this.tipoComprobante = 'BO';
     this.error = '';
   }
 

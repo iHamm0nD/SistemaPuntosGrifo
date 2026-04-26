@@ -96,7 +96,7 @@ class RegistroConsumoReadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.RegistroConsumo
-        fields = ['id', 'cliente', 'cliente_dni', 'cliente_nombre', 'cliente_puntos', 'empleado', 'empleado_nombre',
+        fields = ['id', 'nro_boleta', 'cliente', 'cliente_dni', 'cliente_nombre', 'cliente_puntos', 'empleado', 'empleado_nombre',
                   'tipo_combustible', 'tipo_combustible_nombre', 'galones',
                   'monto_total', 'puntos_otorgados', 'fecha']
 
@@ -106,13 +106,13 @@ class RegistroConsumoReadSerializer(serializers.ModelSerializer):
     def get_empleado_nombre(self, obj):
         if obj.empleado:
             primer_nombre = obj.empleado.nombre.split()[0] if obj.empleado.nombre else ""
-            primer_apellido = obj.empleado.apellido.split()[0] if obj.empleado.apellido else ""
-            return f"{primer_nombre} {primer_apellido}".strip()
+            return primer_nombre
         return "Empleado Eliminado"
 
 
 class RegistrarConsumoSerializer(serializers.Serializer):
     """Serializer principal usado por la interfaz de Empleado (Front) al registrar un tanqueo."""
+    nro_boleta = serializers.CharField(max_length=50)
     dni = serializers.CharField(max_length=15)
     nombres = serializers.CharField(max_length=100)
     apellidos = serializers.CharField(max_length=100)
@@ -120,6 +120,14 @@ class RegistrarConsumoSerializer(serializers.Serializer):
         queryset=models.TipoCombustible.objects.all())
     monto_consumido = serializers.DecimalField(max_digits=10, decimal_places=2)
     tanque_lleno = serializers.BooleanField(default=False)
+
+    def validate_nro_boleta(self, value):
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError("El número de boleta/factura es obligatorio.")
+        if models.RegistroConsumo.objects.filter(nro_boleta=value).exists():
+            raise serializers.ValidationError(f"El número de boleta '{value}' ya fue registrado anteriormente.")
+        return value
 
     def create(self, validated_data):
         # Busca en la BD el cliente con ese DNI; si no lo encuentra, lo crea automáticamente
@@ -156,6 +164,7 @@ class RegistrarConsumoSerializer(serializers.Serializer):
         puntos = round(puntos, 2)
 
         registro = models.RegistroConsumo.objects.create(
+            nro_boleta=validated_data.get('nro_boleta', ''),
             cliente=cliente,
             empleado=self.context.get('empleado'),
             tipo_combustible=tipo_combustible,

@@ -17,4 +17,5 @@ urlpatterns = [
     path('cambiar-password/', views.CambiarPasswordView.as_view(), name='cambiar-password'),
     path('validar-password/', views.ValidarPasswordView.as_view(), name='validar-password'),
     path('consultar-dni/<str:dni>/', views.ConsultarDNIApiView.as_view(), name='consultar-dni'),
+    path('canjear-puntos/', views.CanjearPuntosView.as_view(), name='canjear-puntos'),
 ]

@@ -17,9 +17,9 @@
         <i class="pi pi-users"></i>
         Lista Empleados
       </button>
-      <button class="btn-manage" (click)="abrirModalPrecios()">
-        <i class="pi pi-cog"></i>
-        Precios
+      <button class="btn-manage" (click)="abrirModalCanjearPuntos()">
+        <i class="pi pi-gift"></i>
+        Canjear Puntos
       </button>
       <span class="user-greeting">
         <i class="pi pi-user"></i>
@@ -164,11 +164,11 @@
                 <span class="fuel-records">{{ tipo.total_registros }} registros</span>
               </div>
               <div class="fuel-bar-container">
-                <div class="fuel-bar" [style.width.%]="(tipo.total_galones / consumoPorTipo[0].total_galones) * 100">
+                <div class="fuel-bar" [style.width.%]="(tipo.total_monto / consumoPorTipo[0].total_monto) * 100">
                 </div>
               </div>
               <div class="fuel-stats">
-                <span>{{ tipo.total_galones | number:'1.0-2' }} galones</span>
+                <span>S/. {{ tipo.total_monto | number:'1.2-2' }}</span>
               </div>
             </div>
           </div>
@@ -198,20 +198,31 @@
           <table class="data-table">
             <thead>
               <tr style="white-space: nowrap;">
-                <th>Acción</th>
-                <th>Fecha</th>
-                <th>Hora</th>
+                <th>Nro. Operacion</th>
+                <th>FECHA</th>
                 <th>DNI</th>
                 <th>Cliente</th>
-                <th>Combustible</th>
-                <th>Galones</th>
                 <th>Monto</th>
+                <th>Combustible</th>
                 <th>Ptos</th>
-                <th>Registrado por</th>
+                <th>EMPLEADO</th>
+                <th>Acción</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let reg of registrosPaginados" style="white-space: nowrap;">
+                <td style="font-weight: 600; color: #f8fafc;">{{ reg.nro_boleta || '—' }}</td>
+                <td style="font-size: 0.9em; color: #94a3b8;">{{ reg.fecha | date:'yyyy/MM/dd HH:mm:ss' }}</td>
+                <td>{{ reg.cliente_dni }}</td>
+                <td>{{ reg.cliente_nombre }}</td>
+                <td>S/. {{ reg.monto_total | number:'1.2-2' }}</td>
+                <td>
+                  <span class="badge-fuel">{{ reg.tipo_combustible_nombre }}</span>
+                </td>
+                <td>
+                  <span class="badge-points">+{{ reg.puntos_otorgados }}</span>
+                </td>
+                <td style="color: white;">{{ reg.empleado_nombre }}</td>
                 <td>
                   <button (click)="eliminarRegistro(reg.id)"
                     style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;"
@@ -219,19 +230,6 @@
                     <i class="pi pi-trash"></i>
                   </button>
                 </td>
-                <td style="font-size: 0.9em; color: #94a3b8;">{{ reg.fecha | date:'dd/MM/yyyy' }}</td>
-                <td style="font-size: 0.9em; color: #94a3b8;">{{ reg.fecha | date:'HH:mm' }}</td>
-                <td>{{ reg.cliente_dni }}</td>
-                <td>{{ reg.cliente_nombre }}</td>
-                <td>
-                  <span class="badge-fuel">{{ reg.tipo_combustible_nombre }}</span>
-                </td>
-                <td>{{ reg.galones | number:'1.2-2' }}</td>
-                <td>S/. {{ reg.monto_total | number:'1.2-2' }}</td>
-                <td>
-                  <span class="badge-points">+{{ reg.puntos_otorgados }}</span>
-                </td>
-                <td style="color: white;">{{ reg.empleado_nombre }}</td>
               </tr>
             </tbody>
           </table>
@@ -629,5 +627,146 @@
       </div>
     </ng-template>
   </p-dialog>
+
+
+  <!-- Modal de Canjear Puntos -->
+  <p-dialog header="Canjear Puntos" [(visible)]="mostrarModalCanjearPuntos" [modal]="true" [style]="{width: '95vw', maxWidth: '450px'}"
+    [closable]="true" [draggable]="false" (onHide)="limpiarModalCanje()">
+
+    <div style="padding: 10px 0;">
+      <p style="color: #94a3b8; font-size: 13px; margin-bottom: 16px; margin-top: 0;">
+        Ingresa el DNI del cliente y la cantidad de puntos a reducir por el canje de una recompensa.
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 15px;">
+        <div>
+          <label style="color: #cbd5e1; font-size: 13px; margin-bottom: 5px; display: block;">
+            DNI del Cliente <span style="color: #ef4444;">*</span>
+          </label>
+          <input type="text" [(ngModel)]="canjeDni" (ngModelChange)="onCanjeDniChange()" maxlength="9"
+            placeholder="Ingresa el DNI del cliente" class="form-input"
+            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #262626; color: white; outline: none;">
+          <div *ngIf="canjeClienteEncontrado" style="margin-top: 8px; padding: 8px 12px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 6px;">
+            <p style="margin: 0; color: #4ade80; font-size: 13px; font-weight: 600;">
+              <i class="pi pi-check-circle" style="margin-right: 6px;"></i>
+              {{ canjeClienteEncontrado.nombres }} {{ canjeClienteEncontrado.apellidos }}
+            </p>
+            <p style="margin: 4px 0 0; color: #94a3b8; font-size: 12px;">
+              Puntos disponibles: <strong style="color: #fbbf24;">{{ canjeClienteEncontrado.puntos_acumulados | number:'1.0-2' }} pts</strong>
+            </p>
+          </div>
+          <p *ngIf="canjeErrorDni" style="margin: 6px 0 0; color: #ef4444; font-size: 12px;">
+            <i class="pi pi-exclamation-circle"></i> {{ canjeErrorDni }}
+          </p>
+        </div>
+
+        <div *ngIf="canjeClienteEncontrado">
+          <label style="color: #cbd5e1; font-size: 13px; margin-bottom: 5px; display: block;">
+            Puntos a Reducir <span style="color: #ef4444;">*</span>
+          </label>
+          <input type="number" [(ngModel)]="canjePuntos" min="1"
+            placeholder="Cantidad de puntos a descontar" class="form-input"
+            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #262626; color: white; outline: none;">
+        </div>
+
+        <p *ngIf="canjeMensajeError" style="color: #ef4444; font-size: 13px; margin: 0; text-align: center;">
+          <i class="pi pi-exclamation-circle"></i> {{ canjeMensajeError }}
+        </p>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button (click)="ejecutarCanje()" class="btn btn-primary"
+        [disabled]="!canjeClienteEncontrado || !canjePuntos || canjeando"
+        style="width: 100%; background: linear-gradient(135deg, #f59e0b, #d97706); color: #1e293b; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;">
+        <i class="pi" [ngClass]="canjeando ? 'pi-spin pi-spinner' : 'pi-gift'"></i>
+        {{ canjeando ? 'Procesando...' : 'Confirmar Canje' }}
+      </button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Overlay + Toast premium de canje exitoso -->
+  <div *ngIf="mostrarToastCanje"
+    style="position: fixed; inset: 0; z-index: 9999;
+           background: rgba(0,0,0,0.6);
+           display: flex; align-items: center; justify-content: center;
+           animation: slideInToast 0.3s ease;">
+
+    <div style="background: linear-gradient(145deg, #111827, #0f1923);
+                border: 1px solid rgba(74, 222, 128, 0.25);
+                border-radius: 24px;
+                padding: 40px 36px 32px;
+                width: 90%; max-width: 400px;
+                box-shadow: 0 24px 64px rgba(0,0,0,0.7),
+                            0 0 0 1px rgba(255,255,255,0.04),
+                            0 0 80px rgba(74,222,128,0.06);
+                display: flex; flex-direction: column; align-items: center;
+                text-align: center; position: relative; overflow: hidden;">
+
+      <!-- Brillo decorativo superior -->
+      <div style="position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
+                  width: 200px; height: 120px;
+                  background: radial-gradient(ellipse, rgba(74,222,128,0.12) 0%, transparent 70%);
+                  pointer-events: none;"></div>
+
+      <!-- Ícono principal con anillo -->
+      <div style="position: relative; margin-bottom: 20px;">
+        <div style="width: 76px; height: 76px; border-radius: 50%;
+                    background: rgba(74, 222, 128, 0.08);
+                    border: 1.5px solid rgba(74, 222, 128, 0.3);
+                    display: flex; align-items: center; justify-content: center;
+                    box-shadow: 0 0 30px rgba(74,222,128,0.18), inset 0 0 20px rgba(74,222,128,0.05);">
+          <div style="width: 52px; height: 52px; border-radius: 50%;
+                      background: linear-gradient(135deg, rgba(74,222,128,0.18), rgba(34,197,94,0.1));
+                      border: 1px solid rgba(74,222,128,0.4);
+                      display: flex; align-items: center; justify-content: center;">
+            <i class="pi pi-check" style="color: #4ade80; font-size: 22px; font-weight: 900;"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Badge -->
+      <span style="background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.25);
+                   color: #4ade80; font-size: 11px; font-weight: 700;
+                   letter-spacing: 1.5px; text-transform: uppercase;
+                   padding: 4px 12px; border-radius: 20px; margin-bottom: 14px;">
+        Operación exitosa
+      </span>
+
+      <!-- Título -->
+      <h3 style="margin: 0 0 10px; color: #f1f5f9;
+                 font-family: 'Manrope', sans-serif;
+                 font-size: 22px; font-weight: 800; letter-spacing: -0.5px;">
+        ¡Canje Completado!
+      </h3>
+
+      <!-- Mensaje del backend -->
+      <p style="margin: 0 0 24px; color: #94a3b8;
+                font-size: 14px; line-height: 1.6; max-width: 300px;">
+        {{ toastMensaje }}
+      </p>
+
+      <!-- Barra de progreso auto-cierre -->
+      <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.07);
+                  border-radius: 99px; margin-bottom: 22px; overflow: hidden;">
+        <div style="width: 100%; height: 100%; border-radius: 99px;
+                    background: linear-gradient(90deg, #4ade80, #22c55e);
+                    transform-origin: left center;
+                    will-change: transform;
+                    animation: shrinkBar 15s linear forwards;"></div>
+      </div>
+
+      <!-- Botón cerrar -->
+      <button (click)="mostrarToastCanje = false"
+        style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+               color: #cbd5e1; cursor: pointer; padding: 10px 32px;
+               border-radius: 12px; font-size: 14px; font-weight: 600;
+               transition: all 0.2s ease; letter-spacing: 0.3px;"
+        onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.borderColor='rgba(255,255,255,0.15)'"
+        onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.borderColor='rgba(255,255,255,0.08)'">
+        Cerrar
+      </button>
+    </div>
+  </div>
 
 </div>

@@ -1,5 +1,6 @@
 export interface RegistroConsumo {
     id?: number;
+    nro_boleta?: string;
     cliente: number;
     cliente_dni?: string;
     cliente_nombre?: string;
@@ -14,6 +15,7 @@ export interface RegistroConsumo {
 }
 
 export interface RegistrarConsumoRequest {
+    nro_boleta?: string;
     dni: string;
     nombres: string;
     apellidos: string;

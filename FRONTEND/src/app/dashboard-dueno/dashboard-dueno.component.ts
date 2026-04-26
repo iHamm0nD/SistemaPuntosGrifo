@@ -65,6 +65,21 @@ export class DashboardDuenoComponent implements OnInit {
   todosClientes: any[] = [];
   cargandoRanking = false;
 
+  // Canje de Puntos
+  mostrarModalCanjearPuntos = false;
+  canjeDni = '';
+  canjePuntos: number | null = null;
+  canjeClienteEncontrado: any = null;
+  canjeErrorDni = '';
+  canjeMensajeOk = '';
+  canjeMensajeError = '';
+  canjeando = false;
+
+  // Toast de resultado de canje
+  mostrarToastCanje = false;
+  toastMensaje = '';
+  toastTipo: 'ok' | 'error' = 'ok';
+
   // Verificación de credenciales extra
   mostrarModalVerificarPassword = false;
   verificandoPassword = false;
@@ -503,5 +518,73 @@ export class DashboardDuenoComponent implements OnInit {
           error: () => alert('Error al eliminar empleado')
         });
     }, 'Aviso: Ingrese su contraseña para confirmar y ejecutar la eliminación permanente de esta cuenta.');
+  }
+
+  // ===== Canje de Puntos =====
+  abrirModalCanjearPuntos() {
+    this.limpiarModalCanje();
+    this.mostrarModalCanjearPuntos = true;
+  }
+
+  limpiarModalCanje() {
+    this.canjeDni = '';
+    this.canjePuntos = null;
+    this.canjeClienteEncontrado = null;
+    this.canjeErrorDni = '';
+    this.canjeMensajeOk = '';
+    this.canjeMensajeError = '';
+    this.canjeando = false;
+  }
+
+  onCanjeDniChange() {
+    this.canjeClienteEncontrado = null;
+    this.canjeErrorDni = '';
+    this.canjeMensajeOk = '';
+    this.canjeMensajeError = '';
+
+    const dni = this.canjeDni.replace(/[^0-9]/g, '');
+    this.canjeDni = dni;
+
+    if (dni.length >= 8 && dni.length <= 9) {
+      this.api.buscarClientePorDni(dni).subscribe({
+        next: (cliente: any) => {
+          if (cliente && parseFloat(cliente.puntos_acumulados) > 0) {
+            this.canjeClienteEncontrado = cliente;
+            this.canjeErrorDni = '';
+          } else if (cliente) {
+            this.canjeErrorDni = 'El cliente aún no hizo consumos o no tiene puntos disponibles.';
+          }
+        },
+        error: () => {
+          this.canjeErrorDni = 'Este cliente no tiene consumos registrados en el sistema.';
+        }
+      });
+    }
+  }
+
+  ejecutarCanje() {
+    if (!this.canjeClienteEncontrado || !this.canjePuntos || this.canjePuntos <= 0) return;
+    this.canjeando = true;
+    this.canjeMensajeOk = '';
+    this.canjeMensajeError = '';
+
+    this.api.canjearPuntos(this.canjeDni, this.canjePuntos).subscribe({
+      next: (res: any) => {
+        this.canjeando = false;
+        this.mostrarModalCanjearPuntos = false;
+        this.limpiarModalCanje();
+        // Refrescar datos del dashboard
+        this.cargarDashboard(false);
+        // Mostrar toast flotante
+        this.toastMensaje = `${res.mensaje} Puntos restantes: ${res.puntos_restantes}`;
+        this.toastTipo = 'ok';
+        this.mostrarToastCanje = true;
+        setTimeout(() => this.mostrarToastCanje = false, 15000);
+      },
+      error: (err: any) => {
+        this.canjeando = false;
+        this.canjeMensajeError = err.error?.error || 'Error al procesar el canje.';
+      }
+    });
   }
 }

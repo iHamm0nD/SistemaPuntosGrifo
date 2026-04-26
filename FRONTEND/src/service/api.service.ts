@@ -121,4 +121,13 @@ export class ApiService {
     public consultarDNI(dni: string): Observable<any> {
         return this.http.get<any>(`${this.ApiUrl}consultar-dni/${dni}/`);
     }
+
+    // =============================== CANJE DE PUNTOS ================================
+    public canjearPuntos(dni: string, puntos: number): Observable<any> {
+        return this.http.post<any>(
+            this.ApiUrl + 'canjear-puntos/',
+            { dni, puntos },
+            this.httpOptions
+        );
+    }
 }
