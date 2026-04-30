@@ -82,7 +82,7 @@
             <i class="pi pi-trophy"></i>
             Ranking de Clientes
             <button class="btn-ver-todos" (click)="abrirModalRanking()"
-              style="margin-left: 10px; font-size: 0.8rem; padding: 5px 10px; border-radius: 4px; border: 1px solid #4ade80; background: transparent; color: #4ade80; cursor: pointer;">
+              style="margin-left: 10px; font-size: 0.8rem; padding: 5px 10px; border-radius: 4px; border: 1px solid #D2A679; background: transparent; color: #D2A679; cursor: pointer;">
               Ver todos
             </button>
           </h2>
@@ -123,30 +123,30 @@
           <!-- Botones de filtro de período -->
           <div style="display: flex; gap: 6px;">
             <button (click)="cambiarFiltroPeriodo('dia')"
-              [style.background]="filtroPeriodo === 'dia' ? 'rgba(255, 159, 74, 0.2)' : 'transparent'"
-              [style.border-color]="filtroPeriodo === 'dia' ? '#ff9f4a' : 'rgba(72, 72, 71, 0.3)'"
-              [style.color]="filtroPeriodo === 'dia' ? '#ff9f4a' : '#adaaaa'"
+              [style.background]="filtroPeriodo === 'dia' ? 'rgba(139, 94, 60, 0.2)' : 'transparent'"
+              [style.border-color]="filtroPeriodo === 'dia' ? '#8B5E3C' : 'rgba(72, 72, 71, 0.3)'"
+              [style.color]="filtroPeriodo === 'dia' ? '#8B5E3C' : '#adaaaa'"
               style="font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(72, 72, 71, 0.3); cursor: pointer; transition: all 0.2s;">
               Hoy
             </button>
             <button (click)="cambiarFiltroPeriodo('semana')"
-              [style.background]="filtroPeriodo === 'semana' ? 'rgba(255, 159, 74, 0.2)' : 'transparent'"
-              [style.border-color]="filtroPeriodo === 'semana' ? '#ff9f4a' : 'rgba(72, 72, 71, 0.3)'"
-              [style.color]="filtroPeriodo === 'semana' ? '#ff9f4a' : '#adaaaa'"
+              [style.background]="filtroPeriodo === 'semana' ? 'rgba(139, 94, 60, 0.2)' : 'transparent'"
+              [style.border-color]="filtroPeriodo === 'semana' ? '#8B5E3C' : 'rgba(72, 72, 71, 0.3)'"
+              [style.color]="filtroPeriodo === 'semana' ? '#8B5E3C' : '#adaaaa'"
               style="font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(72, 72, 71, 0.3); cursor: pointer; transition: all 0.2s;">
               7 días
             </button>
             <button (click)="cambiarFiltroPeriodo('mes')"
-              [style.background]="filtroPeriodo === 'mes' ? 'rgba(255, 159, 74, 0.2)' : 'transparent'"
-              [style.border-color]="filtroPeriodo === 'mes' ? '#ff9f4a' : 'rgba(72, 72, 71, 0.3)'"
-              [style.color]="filtroPeriodo === 'mes' ? '#ff9f4a' : '#adaaaa'"
+              [style.background]="filtroPeriodo === 'mes' ? 'rgba(139, 94, 60, 0.2)' : 'transparent'"
+              [style.border-color]="filtroPeriodo === 'mes' ? '#8B5E3C' : 'rgba(72, 72, 71, 0.3)'"
+              [style.color]="filtroPeriodo === 'mes' ? '#8B5E3C' : '#adaaaa'"
               style="font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(72, 72, 71, 0.3); cursor: pointer; transition: all 0.2s;">
               30 días
             </button>
             <button (click)="cambiarFiltroPeriodo('total')"
-              [style.background]="filtroPeriodo === 'total' ? 'rgba(255, 159, 74, 0.2)' : 'transparent'"
-              [style.border-color]="filtroPeriodo === 'total' ? '#ff9f4a' : 'rgba(72, 72, 71, 0.3)'"
-              [style.color]="filtroPeriodo === 'total' ? '#ff9f4a' : '#adaaaa'"
+              [style.background]="filtroPeriodo === 'total' ? 'rgba(139, 94, 60, 0.2)' : 'transparent'"
+              [style.border-color]="filtroPeriodo === 'total' ? '#8B5E3C' : 'rgba(72, 72, 71, 0.3)'"
+              [style.color]="filtroPeriodo === 'total' ? '#8B5E3C' : '#adaaaa'"
               style="font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(72, 72, 71, 0.3); cursor: pointer; transition: all 0.2s;">
               Total
             </button>
@@ -155,7 +155,7 @@
         <div class="panel-body">
           <!-- Loading del gráfico -->
           <div *ngIf="cargandoConsumo" style="display: flex; justify-content: center; align-items: center; height: 80px;">
-            <i class="pi pi-spinner pi-spin" style="color: #ff9f4a; font-size: 24px;"></i>
+            <i class="pi pi-spinner pi-spin" style="color: #8B5E3C; font-size: 24px;"></i>
           </div>
           <div class="fuel-list" *ngIf="!cargandoConsumo && consumoPorTipo.length > 0">
             <div class="fuel-item" *ngFor="let tipo of consumoPorTipo">
@@ -190,7 +190,7 @@
         <div class="search-bar" style="display: flex; gap: 10px;">
           <input type="text" [ngModel]="busquedaRegistro" (ngModelChange)="onSearchChange($event)"
             placeholder="Buscar DNI" class="form-input"
-            style="padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #262626; color: white; width: 250px;">
+            style="padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #ffffff; color: #2E1A0F; width: 250px;">
         </div>
       </div>
       <div class="panel-body">
@@ -211,8 +211,8 @@
             </thead>
             <tbody>
               <tr *ngFor="let reg of registrosPaginados" style="white-space: nowrap;">
-                <td style="font-weight: 600; color: #f8fafc;">{{ reg.nro_boleta || '—' }}</td>
-                <td style="font-size: 0.9em; color: #94a3b8;">{{ reg.fecha | date:'yyyy/MM/dd HH:mm:ss' }}</td>
+                <td style="font-weight: 600; color: #2E1A0F;">{{ reg.nro_boleta || '—' }}</td>
+                <td style="font-size: 0.9em; color: #D2A679;">{{ reg.fecha | date:'yyyy/MM/dd HH:mm:ss' }}</td>
                 <td>{{ reg.cliente_dni }}</td>
                 <td>{{ reg.cliente_nombre }}</td>
                 <td>S/. {{ reg.monto_total | number:'1.2-2' }}</td>
@@ -222,10 +222,10 @@
                 <td>
                   <span class="badge-points">+{{ reg.puntos_otorgados }}</span>
                 </td>
-                <td style="color: white;">{{ reg.empleado_nombre }}</td>
+                <td style="color: #2E1A0F;">{{ reg.empleado_nombre }}</td>
                 <td>
                   <button (click)="eliminarRegistro(reg.id)"
-                    style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;"
+                    style="background: #8B5E3C; color: #2E1A0F; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;"
                     title="Eliminar registro">
                     <i class="pi pi-trash"></i>
                   </button>
@@ -242,7 +242,7 @@
             [style.opacity]="paginaActual === 1 ? '0.5' : '1'">
             <i class="pi pi-chevron-left"></i> Anterior
           </button>
-          <span style="color: white;">Página {{ paginaActual }} de {{ totalPaginas }}</span>
+          <span style="color: #2E1A0F;">Página {{ paginaActual }} de {{ totalPaginas }}</span>
           <button (click)="cambiarPagina(1)" [disabled]="paginaActual === totalPaginas" class="btn-manage"
             [style.opacity]="paginaActual === totalPaginas ? '0.5' : '1'">
             Siguiente <i class="pi pi-chevron-right"></i>
@@ -290,51 +290,51 @@
     [style]="{width: '95vw', maxWidth: '450px'}" [closable]="true" [draggable]="false">
 
     <div class="add-employee-detailed-form" style="padding: 10px 0;">
-      <p style="color: #94a3b8; font-size: 13px; margin-bottom: 16px; margin-top: 0;">Rellena los datos para crear una
-        nueva cuenta. Los campos con <span style="color: #ef4444;">*</span> son obligatorios.</p>
+      <p style="color: #D2A679; font-size: 13px; margin-bottom: 16px; margin-top: 0;">Rellena los datos para crear una
+        nueva cuenta. Los campos con <span style="color: #8B5E3C;">*</span> son obligatorios.</p>
 
       <div style="display: flex; flex-direction: column; gap: 15px;">
         <div>
-          <label style="color: #cbd5e1; font-size: 13px; margin-bottom: 5px; display: block;">DNI del Empleado <span
-              style="color: #ef4444;">*</span></label>
+          <label style="color: #8B5E3C; font-size: 13px; margin-bottom: 5px; display: block;">DNI del Empleado <span
+              style="color: #8B5E3C;">*</span></label>
           <div style="position: relative; display: flex; align-items: center;">
             <input type="text" [(ngModel)]="nuevoEmpleado.dni" (input)="limpiarDniEmpleado()" maxlength="9" minlength="8"
               placeholder="Ingresa DNI" class="form-input"
-              style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #262626; color: white; outline: none;"
+              style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #ffffff; color: #2E1A0F; outline: none;"
               [disabled]="buscandoDni">
-            <i *ngIf="buscandoDni" class="pi pi-spinner pi-spin" style="position: absolute; right: 10px; color: #ff9f4a;"></i>
+            <i *ngIf="buscandoDni" class="pi pi-spinner pi-spin" style="position: absolute; right: 10px; color: #8B5E3C;"></i>
           </div>
-          <p *ngIf="errorDni" style="color: #ef4444; font-size: 11px; margin: 4px 0 0;">{{ errorDni }} <a href="https://apis.net.pe" target="_blank" style="color: #3b82f6; text-decoration: underline;" *ngIf="errorDni.includes('Token')">Obtener token gratis</a></p>
+          <p *ngIf="errorDni" style="color: #8B5E3C; font-size: 11px; margin: 4px 0 0;">{{ errorDni }} <a href="https://apis.net.pe" target="_blank" style="color: #8B5E3C; text-decoration: underline;" *ngIf="errorDni.includes('Token')">Obtener token gratis</a></p>
         </div>
 
         <div>
-          <label style="color: #cbd5e1; font-size: 13px; margin-bottom: 5px; display: block;">Nombres <span
-              style="color: #ef4444;">*</span></label>
+          <label style="color: #8B5E3C; font-size: 13px; margin-bottom: 5px; display: block;">Nombres <span
+              style="color: #8B5E3C;">*</span></label>
           <input type="text" [(ngModel)]="nuevoEmpleado.nombre" (input)="limpiarLetrasNombres()" placeholder="Nombres"
             class="form-input"
-            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #262626; color: white; outline: none;">
+            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #ffffff; color: #2E1A0F; outline: none;">
         </div>
 
         <div>
-          <label style="color: #cbd5e1; font-size: 13px; margin-bottom: 5px; display: block;">Apellidos <span
-              style="color: #ef4444;">*</span></label>
+          <label style="color: #8B5E3C; font-size: 13px; margin-bottom: 5px; display: block;">Apellidos <span
+              style="color: #8B5E3C;">*</span></label>
           <input type="text" [(ngModel)]="nuevoEmpleado.apellido" (input)="limpiarLetrasNombres()"
             placeholder="Apellidos" class="form-input"
-            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #262626; color: white; outline: none;">
+            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #ffffff; color: #2E1A0F; outline: none;">
         </div>
 
         <div>
-          <label style="color: #cbd5e1; font-size: 13px; margin-bottom: 5px; display: block;">Teléfono
+          <label style="color: #8B5E3C; font-size: 13px; margin-bottom: 5px; display: block;">Teléfono
             (Opcional)</label>
           <input type="text" [(ngModel)]="nuevoEmpleado.telefono" placeholder="Número de celular" class="form-input"
-            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #262626; color: white; outline: none;">
+            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #ffffff; color: #2E1A0F; outline: none;">
         </div>
       </div>
     </div>
 
     <ng-template pTemplate="footer">
       <button (click)="guardarEmpleado()" class="btn btn-primary"
-        style="width: 100%; background: linear-gradient(135deg, #f59e0b, #d97706); color: #1e293b; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">Crear
+        style="width: 100%; background: linear-gradient(135deg, #8B5E3C, #2E1A0F); color: #1e293b; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">Crear
         Cuenta de Empleado</button>
     </ng-template>
   </p-dialog>
@@ -345,10 +345,10 @@
 
     <div class="result-content" *ngIf="resumenEmpleadoConstruido">
       <div class="result-icon"
-        style="width: 64px; height: 64px; background: rgba(34, 197, 94, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
-        <i class="pi pi-check-circle" style="font-size: 32px; color: #22c55e;"></i>
+        style="width: 64px; height: 64px; background: rgba(210, 166, 121, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+        <i class="pi pi-check-circle" style="font-size: 32px; color: #8B5E3C;"></i>
       </div>
-      <h3 style="text-align: center; color: #22c55e; margin-top: 0;">Cuenta Creada Exitosamente</h3>
+      <h3 style="text-align: center; color: #8B5E3C; margin-top: 0;">Cuenta Creada Exitosamente</h3>
 
       <div class="result-details"
         style="background: #f8fafc; border-radius: 8px; padding: 15px; border: 1px solid #e2e8f0; text-align: left;">
@@ -364,12 +364,12 @@
         <div
           style="display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding: 8px 0; background: #f0fdf4;">
           <span style="color: #64748b; font-size: 14px; font-weight: 500;">Usuario (Login):</span>
-          <span style="color: #16a34a; font-size: 14px; font-weight: bold;">{{ resumenEmpleadoConstruido.username
+          <span style="color: #8B5E3C; font-size: 14px; font-weight: bold;">{{ resumenEmpleadoConstruido.username
             }}</span>
         </div>
         <div style="display: flex; justify-content: space-between; padding: 8px 0; background: #f0fdf4;">
           <span style="color: #64748b; font-size: 14px; font-weight: 500;">Contraseña gen.:</span>
-          <span style="color: #16a34a; font-size: 14px; font-weight: bold;">{{ resumenEmpleadoConstruido.password
+          <span style="color: #8B5E3C; font-size: 14px; font-weight: bold;">{{ resumenEmpleadoConstruido.password
             }}</span>
         </div>
       </div>
@@ -377,7 +377,7 @@
 
     <ng-template pTemplate="footer">
       <button class="btn btn-primary"
-        style="width: 100%; background: #22c55e; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;"
+        style="width: 100%; background: #8B5E3C; color: #2E1A0F; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;"
         (click)="cerrarResumenEmpleado()">
         Aceptar
       </button>
@@ -412,24 +412,24 @@
               <td style="white-space: nowrap;">
                 <!-- Botón Editar -->
                 <button (click)="abrirEdicionEmpleado(emp)" title="Editar empleado"
-                  style="background: #f59e0b; color: #1e293b; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 6px; font-weight: bold;">
+                  style="background: #8B5E3C; color: #1e293b; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 6px; font-weight: bold;">
                   <i class="pi pi-user-edit"></i>
                 </button>
                 <!-- Botón Ver Credenciales -->
                 <button (click)="toggleCredenciales(emp)" title="Ver credenciales"
-                  style="background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 6px;">
+                  style="background: #8B5E3C; color: #2E1A0F; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 6px;">
                   <i class="pi pi-eye"></i>
                 </button>
                 <!-- Botón Eliminar -->
                 <button (click)="eliminarEmpleado(emp.id)"
-                  style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                  style="background: #8B5E3C; color: #2E1A0F; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
                   <i class="pi pi-trash"></i>
                 </button>
               </td>
             </tr>
           </tbody>
         </table>
-        <div *ngIf="empleados.length === 0" style="text-align: center; color: #94a3b8; padding: 20px;">
+        <div *ngIf="empleados.length === 0" style="text-align: center; color: #D2A679; padding: 20px;">
           No hay empleados registrados.
         </div>
       </div>
@@ -441,46 +441,46 @@
     [style]="{width: '95vw', maxWidth: '420px'}" [closable]="true" [draggable]="false">
 
     <div *ngIf="empleadoEditando" style="padding: 8px 0;">
-      <p style="color: #94a3b8; font-size: 13px; margin-bottom: 16px; margin-top: 0;">Modifica los campos que desees.
-        Los campos con <span style="color: #ef4444;">*</span> son obligatorios.</p>
+      <p style="color: #D2A679; font-size: 13px; margin-bottom: 16px; margin-top: 0;">Modifica los campos que desees.
+        Los campos con <span style="color: #8B5E3C;">*</span> son obligatorios.</p>
 
       <div style="display: flex; flex-direction: column; gap: 14px;">
         <div>
-          <label style="color: #cbd5e1; font-size: 13px; margin-bottom: 5px; display: block;">DNI <span
-              style="color: #ef4444;">*</span></label>
+          <label style="color: #8B5E3C; font-size: 13px; margin-bottom: 5px; display: block;">DNI <span
+              style="color: #8B5E3C;">*</span></label>
           <input type="text" [(ngModel)]="empleadoEditando.dni" (input)="limpiarDniEdicion()" maxlength="9"
             placeholder="DNI del empleado" class="form-input"
-            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #262626; color: white; outline: none;">
+            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #ffffff; color: #2E1A0F; outline: none;">
         </div>
         <div>
-          <label style="color: #cbd5e1; font-size: 13px; margin-bottom: 5px; display: block;">Nombres <span
-              style="color: #ef4444;">*</span></label>
+          <label style="color: #8B5E3C; font-size: 13px; margin-bottom: 5px; display: block;">Nombres <span
+              style="color: #8B5E3C;">*</span></label>
           <input type="text" [(ngModel)]="empleadoEditando.nombre" (input)="limpiarLetrasEdicion()"
             placeholder="Nombres" class="form-input"
-            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #262626; color: white; outline: none;">
+            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #ffffff; color: #2E1A0F; outline: none;">
         </div>
         <div>
-          <label style="color: #cbd5e1; font-size: 13px; margin-bottom: 5px; display: block;">Apellidos <span
-              style="color: #ef4444;">*</span></label>
+          <label style="color: #8B5E3C; font-size: 13px; margin-bottom: 5px; display: block;">Apellidos <span
+              style="color: #8B5E3C;">*</span></label>
           <input type="text" [(ngModel)]="empleadoEditando.apellido" (input)="limpiarLetrasEdicion()"
             placeholder="Apellidos" class="form-input"
-            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #262626; color: white; outline: none;">
+            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #ffffff; color: #2E1A0F; outline: none;">
         </div>
         <div>
-          <label style="color: #cbd5e1; font-size: 13px; margin-bottom: 5px; display: block;">Teléfono
+          <label style="color: #8B5E3C; font-size: 13px; margin-bottom: 5px; display: block;">Teléfono
             (Opcional)</label>
           <input type="text" [(ngModel)]="empleadoEditando.telefono" placeholder="Número de celular" class="form-input"
-            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #262626; color: white; outline: none;">
+            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #ffffff; color: #2E1A0F; outline: none;">
         </div>
-        <p *ngIf="errorEdicionEmpleado" style="color: #ef4444; font-size: 13px; margin: 0;">{{ errorEdicionEmpleado }}
+        <p *ngIf="errorEdicionEmpleado" style="color: #8B5E3C; font-size: 13px; margin: 0;">{{ errorEdicionEmpleado }}
         </p>
-        <p *ngIf="okEdicionEmpleado" style="color: #22c55e; font-size: 13px; margin: 0;">{{ okEdicionEmpleado }}</p>
+        <p *ngIf="okEdicionEmpleado" style="color: #8B5E3C; font-size: 13px; margin: 0;">{{ okEdicionEmpleado }}</p>
       </div>
     </div>
 
     <ng-template pTemplate="footer">
       <button (click)="guardarEdicionEmpleado()" class="btn btn-primary"
-        style="width: 100%; background: linear-gradient(135deg, #f59e0b, #d97706); color: #1e293b; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">
+        style="width: 100%; background: linear-gradient(135deg, #8B5E3C, #2E1A0F); color: #1e293b; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">
         <i class="pi pi-save" style="margin-right: 6px;"></i> Guardar Cambios
       </button>
     </ng-template>
@@ -494,27 +494,27 @@
       <div class="ranking-list" *ngIf="todosClientes.length > 0">
         <div class="ranking-item" *ngFor="let cliente of todosClientes; let i = index" [class.top-1]="i === 0"
           [class.top-2]="i === 1" [class.top-3]="i === 2"
-          style="display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #334155;">
+          style="display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #e0e0e0;">
           <div class="ranking-position" style="width: 40px;">
             <span class="position-badge" [style.background]="getMedalColor(i)"
-              style="color: white; padding: 4px 8px; border-radius: 50%; font-weight: bold;">
+              style="color: #2E1A0F; padding: 4px 8px; border-radius: 50%; font-weight: bold;">
               {{ i + 1 }}
             </span>
           </div>
           <div class="ranking-info" style="flex: 1;">
-            <span class="ranking-name" style="font-weight: bold; color: #f8fafc; display: block;">{{ cliente.nombres }}
+            <span class="ranking-name" style="font-weight: bold; color: #2E1A0F; display: block;">{{ cliente.nombres }}
               {{ cliente.apellidos }}</span>
-            <span class="ranking-dni" style="font-size: 0.8em; color: #94a3b8;">DNI: {{ cliente.dni }}</span>
+            <span class="ranking-dni" style="font-size: 0.8em; color: #D2A679;">DNI: {{ cliente.dni }}</span>
           </div>
           <div class="ranking-points" style="text-align: right;">
-            <span class="points-value" style="font-size: 1.1em; font-weight: bold; color: #f8fafc;">{{
+            <span class="points-value" style="font-size: 1.1em; font-weight: bold; color: #2E1A0F;">{{
               cliente.puntos_acumulados | number }}</span>
-            <span class="points-label" style="font-size: 0.8em; color: #94a3b8; display: block;">puntos</span>
+            <span class="points-label" style="font-size: 0.8em; color: #D2A679; display: block;">puntos</span>
           </div>
         </div>
       </div>
       <div class="empty-state" *ngIf="todosClientes.length === 0"
-        style="text-align: center; color: #94a3b8; padding: 20px;">
+        style="text-align: center; color: #D2A679; padding: 20px;">
         No hay clientes registrados aún.
       </div>
     </div>
@@ -527,13 +527,13 @@
     <div *ngIf="empCredencialesVisible" style="padding: 8px 0;">
       <!-- Nombre completo -->
       <div
-        style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #334155;">
+        style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #e0e0e0;">
         <div
-          style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #6366f1); display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; font-weight: bold; flex-shrink: 0;">
+          style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #8B5E3C, #8B5E3C); display: flex; align-items: center; justify-content: center; font-size: 20px; color: #2E1A0F; font-weight: bold; flex-shrink: 0;">
           {{ empCredencialesVisible.nombre?.charAt(0) }}
         </div>
         <div>
-          <p style="margin: 0; color: #f8fafc; font-weight: bold; font-size: 15px;">{{ empCredencialesVisible.nombre }}
+          <p style="margin: 0; color: #2E1A0F; font-weight: bold; font-size: 15px;">{{ empCredencialesVisible.nombre }}
             {{ empCredencialesVisible.apellido }}</p>
           <p style="margin: 0; color: #64748b; font-size: 12px;">Empleado</p>
         </div>
@@ -542,22 +542,22 @@
       <!-- Credenciales -->
       <div style="display: flex; flex-direction: column; gap: 12px;">
         <!-- Usuario -->
-        <div style="background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 12px 16px;">
+        <div style="background: #ffffff; border: 1px solid rgba(139, 94, 60, 0.2); border-radius: 8px; padding: 12px 16px;">
           <p
             style="margin: 0 0 4px; color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;">
             Usuario (Login)</p>
           <p
-            style="margin: 0; color: #f8fafc; font-family: monospace; font-size: 16px; font-weight: bold; letter-spacing: 1px;">
+            style="margin: 0; color: #2E1A0F; font-family: monospace; font-size: 16px; font-weight: bold; letter-spacing: 1px;">
             {{ empCredencialesVisible.dni }}</p>
         </div>
 
         <!-- Contraseña -->
-        <div style="background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 12px 16px;">
+        <div style="background: #ffffff; border: 1px solid rgba(139, 94, 60, 0.2); border-radius: 8px; padding: 12px 16px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
             <p style="margin: 0; color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;">
               Contraseña</p>
             <button (click)="editandoPassword = !editandoPassword; nuevaPasswordEmp = ''" title="Editar contraseña"
-              style="background: transparent; border: 1px solid #475569; border-radius: 4px; color: #94a3b8; padding: 3px 8px; cursor: pointer; font-size: 12px;">
+              style="background: transparent; border: 1px solid #475569; border-radius: 4px; color: #D2A679; padding: 3px 8px; cursor: pointer; font-size: 12px;">
               <i class="pi" [ngClass]="editandoPassword ? 'pi-times' : 'pi-pencil'"></i>
               {{ editandoPassword ? 'Cancelar' : 'Editar' }}
             </button>
@@ -565,21 +565,21 @@
 
           <!-- Modo vista -->
           <p *ngIf="!editandoPassword"
-            style="margin: 0; color: #4ade80; font-family: monospace; font-size: 16px; font-weight: bold; letter-spacing: 1px;">
+            style="margin: 0; color: #D2A679; font-family: monospace; font-size: 16px; font-weight: bold; letter-spacing: 1px;">
             {{ passwordMostrada }}</p>
 
           <!-- Modo edición -->
           <div *ngIf="editandoPassword" style="margin-top: 8px; display: flex; gap: 8px;">
             <input type="text" [(ngModel)]="nuevaPasswordEmp" placeholder="Nueva contraseña"
-              style="flex: 1; padding: 8px 10px; border-radius: 6px; border: 1px solid #ff9f4a; background: #262626; color: #f8fafc; font-family: monospace; font-size: 14px; outline: none;">
+              style="flex: 1; padding: 8px 10px; border-radius: 6px; border: 1px solid #8B5E3C; background: #ffffff; color: #2E1A0F; font-family: monospace; font-size: 14px; outline: none;">
             <button (click)="guardarNuevaPassword()"
-              style="background: #22c55e; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold;">
+              style="background: #8B5E3C; color: #2E1A0F; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold;">
               <i class="pi pi-check"></i>
             </button>
           </div>
-          <p *ngIf="mensajePasswordError" style="margin: 6px 0 0; color: #ff7351; font-size: 12px;">{{
+          <p *ngIf="mensajePasswordError" style="margin: 6px 0 0; color: #D2A679; font-size: 12px;">{{
             mensajePasswordError }}</p>
-          <p *ngIf="mensajePasswordOk" style="margin: 6px 0 0; color: #48ffa8; font-size: 12px;">{{ mensajePasswordOk }}
+          <p *ngIf="mensajePasswordOk" style="margin: 6px 0 0; color: #D2A679; font-size: 12px;">{{ mensajePasswordOk }}
           </p>
         </div>
       </div>
@@ -592,12 +592,12 @@
     
     <div style="padding: 10px 0; text-align: center;">
       <div style="display: flex; justify-content: center; margin-bottom: 15px;">
-        <div style="width: 50px; height: 50px; border-radius: 50%; background: rgba(239, 68, 68, 0.1); color: #ef4444; display: flex; justify-content: center; align-items: center; font-size: 24px;">
+        <div style="width: 50px; height: 50px; border-radius: 50%; background: rgba(139, 94, 60, 0.1); color: #8B5E3C; display: flex; justify-content: center; align-items: center; font-size: 24px;">
           <i class="pi pi-shield"></i>
         </div>
       </div>
-      <h3 style="margin: 0 0 10px; color: #f8fafc;">Acción Protegida</h3>
-      <p style="color: #94a3b8; font-size: 13px; line-height: 1.5; margin-bottom: 20px;">
+      <h3 style="margin: 0 0 10px; color: #2E1A0F;">Acción Protegida</h3>
+      <p style="color: #D2A679; font-size: 13px; line-height: 1.5; margin-bottom: 20px;">
         {{ mensajeVerificacion }}
       </p>
 
@@ -605,20 +605,20 @@
         <div style="position: relative;">
           <input type="password" [(ngModel)]="passwordVerificacion" name="passwordVerificacion"
             placeholder="Contraseña del dueño" class="form-input" 
-            style="width: 100%; padding: 12px 14px; padding-left: 40px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #262626; color: white; outline: none; transition: border-color 0.2s;" [style.border-color]="errorVerificacion ? '#ef4444' : 'rgba(72, 72, 71, 0.3)'">
-          <i class="pi pi-lock" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+            style="width: 100%; padding: 12px 14px; padding-left: 40px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #ffffff; color: #2E1A0F; outline: none; transition: border-color 0.2s;" [style.border-color]="errorVerificacion ? '#8B5E3C' : 'rgba(72, 72, 71, 0.3)'">
+          <i class="pi pi-lock" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #D2A679;"></i>
         </div>
-        <p *ngIf="errorVerificacion" style="margin: 0; color: #ef4444; font-size: 12px; text-align: left;"><i class="pi pi-info-circle"></i> {{ errorVerificacion }}</p>
+        <p *ngIf="errorVerificacion" style="margin: 0; color: #8B5E3C; font-size: 12px; text-align: left;"><i class="pi pi-info-circle"></i> {{ errorVerificacion }}</p>
       </form>
     </div>
 
     <ng-template pTemplate="footer">
       <div style="display: flex; gap: 10px; width: 100%;">
-        <button class="btn" style="flex: 1; padding: 10px; border-radius: 8px; background: transparent; border: 1px solid #475569; color: #cbd5e1; cursor: pointer; font-weight: bold;"
+        <button class="btn" style="flex: 1; padding: 10px; border-radius: 8px; background: transparent; border: 1px solid #475569; color: #8B5E3C; cursor: pointer; font-weight: bold;"
           (click)="mostrarModalVerificarPassword = false" [disabled]="verificandoPassword">
           Cancelar
         </button>
-        <button class="btn btn-primary" style="flex: 1; padding: 10px; border-radius: 8px; background: #ef4444; border: none; color: white; cursor: pointer; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px;"
+        <button class="btn btn-primary" style="flex: 1; padding: 10px; border-radius: 8px; background: #8B5E3C; border: none; color: #2E1A0F; cursor: pointer; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px;"
           (click)="confirmarPassword()" [disabled]="verificandoPassword || !passwordVerificacion">
           <i class="pi pi-check" *ngIf="!verificandoPassword"></i>
           <i class="pi pi-spinner pi-spin" *ngIf="verificandoPassword"></i>
@@ -634,42 +634,42 @@
     [closable]="true" [draggable]="false" (onHide)="limpiarModalCanje()">
 
     <div style="padding: 10px 0;">
-      <p style="color: #94a3b8; font-size: 13px; margin-bottom: 16px; margin-top: 0;">
+      <p style="color: #D2A679; font-size: 13px; margin-bottom: 16px; margin-top: 0;">
         Ingresa el DNI del cliente y la cantidad de puntos a reducir por el canje de una recompensa.
       </p>
 
       <div style="display: flex; flex-direction: column; gap: 15px;">
         <div>
-          <label style="color: #cbd5e1; font-size: 13px; margin-bottom: 5px; display: block;">
-            DNI del Cliente <span style="color: #ef4444;">*</span>
+          <label style="color: #8B5E3C; font-size: 13px; margin-bottom: 5px; display: block;">
+            DNI del Cliente <span style="color: #8B5E3C;">*</span>
           </label>
           <input type="text" [(ngModel)]="canjeDni" (ngModelChange)="onCanjeDniChange()" maxlength="9"
             placeholder="Ingresa el DNI del cliente" class="form-input"
-            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #262626; color: white; outline: none;">
+            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #ffffff; color: #2E1A0F; outline: none;">
           <div *ngIf="canjeClienteEncontrado" style="margin-top: 8px; padding: 8px 12px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 6px;">
-            <p style="margin: 0; color: #4ade80; font-size: 13px; font-weight: 600;">
+            <p style="margin: 0; color: #D2A679; font-size: 13px; font-weight: 600;">
               <i class="pi pi-check-circle" style="margin-right: 6px;"></i>
               {{ canjeClienteEncontrado.nombres }} {{ canjeClienteEncontrado.apellidos }}
             </p>
-            <p style="margin: 4px 0 0; color: #94a3b8; font-size: 12px;">
-              Puntos disponibles: <strong style="color: #fbbf24;">{{ canjeClienteEncontrado.puntos_acumulados | number:'1.0-2' }} pts</strong>
+            <p style="margin: 4px 0 0; color: #D2A679; font-size: 12px;">
+              Puntos disponibles: <strong style="color: #D2A679;">{{ canjeClienteEncontrado.puntos_acumulados | number:'1.0-2' }} pts</strong>
             </p>
           </div>
-          <p *ngIf="canjeErrorDni" style="margin: 6px 0 0; color: #ef4444; font-size: 12px;">
+          <p *ngIf="canjeErrorDni" style="margin: 6px 0 0; color: #8B5E3C; font-size: 12px;">
             <i class="pi pi-exclamation-circle"></i> {{ canjeErrorDni }}
           </p>
         </div>
 
         <div *ngIf="canjeClienteEncontrado">
-          <label style="color: #cbd5e1; font-size: 13px; margin-bottom: 5px; display: block;">
-            Puntos a Reducir <span style="color: #ef4444;">*</span>
+          <label style="color: #8B5E3C; font-size: 13px; margin-bottom: 5px; display: block;">
+            Puntos a Reducir <span style="color: #8B5E3C;">*</span>
           </label>
           <input type="number" [(ngModel)]="canjePuntos" min="1"
             placeholder="Cantidad de puntos a descontar" class="form-input"
-            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #262626; color: white; outline: none;">
+            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #ffffff; color: #2E1A0F; outline: none;">
         </div>
 
-        <p *ngIf="canjeMensajeError" style="color: #ef4444; font-size: 13px; margin: 0; text-align: center;">
+        <p *ngIf="canjeMensajeError" style="color: #8B5E3C; font-size: 13px; margin: 0; text-align: center;">
           <i class="pi pi-exclamation-circle"></i> {{ canjeMensajeError }}
         </p>
       </div>
@@ -678,7 +678,7 @@
     <ng-template pTemplate="footer">
       <button (click)="ejecutarCanje()" class="btn btn-primary"
         [disabled]="!canjeClienteEncontrado || !canjePuntos || canjeando"
-        style="width: 100%; background: linear-gradient(135deg, #f59e0b, #d97706); color: #1e293b; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;">
+        style="width: 100%; background: linear-gradient(135deg, #8B5E3C, #2E1A0F); color: #1e293b; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;">
         <i class="pi" [ngClass]="canjeando ? 'pi-spin pi-spinner' : 'pi-gift'"></i>
         {{ canjeando ? 'Procesando...' : 'Confirmar Canje' }}
       </button>
@@ -692,8 +692,8 @@
            display: flex; align-items: center; justify-content: center;
            animation: slideInToast 0.3s ease;">
 
-    <div style="background: linear-gradient(145deg, #111827, #0f1923);
-                border: 1px solid rgba(74, 222, 128, 0.25);
+    <div style="background: linear-gradient(145deg, #ffffff, #ffffff);
+                border: 1px solid rgba(210, 166, 121, 0.25);
                 border-radius: 24px;
                 padding: 40px 36px 32px;
                 width: 90%; max-width: 400px;
@@ -712,22 +712,22 @@
       <!-- Ícono principal con anillo -->
       <div style="position: relative; margin-bottom: 20px;">
         <div style="width: 76px; height: 76px; border-radius: 50%;
-                    background: rgba(74, 222, 128, 0.08);
-                    border: 1.5px solid rgba(74, 222, 128, 0.3);
+                    background: rgba(210, 166, 121, 0.08);
+                    border: 1.5px solid rgba(210, 166, 121, 0.3);
                     display: flex; align-items: center; justify-content: center;
                     box-shadow: 0 0 30px rgba(74,222,128,0.18), inset 0 0 20px rgba(74,222,128,0.05);">
           <div style="width: 52px; height: 52px; border-radius: 50%;
                       background: linear-gradient(135deg, rgba(74,222,128,0.18), rgba(34,197,94,0.1));
                       border: 1px solid rgba(74,222,128,0.4);
                       display: flex; align-items: center; justify-content: center;">
-            <i class="pi pi-check" style="color: #4ade80; font-size: 22px; font-weight: 900;"></i>
+            <i class="pi pi-check" style="color: #D2A679; font-size: 22px; font-weight: 900;"></i>
           </div>
         </div>
       </div>
 
       <!-- Badge -->
       <span style="background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.25);
-                   color: #4ade80; font-size: 11px; font-weight: 700;
+                   color: #D2A679; font-size: 11px; font-weight: 700;
                    letter-spacing: 1.5px; text-transform: uppercase;
                    padding: 4px 12px; border-radius: 20px; margin-bottom: 14px;">
         Operación exitosa
@@ -741,16 +741,16 @@
       </h3>
 
       <!-- Mensaje del backend -->
-      <p style="margin: 0 0 24px; color: #94a3b8;
+      <p style="margin: 0 0 24px; color: #D2A679;
                 font-size: 14px; line-height: 1.6; max-width: 300px;">
         {{ toastMensaje }}
       </p>
 
       <!-- Barra de progreso auto-cierre -->
-      <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.07);
+      <div style="width: 100%; height: 6px; background: rgba(0,0,0,0.1);
                   border-radius: 99px; margin-bottom: 22px; overflow: hidden;">
         <div style="width: 100%; height: 100%; border-radius: 99px;
-                    background: linear-gradient(90deg, #4ade80, #22c55e);
+                    background: linear-gradient(90deg, #D2A679, #8B5E3C);
                     transform-origin: left center;
                     will-change: transform;
                     animation: shrinkBar 15s linear forwards;"></div>
@@ -758,12 +758,12 @@
 
       <!-- Botón cerrar -->
       <button (click)="mostrarToastCanje = false"
-        style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
-               color: #cbd5e1; cursor: pointer; padding: 10px 32px;
+        style="background: rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.1);
+               color: #8B5E3C; cursor: pointer; padding: 10px 32px;
                border-radius: 12px; font-size: 14px; font-weight: 600;
                transition: all 0.2s ease; letter-spacing: 0.3px;"
         onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.borderColor='rgba(255,255,255,0.15)'"
-        onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.borderColor='rgba(255,255,255,0.08)'">
+        onmouseout="this.style.background='rgba(0,0,0,0.05)'; this.style.borderColor='rgba(0,0,0,0.1)'">
         Cerrar
       </button>
     </div>

@@ -5,7 +5,7 @@
 ::ng-deep .custom-header {
   background: rgba(14, 14, 14, 0.98) !important;
   border: none !important;
-  border-bottom: 1px solid rgba(72, 72, 71, 0.2) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
   padding: 1rem 2rem !important;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
 }
@@ -63,10 +63,10 @@
 /* Hero Section */
 .hero-section {
   position: relative;
-  background-color: #0e0e0e;
+  background-color: #fafbfa;
   padding: 6rem 2rem;
   text-align: center;
-  color: #ffffff;
+  color: #333333;
   overflow: hidden;
   min-height: 80vh;
   display: flex;
@@ -101,7 +101,7 @@
   line-height: 1.2 !important;
   margin-bottom: 1.5rem !important;
   letter-spacing: -1.5px;
-  color: #ffffff;
+  color: #333333;
 }
 
 .hero-highlight {
@@ -116,7 +116,7 @@
   font-weight: 500 !important;
   line-height: 1.6 !important;
   margin-bottom: 2.5rem !important;
-  color: #adaaaa; /* on_surface_variant */
+  color: #666666; /* on_surface_variant */
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
@@ -175,7 +175,7 @@
 ::ng-deep .elegant-dialog {
   border-radius: 28px !important;
   overflow: hidden;
-  border: 1px solid rgba(72, 72, 71, 0.2) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
   box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6) !important;
   background: transparent !important;
 }
@@ -188,7 +188,7 @@
 .elegant-dialog-content {
   position: relative;
   padding: 40px 30px;
-  color: white;
+  color: #333333;
   overflow: hidden;
   font-family: 'Inter', sans-serif;
 }
@@ -209,7 +209,7 @@
   position: absolute;
   top: 20px;
   right: 20px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.05);
   border: none;
   width: 36px;
   height: 36px;
@@ -217,15 +217,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #adaaaa;
+  color: #666666;
   cursor: pointer;
   transition: all 0.3s ease;
   z-index: 10;
 }
 
 .custom-close-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+  background: rgba(0, 0, 0, 0.1);
+  color: #333333;
   transform: rotate(90deg);
 }
 
@@ -266,12 +266,12 @@
   font-size: 2.2rem;
   font-weight: 800;
   margin: 0 0 10px;
-  color: #ffffff;
+  color: #333333;
   letter-spacing: -1px;
 }
 
 .elegant-subtitle {
-  color: #adaaaa;
+  color: #666666;
   font-size: 1.05rem;
   margin: 0;
   line-height: 1.5;
@@ -286,8 +286,8 @@
 .elegant-input-group {
   display: flex;
   align-items: center;
-  background: #262626; /* surface_container_highest */
-  border: 1px solid rgba(72, 72, 71, 0.3);
+  background: #ffffff; /* surface_container_highest */
+  border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 18px;
   padding: 6px 6px 6px 20px;
   transition: all 0.3s ease;
@@ -304,7 +304,7 @@
 }
 
 .input-icon {
-  color: #565555;
+  color: #888888;
   font-size: 1.2rem;
   margin-right: 12px;
 }
@@ -318,7 +318,7 @@
   background: transparent;
   border: none;
   padding: 14px 10px;
-  color: white;
+  color: #333333;
   font-size: 1.1rem;
   font-family: inherit;
   font-weight: 500;
@@ -327,7 +327,7 @@
 }
 
 .elegant-input::placeholder {
-  color: #565555;
+  color: #888888;
 }
 
 .elegant-submit-btn {
@@ -353,7 +353,7 @@
 
 .elegant-submit-btn:disabled {
   background: #2c2c2c;
-  color: #565555;
+  color: #888888;
   box-shadow: none;
   cursor: not-allowed;
 }
@@ -376,8 +376,8 @@
 }
 
 .result-card {
-  background: rgba(45, 45, 45, 0.95);
-  border: 1px solid rgba(72, 72, 71, 0.2);
+  background: #ffffff; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 24px;
   padding: 30px;
   text-align: center;
@@ -391,11 +391,11 @@
 }
 
 .greeting-text {
-  color: #adaaaa;
+  color: #666666;
 }
 
 .greeting-name {
-  color: white;
+  color: #333333;
   font-weight: 700;
   margin-left: 5px;
 }

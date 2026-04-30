@@ -3,12 +3,12 @@
 
 .dashboard-container {
   min-height: 100vh;
-  background-color: #0e0e0e;
+  background-color: #fafbfa;
   background-image: 
     radial-gradient(circle at 5% 5%, rgba(255, 159, 74, 0.05) 0%, transparent 40%),
     radial-gradient(circle at 95% 95%, rgba(253, 139, 0, 0.03) 0%, transparent 50%);
   font-family: 'Inter', sans-serif;
-  color: #ffffff;
+  color: #333333;
 }
 
 /* ===== Top Bar ===== */
@@ -17,8 +17,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 32px;
-  background: rgba(20, 20, 20, 0.98);
-  border-bottom: 1px solid rgba(72, 72, 71, 0.2); /* outline-variant ghost border */
+  background: #ffffff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1); /* outline-variant ghost border */
   position: sticky;
   top: 0;
   z-index: 100;
@@ -56,7 +56,7 @@
   font-family: 'Manrope', sans-serif;
   font-size: 22px;
   font-weight: 800;
-  color: #ffffff;
+  color: #8c2e0b;
   letter-spacing: -0.5px;
 }
 
@@ -67,7 +67,7 @@
 }
 
 .user-greeting {
-  color: #adaaaa; /* on_surface_variant */
+  color: #666666; /* on_surface_variant */
   font-size: 14px;
   display: flex;
   align-items: center;
@@ -108,7 +108,7 @@
 
 .page-title {
   font-family: 'Manrope', sans-serif;
-  color: #ffffff;
+  color: #333333;
   font-size: 32px;
   font-weight: 800;
   margin: 0 0 8px 0;
@@ -124,15 +124,15 @@
 }
 
 .page-subtitle {
-  color: #adaaaa;
+  color: #666666;
   font-size: 15px;
   margin: 0;
 }
 
 /* ===== Form Card (Glassmorphism) ===== */
 .form-card {
-  background: rgba(45, 45, 45, 0.95); /* surface-variant */
-  border: 1px solid rgba(72, 72, 71, 0.2); /* ghost border */
+  background: #ffffff; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04); /* surface-variant */
+  border: 1px solid rgba(0, 0, 0, 0.1); /* ghost border */
   border-radius: 24px;
   padding: 36px;
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
@@ -156,7 +156,7 @@
 }
 
 .form-label {
-  color: #ffffff;
+  color: #333333;
   font-size: 13px;
   font-weight: 600;
   margin-bottom: 8px;
@@ -175,10 +175,10 @@
 .form-input {
   width: 100%;
   padding: 14px 18px;
-  background: #262626; /* surface_container_highest */
-  border: 1px solid rgba(72, 72, 71, 0.3);
+  background: #ffffff; /* surface_container_highest */
+  border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 12px;
-  color: #ffffff;
+  color: #333333;
   font-size: 15px;
   font-weight: 500;
   transition: all 0.3s ease;
@@ -192,7 +192,7 @@
   box-shadow: 0 0 0 4px rgba(255, 159, 74, 0.08);
 }
 
-.form-input::placeholder { color: #565555; }
+.form-input::placeholder { color: #888888; }
 
 .form-select {
   appearance: none;
@@ -203,8 +203,8 @@
   padding-right: 40px;
 }
 .form-select option {
-  background: #262626;
-  color: #ffffff;
+  background: #ffffff;
+  color: #333333;
 }
 
 .error-msg { display: block; margin-bottom: 20px; }
@@ -246,7 +246,7 @@
 
 .btn-primary:disabled {
   background: #2c2c2c;
-  color: #565555;
+  color: #888888;
   box-shadow: none;
   cursor: not-allowed;
   transform: none;
@@ -254,13 +254,13 @@
 
 .btn-outline {
   background: rgba(255, 255, 255, 0.02);
-  color: #adaaaa;
+  color: #666666;
   border: 1px solid rgba(255, 159, 74, 0.15); /* Ghost Border */
 }
 
 .btn-outline:hover {
   background: rgba(255, 159, 74, 0.05);
-  color: #ffffff;
+  color: #333333;
   border-color: rgba(255, 159, 74, 0.3);
   transform: translateY(-2px);
 }
@@ -281,7 +281,7 @@
 .confirm-content, .result-content {
   text-align: center;
   padding: 20px 0;
-  color: #ffffff;
+  color: #333333;
 }
 
 .confirm-icon {
@@ -303,7 +303,7 @@
 }
 
 .confirm-title {
-  color: #ffffff;
+  color: #333333;
   font-family: 'Manrope', sans-serif;
   font-size: 20px;
   font-weight: 800;
@@ -312,10 +312,10 @@
 
 .confirm-details, .result-details {
   text-align: left;
-  background: #1a1a1a; /* surface_container */
+  background: #f0f0f0; /* surface_container */
   border-radius: 16px;
   padding: 20px;
-  border: 1px solid rgba(72, 72, 71, 0.3);
+  border: 1px solid rgba(0, 0, 0, 0.15);
 }
 
 .detail-row {
@@ -323,7 +323,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .detail-row:last-child {
@@ -331,13 +331,13 @@
 }
 
 .detail-label {
-  color: #adaaaa;
+  color: #666666;
   font-size: 14px;
   font-weight: 500;
 }
 
 .detail-value {
-  color: #ffffff;
+  color: #333333;
   font-size: 15px;
   font-weight: 600;
 }
