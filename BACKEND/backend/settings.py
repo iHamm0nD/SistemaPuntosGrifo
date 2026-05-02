@@ -33,12 +33,14 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'django_filters',
+    'cloudinary_storage',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary',
 ]
 
 REST_FRAMEWORK = {
@@ -171,3 +173,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Llave primaria por defecto de todos los modelos de BDD
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ================= ALMACENAMIENTO EN LA NUBE (CLOUDINARY) =================
+if env('CLOUDINARY_URL', default=''):
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
