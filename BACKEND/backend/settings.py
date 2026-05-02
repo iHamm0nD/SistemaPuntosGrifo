@@ -347,7 +347,7 @@ STORAGES = {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
 
@@ -358,3 +358,6 @@ if env('CLOUDINARY_URL', default=''):
 # Compatibilidad con librerías antiguas (django-cloudinary-storage en Django 5+)
 STATICFILES_STORAGE = STORAGES['staticfiles']['BACKEND']
 DEFAULT_FILE_STORAGE = STORAGES['default']['BACKEND']
+
+# Evitar errores si archivos referenciados en CSS (como fuentes de fontawesome en DRF) no existen
+WHITENOISE_MANIFEST_STRICT = False
