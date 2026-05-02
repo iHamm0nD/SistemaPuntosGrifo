@@ -128,3 +128,23 @@ class RegistroConsumo(models.Model):
         ordering = ['-fecha']
         verbose_name = "Registro de Consumo"
         verbose_name_plural = "Registros de Consumo"
+
+
+class ProductoCanjeable(models.Model):
+    nombre = models.CharField(max_length=150)
+    descripcion = models.TextField(blank=True, default='')
+    puntos_requeridos = models.IntegerField(help_text="Puntos necesarios para canjear este producto")
+    imagen = models.ImageField(upload_to='productos/', blank=True, null=True)
+    categoria = models.CharField(max_length=50, blank=True, default='General')
+    stock = models.IntegerField(default=0, help_text="Unidades disponibles en stock")
+    activo = models.BooleanField(default=True)
+    destacado = models.BooleanField(default=False, help_text="Aparece en productos destacados del inicio")
+    fecha_creacion = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.nombre} - {self.puntos_requeridos} pts"
+
+    class Meta:
+        ordering = ['-fecha_creacion']
+        verbose_name = "Producto Canjeable"
+        verbose_name_plural = "Productos Canjeables"

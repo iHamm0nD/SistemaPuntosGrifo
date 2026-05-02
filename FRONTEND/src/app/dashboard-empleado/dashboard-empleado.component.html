@@ -1,21 +1,23 @@
 <div class="dashboard-container">
-  <!-- Header -->
-  <div class="top-bar">
-    <div class="top-bar-left">
-      <div class="logo-icon">
-        <i class="pi pi-bolt"></i>
+  <!-- Header matching the Index exactly in design/colors -->
+  <div class="header">
+    <div class="header-content">
+      <div class="header-left-side">
+        <div class="logo-container">
+          <img src="assets/images/logoperricholi.png" alt="Logo La Perricholi" class="header-logo-img">
+        </div>
+        <span class="logo-text">La Perricholi</span>
       </div>
-      <span class="logo-text">GrifoPuntos</span>
-    </div>
-    <div class="top-bar-right">
-      <span class="user-greeting">
-        <i class="pi pi-user"></i>
-        Hola, {{ usuario?.first_name }}
-      </span>
-      <button class="btn-logout" (click)="logout()">
-        <i class="pi pi-sign-out"></i>
-        Salir
-      </button>
+      <div class="header-right-side">
+        <span class="user-greeting">
+          <i class="pi pi-user"></i>
+          Hola, {{ usuario?.first_name }}
+        </span>
+        <button class="header-logout-btn" (click)="logout()">
+          <i class="pi pi-sign-out"></i>
+          Salir
+        </button>
+      </div>
     </div>
   </div>
 
@@ -37,30 +39,24 @@
           <div class="form-group">
             <label for="dni" class="form-label">
               <i class="pi pi-id-card"></i>
-              DNI del Cliente <span style="color: #ef4444; margin-left: 4px;">*</span>
+              DNI del Cliente <span class="required-star">*</span>
             </label>
             <div style="position: relative; display: flex; align-items: center;">
               <input id="dni" type="text" class="form-input" [(ngModel)]="dni" (ngModelChange)="buscarCliente()"
                 name="dni" #dniRef="ngModel" placeholder="Ingresa el DNI" maxlength="9" minlength="8" pattern="^[0-9]+$"
                 (input)="intentoSubmit = false"
-                [style.border-color]="(dniRef.invalid && intentoSubmit) ? '#ef4444' : null" required>
-              <i *ngIf="buscandoDni" class="pi pi-spinner pi-spin"
-                style="position: absolute; right: 10px; color: #ff9f4a;"></i>
+                [style.border-color]="(dniRef.invalid && intentoSubmit) ? '#D84F34' : null" required>
+              <i *ngIf="buscandoDni" class="pi pi-spinner pi-spin input-loading-icon"></i>
             </div>
-            <small *ngIf="errorDni"
-              style="color: #ef4444; margin-top: 6px; font-size: 12.5px; font-weight: 500; display: flex; align-items: center; gap: 4px;">
-              <i class="pi pi-exclamation-circle" style="font-size: 12px;"></i>
+            <small *ngIf="errorDni" class="form-error-msg">
+              <i class="pi pi-exclamation-circle"></i>
               <span>{{ errorDni }}</span>
             </small>
-            <small *ngIf="dniRef.invalid && intentoSubmit"
-              style="color: #ef4444; margin-top: 6px; font-size: 12.5px; font-weight: 500; display: flex; align-items: center; gap: 4px;">
-              <i class="pi pi-exclamation-circle" style="font-size: 12px;"></i>
+            <small *ngIf="dniRef.invalid && intentoSubmit" class="form-error-msg">
+              <i class="pi pi-exclamation-circle"></i>
               <span *ngIf="dniRef.errors?.['required']">Rellenar este campo es obligatorio.</span>
-              <span *ngIf="dniRef.errors?.['pattern'] && !dniRef.errors?.['required']">Solo se permiten números en el
-                DNI.</span>
-              <span
-                *ngIf="dniRef.errors?.['minlength'] && !dniRef.errors?.['required'] && !dniRef.errors?.['pattern']">El
-                DNI debe tener al menos 8 dígitos numéricos.</span>
+              <span *ngIf="dniRef.errors?.['pattern'] && !dniRef.errors?.['required']">Solo se permiten números en el DNI.</span>
+              <span *ngIf="dniRef.errors?.['minlength'] && !dniRef.errors?.['required'] && !dniRef.errors?.['pattern']">El DNI debe tener al menos 8 dígitos numéricos.</span>
             </small>
           </div>
 
@@ -88,19 +84,18 @@
           <div class="form-group">
             <label for="combustible" class="form-label">
               <i class="pi pi-car"></i>
-              Tipo de Combustible <span style="color: #ef4444; margin-left: 4px;">*</span>
+              Tipo de Combustible <span class="required-star">*</span>
             </label>
             <select id="combustible" class="form-input form-select" [(ngModel)]="tipoCombustibleId"
               name="tipoCombustible" #combustibleRef="ngModel" (change)="intentoSubmit = false"
-              [style.border-color]="(combustibleRef.invalid && intentoSubmit) ? '#ef4444' : null" required>
+              [style.border-color]="(combustibleRef.invalid && intentoSubmit) ? '#D84F34' : null" required>
               <option [ngValue]="null" disabled>Selecciona un combustible</option>
               <option *ngFor="let tipo of tiposCombustible" [ngValue]="tipo.id">
                 {{ tipo.nombre }}
               </option>
             </select>
-            <small *ngIf="combustibleRef.invalid && intentoSubmit"
-              style="color: #ef4444; margin-top: 6px; font-size: 12.5px; font-weight: 500; display: flex; align-items: center; gap: 4px;">
-              <i class="pi pi-exclamation-circle" style="font-size: 12px;"></i>
+            <small *ngIf="combustibleRef.invalid && intentoSubmit" class="form-error-msg">
+              <i class="pi pi-exclamation-circle"></i>
               <span>Debes seleccionar un tipo de combustible.</span>
             </small>
           </div>
@@ -109,37 +104,32 @@
           <div class="form-group">
             <label for="monto" class="form-label">
               <i class="pi pi-money-bill"></i>
-              Monto Consumido (S/.) <span style="color: #ef4444; margin-left: 4px;">*</span>
+              Monto Consumido (S/.) <span class="required-star">*</span>
             </label>
             <input id="monto" type="number" class="form-input" [(ngModel)]="monto" name="monto" #montoRef="ngModel"
               placeholder="Ingresa el monto en soles" step="0.10" min="0.10" (input)="intentoSubmit = false"
-              [style.border-color]="(montoRef.invalid && intentoSubmit) ? '#ef4444' : null" required>
-            <small *ngIf="montoRef.invalid && intentoSubmit"
-              style="color: #ef4444; margin-top: 6px; font-size: 12.5px; font-weight: 500; display: flex; align-items: center; gap: 4px;">
-              <i class="pi pi-exclamation-circle" style="font-size: 12px;"></i>
+              [style.border-color]="(montoRef.invalid && intentoSubmit) ? '#D84F34' : null" required>
+            <small *ngIf="montoRef.invalid && intentoSubmit" class="form-error-msg">
+              <i class="pi pi-exclamation-circle"></i>
               <span *ngIf="montoRef.errors?.['required']">Rellenar este campo es obligatorio.</span>
-              <span *ngIf="montoRef.errors?.['min'] && !montoRef.errors?.['required']">El monto debe ser mayor a
-                0.</span>
+              <span *ngIf="montoRef.errors?.['min'] && !montoRef.errors?.['required']">El monto debe ser mayor a 0.</span>
             </small>
           </div>
 
           <!-- Tipo y Nro. Comprobante -->
           <div class="form-group">
-            <!-- Selector Boleta / Factura -->
             <div style="display: flex; gap: 16px; margin-bottom: 10px;">
-              <label
-                style="display: flex; align-items: center; gap: 7px; cursor: pointer; color: #555555; font-size: 13.5px; font-weight: 600;">
+              <label class="radio-comprobante-label">
                 <input type="radio" name="tipoComprobante" value="BO" [(ngModel)]="tipoComprobante"
-                  style="accent-color: #ff9f4a; width: 16px; height: 16px; cursor: pointer;">
-                <i class="pi pi-file" style="color: #ff9f4a; font-size: 13px;"></i>
+                  style="accent-color: #D84F34; width: 16px; height: 16px; cursor: pointer;">
+                <i class="pi pi-file"></i>
                 Boleta 
               </label>
-              <label
-                style="display: flex; align-items: center; gap: 7px; cursor: pointer; color: #555555; font-size: 13.5px; font-weight: 600;">
+              <label class="radio-comprobante-label">
                 <input type="radio" name="tipoComprobante" value="FA" [(ngModel)]="tipoComprobante"
-                  style="accent-color: #ffe393; width: 16px; height: 16px; cursor: pointer;">
-                <i class="pi pi-file-edit" style="color: #ffe393; font-size: 13px;"></i>
-                Factura <span style="color: #ef4444; margin-left: 2px;">*</span>
+                  style="accent-color: #D84F34; width: 16px; height: 16px; cursor: pointer;">
+                <i class="pi pi-file-edit"></i>
+                Factura <span class="required-star">*</span>
               </label>
             </div>
             <!-- Label dinámico -->
@@ -147,10 +137,9 @@
               #boletaRef="ngModel"
               [placeholder]="tipoComprobante === 'FA' ? 'Ingrese Nro. Factura' : 'Ingrese Nro. Boleta'"
               (input)="intentoSubmit = false"
-              [style.border-color]="(boletaRef.invalid && intentoSubmit) ? '#ef4444' : null" required>
-            <small *ngIf="boletaRef.invalid && intentoSubmit"
-              style="color: #ef4444; margin-top: 6px; font-size: 12.5px; font-weight: 500; display: flex; align-items: center; gap: 4px;">
-              <i class="pi pi-exclamation-circle" style="font-size: 12px;"></i>
+              [style.border-color]="(boletaRef.invalid && intentoSubmit) ? '#D84F34' : null" required>
+            <small *ngIf="boletaRef.invalid && intentoSubmit" class="form-error-msg">
+              <i class="pi pi-exclamation-circle"></i>
               <span>El Nro. de {{ tipoComprobante === 'FA' ? 'Factura' : 'Boleta' }} es obligatorio.</span>
             </small>
           </div>
@@ -158,10 +147,9 @@
 
           <!-- Tanque Lleno -->
           <div class="form-group" style="grid-column: 1 / -1; margin-top: 10px;">
-            <label class="form-label"
-              style="display: flex; align-items: center; gap: 8px; cursor: pointer; text-transform:none; font-weight: normal;">
+            <label class="checkbox-label">
               <input type="checkbox" [(ngModel)]="tanqueLleno" name="tanqueLleno" (change)="intentoSubmit = false"
-                style="width: 18px; height: 18px; accent-color: #ff9f4a;">
+                style="width: 18px; height: 18px; accent-color: #D84F34;">
               <span>¿Tanque lleno?</span>
             </label>
           </div>
@@ -172,8 +160,8 @@
         </p-message>
 
         <div style="text-align: left; margin-top: -8px; margin-bottom: 12px;">
-          <span style="color: #888888; font-size: 11.5px; font-style: italic;">
-            Los campos marcados con <span style="color: #ef4444; font-weight: bold;">*</span> son obligatorios.
+          <span style="color: #64748b; font-size: 11.5px; font-style: italic;">
+            Los campos marcados con <span style="color: #D84F34; font-weight: bold;">*</span> son obligatorios.
           </span>
         </div>
 
@@ -194,105 +182,115 @@
 
   <!-- Modal de Confirmación -->
   <p-dialog header="Confirmar Registro" [(visible)]="mostrarConfirmacion" [modal]="true"
-    [style]="{width: '95vw', maxWidth: '500px'}" [closable]="true" [draggable]="false">
+    [style]="{width: '95vw', maxWidth: '500px'}" [closable]="true" [draggable]="false"
+    [showHeader]="false" [closeOnEscape]="true" [dismissableMask]="true">
 
-    <div class="confirm-content">
-      <div class="confirm-icon">
-        <i class="pi pi-info-circle"></i>
+    <div class="confirm-modal-wrapper">
+      <div class="confirm-modal-header">
+        <div class="confirm-header-icon"><i class="pi pi-info-circle"></i></div>
+        <div>
+          <h2 class="confirm-modal-title">Confirmar Registro</h2>
+          <p class="confirm-modal-subtitle">Verifica los datos antes de confirmar</p>
+        </div>
+        <button class="confirm-close-btn" (click)="mostrarConfirmacion = false">
+          <i class="pi pi-times"></i>
+        </button>
       </div>
-      <h3 class="confirm-title">Verifica los datos antes de confirmar</h3>
 
-      <div class="confirm-details">
-        <div class="detail-row">
-          <span class="detail-label">Cliente:</span>
-          <span class="detail-value">{{ nombres }} {{ apellidos }}</span>
+      <div class="confirm-modal-body">
+        <div class="confirm-details">
+          <div class="detail-row">
+            <span class="detail-label">Cliente:</span>
+            <span class="detail-value">{{ nombres }} {{ apellidos }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">DNI:</span>
+            <span class="detail-value">{{ dni }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Combustible:</span>
+            <span class="detail-value">{{ combustibleSeleccionado?.nombre }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Monto Consumido:</span>
+            <span class="detail-value">S/. {{ monto | number:'1.2-2' }}</span>
+          </div>
+          <div class="detail-row highlight points">
+            <span class="detail-label">Puntos a Otorgar:</span>
+            <span class="detail-value points-value">{{ puntosEstimados }} pts</span>
+          </div>
         </div>
-        <div class="detail-row">
-          <span class="detail-label">DNI:</span>
-          <span class="detail-value">{{ dni }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Combustible:</span>
-          <span class="detail-value">{{ combustibleSeleccionado?.nombre }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Monto Consumido:</span>
-          <span class="detail-value">S/. {{ monto | number:'1.2-2' }}</span>
-        </div>
-        <div class="detail-row highlight points">
-          <span class="detail-label">Puntos a Otorgar:</span>
-          <span class="detail-value points-value">{{ puntosEstimados }} pts</span>
-        </div>
+      </div>
+
+      <div class="confirm-modal-footer">
+        <button class="btn btn-outline" style="flex:1;" (click)="cancelarConfirmacion()">
+          <i class="pi pi-times"></i> Cancelar
+        </button>
+        <button class="btn btn-primary" style="flex:1.2;" (click)="confirmarRegistro()">
+          <i class="pi pi-check"></i> Confirmar
+        </button>
       </div>
     </div>
-
-    <ng-template pTemplate="footer">
-      <div class="dialog-buttons">
-        <button class="btn btn-outline" (click)="cancelarConfirmacion()">
-          <i class="pi pi-times"></i>
-          Cancelar
-        </button>
-        <button class="btn btn-primary" (click)="confirmarRegistro()">
-          <i class="pi pi-check"></i>
-          Confirmar
-        </button>
-      </div>
-    </ng-template>
   </p-dialog>
 
   <!-- Modal de Resultado -->
   <p-dialog header="¡Registro Exitoso!" [(visible)]="mostrarResultado" [modal]="true"
-    [style]="{width: '95vw', maxWidth: '480px'}" [closable]="true" [draggable]="false">
+    [style]="{width: '95vw', maxWidth: '480px'}" [closable]="true" [draggable]="false"
+    [showHeader]="false" [closeOnEscape]="true" [dismissableMask]="true">
 
-    <div class="result-content" *ngIf="resultadoRegistro">
-      <div class="result-icon">
-        <i class="pi pi-check-circle"></i>
+    <div class="result-modal-wrapper">
+      <div class="result-modal-header">
+        <div class="result-header-icon"><i class="pi pi-check-circle"></i></div>
+        <div>
+          <h2 class="result-modal-title">¡Registro Exitoso!</h2>
+          <p class="result-modal-subtitle">La venta fue registrada y los puntos han sido asignados</p>
+        </div>
+        <button class="result-close-btn" (click)="cerrarResultado()">
+          <i class="pi pi-times"></i>
+        </button>
       </div>
 
-      <div class="result-details">
-        <div class="detail-row">
-          <span class="detail-label">Fecha del Registro:</span>
-          <span class="detail-value">{{ fechaActual | date:'dd/MM/yyyy HH:mm' }}</span>
+      <div class="result-modal-body" *ngIf="resultadoRegistro">
+        <div class="result-details">
+          <div class="detail-row">
+            <span class="detail-label">Fecha del Registro:</span>
+            <span class="detail-value">{{ fechaActual | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Cliente:</span>
+            <span class="detail-value">{{ resultadoRegistro.cliente }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">DNI:</span>
+            <span class="detail-value">{{ resultadoRegistro.dni }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Combustible:</span>
+            <span class="detail-value">{{ resultadoRegistro.combustible }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Monto Total:</span>
+            <span class="detail-value">S/. {{ resultadoRegistro.monto_total | number:'1.2-2' }}</span>
+          </div>
+          <div class="detail-row highlight points">
+            <span class="detail-label">Puntos Otorgados:</span>
+            <span class="detail-value points-value">+{{ resultadoRegistro.puntos_otorgados }} pts</span>
+          </div>
+          <div class="detail-row total-points">
+            <span class="detail-label">Puntos Acumulados:</span>
+            <span class="detail-value">{{ resultadoRegistro.puntos_acumulados }} pts</span>
+          </div>
         </div>
-        <div class="detail-row">
-          <span class="detail-label">Cliente:</span>
-          <span class="detail-value">{{ resultadoRegistro.cliente }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">DNI:</span>
-          <span class="detail-value">{{ resultadoRegistro.dni }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Combustible:</span>
-          <span class="detail-value">{{ resultadoRegistro.combustible }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Monto Total:</span>
-          <span class="detail-value">S/. {{ resultadoRegistro.monto_total | number:'1.2-2' }}</span>
-        </div>
-        <div class="detail-row highlight points">
-          <span class="detail-label">Puntos Otorgados:</span>
-          <span class="detail-value points-value">+{{ resultadoRegistro.puntos_otorgados }} pts</span>
-        </div>
-        <div class="detail-row total-points">
-          <span class="detail-label">Puntos Acumulados:</span>
-          <span class="detail-value">{{ resultadoRegistro.puntos_acumulados }} pts</span>
-        </div>
+      </div>
+
+      <div class="result-modal-footer">
+        <button class="btn btn-primary" style="width: 100%;" (click)="cerrarResultado()">
+          <i class="pi pi-check"></i> Aceptar
+        </button>
+        <button class="btn btn-outline btn-print" style="width: 100%;" type="button" (click)="imprimirTicket()">
+          <i class="pi pi-print"></i> Imprimir Ticket
+        </button>
       </div>
     </div>
-
-    <ng-template pTemplate="footer">
-      <div style="display: flex; flex-direction: column; gap: 8px; width: 100%;">
-        <button class="btn btn-primary" style="width: 100%; justify-content: center;" (click)="cerrarResultado()">
-          <i class="pi pi-check"></i>
-          Aceptar
-        </button>
-        <button class="btn btn-print" style="width: 100%; justify-content: center;" type="button"
-          (click)="imprimirTicket()">
-          <i class="pi pi-print"></i>
-          Imprimir
-        </button>
-      </div>
-    </ng-template>
   </p-dialog>
 </div>

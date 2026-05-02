@@ -60,7 +60,7 @@ import { DashboardDuenoComponent } from './dashboard-dueno/dashboard-dueno.compo
           preset: Lara,
           options: {
             colorScheme: 'light',
-            primaryColor: '#f59e0b',
+            primaryColor: '#D84F34',
           }
       }
     })

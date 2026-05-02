@@ -2,6 +2,25 @@ from rest_framework import serializers
 from . import models
 
 
+# ========================== PRODUCTOS CANJEABLES ==========================
+
+class ProductoCanjeableSerializer(serializers.ModelSerializer):
+    imagen_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.ProductoCanjeable
+        fields = ['id', 'nombre', 'descripcion', 'puntos_requeridos', 'imagen', 'imagen_url', 'categoria', 'stock', 'activo', 'destacado', 'fecha_creacion']
+        extra_kwargs = {'imagen': {'required': False}}
+
+    def get_imagen_url(self, obj):
+        if obj.imagen:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.imagen.url)
+            return obj.imagen.url
+        return None
+
+
 # ========================== USUARIOS ==========================
 # Serializadores encargados de convertir los objetos de Usuario a JSON y viceversa
 

@@ -123,11 +123,38 @@ export class ApiService {
     }
 
     // =============================== CANJE DE PUNTOS ================================
-    public canjearPuntos(dni: string, puntos: number): Observable<any> {
+    public canjearPuntos(dni: string, puntos: number, productoId?: number): Observable<any> {
+        const body: any = { dni, puntos };
+        if (productoId) body.producto_id = productoId;
         return this.http.post<any>(
             this.ApiUrl + 'canjear-puntos/',
-            { dni, puntos },
+            body,
             this.httpOptions
         );
     }
-}
+
+    // =============================== PRODUCTOS CANJEABLES ================================
+    public getProductos(): Observable<any[]> {
+        return this.http.get<any[]>(this.ApiUrl + 'producto/');
+    }
+
+    public postProducto(formData: FormData): Observable<any> {
+        return this.http.post<any>(this.ApiUrl + 'producto/', formData);
+    }
+
+    public putProducto(id: number, formData: FormData): Observable<any> {
+        return this.http.put<any>(this.ApiUrl + 'producto/' + id + '/', formData);
+    }
+
+    public deleteProducto(id: number): Observable<void> {
+        return this.http.delete<void>(this.ApiUrl + 'producto/' + id + '/');
+    }
+
+    public setDestacados(ids: number[]): Observable<any> {
+        return this.http.post<any>(
+            this.ApiUrl + 'producto/set-destacados/',
+            { ids },
+            this.httpOptions
+        );
+    }
+}

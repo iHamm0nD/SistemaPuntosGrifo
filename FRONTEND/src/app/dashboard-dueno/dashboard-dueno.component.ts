@@ -14,13 +14,14 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 export class DashboardDuenoComponent implements OnInit {
 
   usuario: any;
+  menuAbierto = false;
   totalClientes = 0;
   totalPuntos = 0;
   totalConsumos = 0;
   topClientes: any[] = [];
   consumoPorTipo: any[] = [];
   cargando = true;
-  filtroPeriodo: string = 'total'; // dia, semana, mes, total
+  filtroPeriodo: string = 'dia'; // dia, semana, mes, total
   cargandoConsumo = false;
 
   // Manejo de combustibles
@@ -80,6 +81,21 @@ export class DashboardDuenoComponent implements OnInit {
   toastMensaje = '';
   toastTipo: 'ok' | 'error' = 'ok';
 
+  // Productos para el modal de canje
+  productosParaCanje: any[] = [];
+  productoSeleccionadoCanje: any | null = null;
+  mostrarProductosCanje = false;
+  cargandoProductosCanje = false;
+
+  // Configuración — Productos Destacados
+  mostrarModalConfiguracion = false;
+  productosConfig: any[] = [];
+  cargandoConfig = false;
+  guardandoConfig = false;
+  configMensajeOk = '';
+  configMensajeError = '';
+  idsDestacados: Set<number> = new Set();
+
   // Verificación de credenciales extra
   mostrarModalVerificarPassword = false;
   verificandoPassword = false;
@@ -87,6 +103,14 @@ export class DashboardDuenoComponent implements OnInit {
   errorVerificacion = '';
   mensajeVerificacion = '';
   accionProtegidaPendiente: Function | null = null;
+
+  // Productos Canjeables
+  mostrarModalProductos = false;
+  productosLista: any[] = [];
+  nuevoProducto: any = { nombre: '', descripcion: '', puntos_requeridos: null, stock: 0, categoria: 'General' };
+  imagenSeleccionada: File | null = null;
+  guardandoProducto = false;
+  productoEditando: any = null;
 
   constructor(
     private api: ApiService,
@@ -524,6 +548,14 @@ export class DashboardDuenoComponent implements OnInit {
   abrirModalCanjearPuntos() {
     this.limpiarModalCanje();
     this.mostrarModalCanjearPuntos = true;
+    this.cargandoProductosCanje = true;
+    this.api.getProductos().subscribe({
+      next: (data) => {
+        this.productosParaCanje = data;
+        this.cargandoProductosCanje = false;
+      },
+      error: () => { this.cargandoProductosCanje = false; }
+    });
   }
 
   limpiarModalCanje() {
@@ -534,6 +566,8 @@ export class DashboardDuenoComponent implements OnInit {
     this.canjeMensajeOk = '';
     this.canjeMensajeError = '';
     this.canjeando = false;
+    this.productoSeleccionadoCanje = null;
+    this.mostrarProductosCanje = false;
   }
 
   onCanjeDniChange() {
@@ -562,20 +596,32 @@ export class DashboardDuenoComponent implements OnInit {
     }
   }
 
+  seleccionarProductoCanje(prod: any) {
+    if (this.productoSeleccionadoCanje?.id === prod.id) {
+      // Deseleccionar si ya estaba seleccionado
+      this.productoSeleccionadoCanje = null;
+      this.canjePuntos = null;
+    } else {
+      this.productoSeleccionadoCanje = prod;
+      this.canjePuntos = prod.puntos_requeridos;
+    }
+    this.canjeMensajeError = '';
+  }
+
   ejecutarCanje() {
-    if (!this.canjeClienteEncontrado || !this.canjePuntos || this.canjePuntos <= 0) return;
+    if (!this.canjeClienteEncontrado || !this.productoSeleccionadoCanje) return;
     this.canjeando = true;
     this.canjeMensajeOk = '';
     this.canjeMensajeError = '';
+    const puntos = this.productoSeleccionadoCanje.puntos_requeridos;
+    const productoId = this.productoSeleccionadoCanje.id;
 
-    this.api.canjearPuntos(this.canjeDni, this.canjePuntos).subscribe({
+    this.api.canjearPuntos(this.canjeDni, puntos, productoId).subscribe({
       next: (res: any) => {
         this.canjeando = false;
         this.mostrarModalCanjearPuntos = false;
         this.limpiarModalCanje();
-        // Refrescar datos del dashboard
         this.cargarDashboard(false);
-        // Mostrar toast flotante
         this.toastMensaje = `${res.mensaje} Puntos restantes: ${res.puntos_restantes}`;
         this.toastTipo = 'ok';
         this.mostrarToastCanje = true;
@@ -584,6 +630,153 @@ export class DashboardDuenoComponent implements OnInit {
       error: (err: any) => {
         this.canjeando = false;
         this.canjeMensajeError = err.error?.error || 'Error al procesar el canje.';
+      }
+    });
+  }
+
+  // ===== Gestión de Productos Canjeables =====
+  abrirModalProductos() {
+    this.mostrarModalProductos = true;
+    this.cargarProductos();
+    this.limpiarFormProducto();
+  }
+
+  cargarProductos() {
+    this.api.getProductos().subscribe({
+      next: (data) => this.productosLista = data,
+      error: () => this.productosLista = []
+    });
+  }
+
+  limpiarFormProducto() {
+    this.nuevoProducto = { nombre: '', descripcion: '', puntos_requeridos: null, stock: 0, categoria: 'General' };
+    this.imagenSeleccionada = null;
+    this.productoEditando = null;
+  }
+
+  onImagenSeleccionada(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.imagenSeleccionada = file;
+    }
+  }
+
+  guardarProducto() {
+    if (!this.nuevoProducto.nombre || !this.nuevoProducto.puntos_requeridos) return;
+    this.guardandoProducto = true;
+
+    const formData = new FormData();
+    formData.append('nombre', this.nuevoProducto.nombre);
+    formData.append('descripcion', this.nuevoProducto.descripcion || '');
+    formData.append('puntos_requeridos', this.nuevoProducto.puntos_requeridos.toString());
+    formData.append('categoria', this.nuevoProducto.categoria || 'General');
+    formData.append('stock', (this.nuevoProducto.stock ?? 0).toString());
+    formData.append('activo', 'true'); // Explicitly set to true to ensure it shows publicly
+    if (this.imagenSeleccionada) {
+      formData.append('imagen', this.imagenSeleccionada);
+    }
+
+    if (this.productoEditando) {
+      this.api.putProducto(this.productoEditando.id, formData).subscribe({
+        next: () => {
+          this.guardandoProducto = false;
+          this.cargarProductos();
+          this.limpiarFormProducto();
+        },
+        error: (err) => {
+          this.guardandoProducto = false;
+          const msg = err.error ? JSON.stringify(err.error) : 'Error desconocido';
+          alert('Error al actualizar el producto: ' + msg);
+        }
+      });
+    } else {
+      this.api.postProducto(formData).subscribe({
+        next: () => {
+          this.guardandoProducto = false;
+          this.cargarProductos();
+          this.limpiarFormProducto();
+        },
+        error: (err) => {
+          this.guardandoProducto = false;
+          const msg = err.error ? JSON.stringify(err.error) : 'Error desconocido';
+          alert('Error al crear el producto: ' + msg);
+        }
+      });
+    }
+  }
+
+  editarProducto(prod: any) {
+    this.productoEditando = prod;
+    this.nuevoProducto = {
+      nombre: prod.nombre,
+      descripcion: prod.descripcion,
+      puntos_requeridos: prod.puntos_requeridos,
+      stock: prod.stock ?? 0,
+      categoria: prod.categoria
+    };
+    this.imagenSeleccionada = null;
+  }
+
+  cancelarEdicionProducto() {
+    this.limpiarFormProducto();
+  }
+
+  eliminarProducto(id: number) {
+    this.solicitarVerificacionPassword(() => {
+      this.api.deleteProducto(id).subscribe({
+        next: () => this.cargarProductos(),
+        error: () => alert('Error al eliminar el producto.')
+      });
+    }, 'Ingrese su contraseña para confirmar la eliminación de este producto.');
+  }
+
+  // ─── Configuración de Destacados ───
+  abrirModalConfiguracion() {
+    this.mostrarModalConfiguracion = true;
+    this.configMensajeOk = '';
+    this.configMensajeError = '';
+    this.cargandoConfig = true;
+    this.api.getProductos().subscribe({
+      next: (data) => {
+        this.productosConfig = data;
+        this.idsDestacados = new Set(data.filter((p: any) => p.destacado).map((p: any) => p.id));
+        this.cargandoConfig = false;
+      },
+      error: () => { this.cargandoConfig = false; }
+    });
+  }
+
+  toggleDestacado(id: number) {
+    if (this.idsDestacados.has(id)) {
+      this.idsDestacados.delete(id);
+    } else {
+      if (this.idsDestacados.size >= 6) {
+        this.configMensajeError = 'Máximo 6 productos destacados permitidos.';
+        return;
+      }
+      this.idsDestacados.add(id);
+    }
+    this.configMensajeError = '';
+  }
+
+  guardarDestacados() {
+    const ids = Array.from(this.idsDestacados);
+    if (ids.length < 4 || ids.length > 6) {
+      this.configMensajeError = 'Debes seleccionar entre 4 y 6 productos destacados.';
+      return;
+    }
+    this.guardandoConfig = true;
+    this.configMensajeOk = '';
+    this.configMensajeError = '';
+    this.api.setDestacados(ids).subscribe({
+      next: (res: any) => {
+        this.guardandoConfig = false;
+        this.configMensajeOk = res.mensaje || 'Destacados guardados correctamente.';
+        setTimeout(() => this.configMensajeOk = '', 3000);
+      },
+      error: (err: any) => {
+        this.guardandoConfig = false;
+        this.configMensajeError = err.error?.error || 'Error al guardar.';
       }
     });
   }

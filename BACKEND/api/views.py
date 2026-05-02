@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import action
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django.contrib.auth import authenticate
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -10,6 +11,44 @@ from rest_framework.authtoken.models import Token
 from django.db.models import Sum, Count, Q
 from rest_framework.pagination import PageNumberPagination
 from . import models, serializers, permissions
+
+
+class ProductoCanjeableViewSet(viewsets.ModelViewSet):
+    queryset = models.ProductoCanjeable.objects.filter(activo=True)
+    serializer_class = serializers.ProductoCanjeableSerializer
+    parser_classes = [MultiPartParser, FormParser]
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [AllowAny()]
+        return [permissions.IsDueno()]
+
+    def get_queryset(self):
+        qs = models.ProductoCanjeable.objects.all()
+        if self.action in ['list', 'retrieve']:
+            if not self.request.user.is_authenticated or getattr(self.request.user, 'tipo_usuario', '') not in ['dueno', 'dev']:
+                qs = qs.filter(activo=True)
+        return qs
+
+    @action(detail=False, methods=['post'], url_path='set-destacados',
+            permission_classes=[permissions.IsDueno],
+            parser_classes=[JSONParser])
+    def set_destacados(self, request):
+        """Configura qué productos aparecen como destacados en la página principal (4-6 productos)."""
+        ids = request.data.get('ids', [])
+        if not isinstance(ids, list):
+            return Response({'error': 'Se esperaba una lista de IDs.'}, status=status.HTTP_400_BAD_REQUEST)
+        if len(ids) < 4 or len(ids) > 6:
+            return Response({'error': 'Debes seleccionar entre 4 y 6 productos destacados.'}, status=status.HTTP_400_BAD_REQUEST)
+        # Verificar que todos los IDs existen
+        encontrados = models.ProductoCanjeable.objects.filter(id__in=ids, activo=True).count()
+        if encontrados != len(ids):
+            return Response({'error': 'Uno o más productos no fueron encontrados.'}, status=status.HTTP_400_BAD_REQUEST)
+        # Limpiar y reasignar
+        models.ProductoCanjeable.objects.all().update(destacado=False)
+        models.ProductoCanjeable.objects.filter(id__in=ids).update(destacado=True)
+        return Response({'mensaje': f'{len(ids)} productos marcados como destacados.'}, status=status.HTTP_200_OK)
+
 
 
 class LoginView(APIView):
@@ -249,8 +288,10 @@ class DashboardView(APIView):
             inicio_mes = ahora - timedelta(days=30)
             consumo_qs = consumo_qs.filter(fecha__gte=inicio_mes)
 
-        # Consumo por tipo de combustible
-        consumo_por_tipo = consumo_qs.values(
+        # Consumo por tipo de combustible (excluir canjes)
+        consumo_por_tipo = consumo_qs.exclude(
+            tipo_combustible__nombre='CANJE DE PUNTOS'
+        ).values(
             'tipo_combustible__nombre'
         ).annotate(
             total_monto=Sum('monto_total'),
@@ -315,9 +356,20 @@ class CanjearPuntosView(APIView):
     def post(self, request):
         dni = request.data.get('dni')
         puntos_a_canjear = request.data.get('puntos')
+        producto_id = request.data.get('producto_id')
 
         if not dni:
             return Response({'error': 'El DNI es requerido.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Si se envía producto_id, los puntos se toman del producto
+        producto = None
+        if producto_id:
+            try:
+                producto = models.ProductoCanjeable.objects.get(id=producto_id, activo=True)
+                puntos_a_canjear = producto.puntos_requeridos
+            except models.ProductoCanjeable.DoesNotExist:
+                return Response({'error': 'Producto no encontrado o inactivo.'}, status=status.HTTP_404_NOT_FOUND)
+
         if not puntos_a_canjear:
             return Response({'error': 'Los puntos a canjear son requeridos.'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -338,18 +390,28 @@ class CanjearPuntosView(APIView):
         if puntos_a_canjear > puntos_actuales:
             return Response({'error': f'El cliente solo tiene {puntos_actuales} puntos disponibles.'}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Si se seleccionó un producto, verificar y reducir su stock
+        if producto:
+            if producto.stock <= 0:
+                return Response({'error': f'El producto "{producto.nombre}" está agotado.'}, status=status.HTTP_400_BAD_REQUEST)
+            producto.stock -= 1
+            producto.save()
+
         from decimal import Decimal
         puntos_a_canjear_decimal = Decimal(str(puntos_a_canjear))
 
-        # Crear un tipo de combustible ficticio si no existe para registrar el canje
         tipo_canje, _ = models.TipoCombustible.objects.get_or_create(
             nombre='CANJE DE PUNTOS',
             defaults={'precio_referencial': 0, 'puntos_por_galon': 0}
         )
 
         import uuid
+        nro = f"CANJE-{uuid.uuid4().hex[:8].upper()}"
+        if producto:
+            nro = f"CANJE-{producto.nombre[:8].upper()}-{uuid.uuid4().hex[:6].upper()}"
+
         models.RegistroConsumo.objects.create(
-            nro_boleta=f"CANJE-{uuid.uuid4().hex[:8].upper()}",
+            nro_boleta=nro,
             cliente=cliente,
             empleado=request.user,
             tipo_combustible=tipo_canje,
@@ -358,11 +420,13 @@ class CanjearPuntosView(APIView):
             puntos_otorgados=-puntos_a_canjear_decimal
         )
 
-        # La propia acción de guardar el RegistroConsumo ya actualiza el saldo del cliente
         cliente.refresh_from_db()
 
+        msg_producto = f' por "{producto.nombre}"' if producto else ''
         return Response({
-            'mensaje': f'Se canjearon {puntos_a_canjear} puntos correctamente.',
+            'mensaje': f'Se canjearon {puntos_a_canjear} puntos{msg_producto} correctamente.',
             'cliente': f'{cliente.nombres} {cliente.apellidos}',
-            'puntos_restantes': float(cliente.puntos_acumulados)
+            'puntos_restantes': float(cliente.puntos_acumulados),
+            'producto': producto.nombre if producto else None,
+            'stock_restante': producto.stock if producto else None,
         }, status=status.HTTP_200_OK)

@@ -1,123 +1,256 @@
 <!-- Header -->
-<p-toolbar styleClass="custom-header">
-  <div class="p-toolbar-group-left flex align-items-center gap-3">
+<div class="header">
+  <div class="header-content">
     <div class="logo-container">
-      <i class="pi pi-bolt"></i>
+      <img src="assets/images/logoperricholi.png" alt="Logo La Perricholi" class="header-logo-img">
     </div>
-    <span class="logo-text">GrifoPuntos</span>
-  </div>
-  <div class="p-toolbar-group-right flex align-items-center gap-3">
-  </div>
-</p-toolbar>
-
-<!-- Hero Section -->
-<div class="hero-section">
-  <div class="hero-background"></div>
-  <div class="hero-content">
-
-    <h1 class="hero-title">
-      Sistema de Acumulación de <span class="hero-highlight">Puntos</span>
-    </h1>
-    
-    <p class="hero-description">
-      Controla y gestiona los puntos acumulados por los clientes en cada compra de combustible en tu grifo. Premia a tus mejores clientes.
-    </p>
-
-    <div class="hero-buttons">
-      <p-button 
-        label="Consultar Mis Puntos" 
-        icon="pi pi-star"
-        styleClass="hero-btn-secondary"
-        (onClick)="abrirModalConsultarPuntos()">
-      </p-button>
-    </div>
+    <span class="logo-text">La Perricholi </span>
+    <button class="header-points-btn" (click)="abrirModalConsultarPuntos()">
+      <i class="pi pi-id-card"></i>
+      <span>Consultar Puntos</span>
+    </button>
   </div>
 </div>
 
-<!-- Modal Consultar Puntos -->
-<p-dialog 
-  [(visible)]="mostrarModalPuntos" 
-  [modal]="true" 
-  [style]="{width: '90vw', maxWidth: '480px'}" 
-  [draggable]="false" 
-  [resizable]="false"
-  [showHeader]="false"
-  [closeOnEscape]="true"
-  [dismissableMask]="true"
-  styleClass="elegant-dialog">
-  
-  <div class="elegant-dialog-content">
-    
-    <!-- Botón de cerrar personalizado -->
-    <button class="custom-close-btn" (click)="mostrarModalPuntos = false">
-      <i class="pi pi-times"></i>
-    </button>
-
-    <!-- Header personalizado -->
-    <div class="elegant-header">
-      <div class="icon-wrapper">
-        <i class="pi pi-star-fill glow-icon"></i>
-      </div>
-      <h2 class="elegant-title">Mis Puntos</h2>
-      <p class="elegant-subtitle">Ingresa tu DNI para conocer tus beneficios acumulados</p>
+<!-- Main Content -->
+<div class="main-container">
+  <!-- Catalog Section -->
+  <div class="catalog-section">
+    <div class="catalog-header">
+      <h1 class="catalog-title">Canjea Tus Puntos</h1>
+      <p class="catalog-subtitle">Elige entre nuestros productos disponibles para canjear</p>
     </div>
 
-    <!-- Buscador -->
-    <div class="search-section">
-      <div class="elegant-input-group" [class.has-error]="mensajeError">
-        <i class="pi pi-id-card input-icon"></i>
-        <input 
-          id="dniConsulta"
-          type="text" 
-          [(ngModel)]="dniConsulta" 
-          placeholder="Número de DNI (8 dígitos)" 
-          maxlength="8"
-          (keyup.enter)="consultarPuntos()"
-          [disabled]="cargando"
-          class="elegant-input">
-        <button 
-          class="elegant-submit-btn" 
-          (click)="consultarPuntos()" 
-          [disabled]="cargando || dniConsulta.length !== 8 || enCooldown">
-          <i class="pi pi-arrow-right" *ngIf="!cargando && !enCooldown"></i>
-          <i class="pi pi-spinner pi-spin" *ngIf="cargando"></i>
-          <span *ngIf="enCooldown" class="text-sm font-semibold">{{ segundosCooldown }}s</span>
-        </button>
+    <!-- Featured label — left aligned, above carousel -->
+    <div class="featured-section-header">
+      <div class="featured-label">
+        <i class="pi pi-star-fill"></i>
+        <span>Productos Destacados</span>
       </div>
-      
-      <div class="error-wrapper" *ngIf="mensajeError">
-        <i class="pi pi-exclamation-circle"></i>
-        <span>{{ mensajeError }}</span>
-      </div>
+      <div class="featured-divider"></div>
     </div>
 
-    <!-- Resultado (estado éxito) -->
-    <div class="result-section" *ngIf="puntosCliente !== null">
-      <div class="result-card">
-        <div class="user-greeting">
-          <span class="greeting-text">¡Hola,</span>
-          <span class="greeting-name">{{ nombreCliente }}!</span>
-        </div>
-        
-        <div class="animated-points">
-          <div class="points-ring">
-            <div class="points-circle-elegant">
-              <span class="value">{{ puntosCliente }}</span>
-              <span class="label">PUNTOS</span>
+    <!-- Products Carousel -->
+    <div class="carousel-wrapper">
+      <button class="carousel-btn carousel-btn-left" (click)="scrollCarousel(-1)" aria-label="Anterior">
+        <i class="pi pi-chevron-left"></i>
+      </button>
+
+      <div class="carousel-track" #carouselTrack (scroll)="onCarouselScroll()" (mousedown)="onDragStart($event)"
+        (mousemove)="onDragMove($event)" (mouseup)="onDragEnd()" (mouseleave)="onDragEnd()"
+        (touchstart)="onTouchStart($event)" (touchmove)="onTouchMove($event)" (touchend)="onDragEnd()">
+        <div class="product-card" *ngFor="let product of loopedProducts">
+          <div class="product-image">
+            <img [src]="product.image" [alt]="product.name">
+          </div>
+          <div class="product-info">
+            <h3 class="product-name">{{ product.name }}</h3>
+            <p class="product-description">{{ product.description }}</p>
+            <div class="points-required">
+              <div class="points-display">
+                <span class="points-value">{{ product.pointsRequired }}</span>
+                <span class="points-label">puntos</span>
+              </div>
             </div>
-            <!-- Elementos decorativos (partículas) -->
-            <div class="sparkle s1"></div>
-            <div class="sparkle s2"></div>
-            <div class="sparkle s3"></div>
+            <div class="stock-badge" [class.stock-disponible]="product.stock > 0" [class.stock-agotado]="product.stock === 0">
+              <i class="pi" [ngClass]="product.stock > 0 ? 'pi-box' : 'pi-times-circle'"></i>
+              <span *ngIf="product.stock > 0">{{ product.stock }} en stock</span>
+              <span *ngIf="product.stock === 0">Agotado</span>
+            </div>
           </div>
         </div>
-        
-        <div class="result-footer">
-          <div class="footer-badge">
-            <i class="pi pi-gift"></i> Sigue acumulando
+      </div>
+
+      <button class="carousel-btn carousel-btn-right" (click)="scrollCarousel(1)" aria-label="Siguiente">
+        <i class="pi pi-chevron-right"></i>
+      </button>
+    </div>
+
+    <!-- Toggle button -->
+    <div class="show-all-wrapper">
+      <button class="show-all-btn" (click)="toggleVerTodos()">
+        <i class="pi" [ngClass]="verTodos ? 'pi-chevron-up' : 'pi-grid'"></i>
+        <span>{{ verTodos ? 'Ocultar' : 'Ver todos los productos' }}</span>
+      </button>
+    </div>
+
+    <!-- Full product grid (visible when verTodos = true) -->
+    <div class="all-products-grid" *ngIf="verTodos">
+      <div class="all-product-card" *ngFor="let product of allProducts">
+
+        <div class="all-product-image">
+          <img [src]="product.image" [alt]="product.name">
+        </div>
+        <div class="all-product-body">
+          <p class="all-product-name">{{ product.name }}</p>
+          <div class="all-price-block">
+            <span class="all-pts-number">{{ product.pointsRequired }}</span>
+            <span class="all-pts-word"> puntos</span>
           </div>
+          <div class="stock-badge" [class.stock-disponible]="product.stock > 0" [class.stock-agotado]="product.stock === 0">
+            <i class="pi" [ngClass]="product.stock > 0 ? 'pi-box' : 'pi-times-circle'"></i>
+            <span *ngIf="product.stock > 0">{{ product.stock }} en stock</span>
+            <span *ngIf="product.stock === 0">Agotado</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- How it works -->
+  <div class="how-it-works-section">
+    <div class="how-card">
+      <div class="how-icon">
+        <i class="pi pi-star-fill"></i>
+      </div>
+      <h3 class="how-title">Acumula tus Puntos</h3>
+      <p class="how-desc">Cada vez que cargas combustible en Grifo La Perricholi acumulas puntos automáticamente
+        registrados en tu cuenta.</p>
+    </div>
+    <div class="how-card">
+      <div class="how-icon">
+        <i class="pi pi-gift"></i>
+      </div>
+      <h3 class="how-title">Canjea tus Productos</h3>
+      <p class="how-desc">Usa los puntos acumulados para canjear los productos disponibles en nuestro catálogo. Puedes
+        canjearlo total o parcialmente.</p>
+    </div>
+  </div>
+
+  <!-- FAQ Section -->
+  <div class="faq-section">
+    <h2 class="faq-title">Preguntas Frecuentes</h2>
+
+    <div class="faq-list">
+      <div class="faq-item" *ngFor="let faq of faqs; let i = index">
+        <button class="faq-question" (click)="toggleFaq(i)">
+          <span>{{ faq.question }}</span>
+          <i class="pi" [ngClass]="faq.open ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
+        </button>
+        <div class="faq-answer" [class.open]="faq.open">
+          <p>{{ faq.answer }}</p>
         </div>
       </div>
     </div>
   </div>
-</p-dialog>
+
+  <!-- Footer bar -->
+  <div class="footer-bar">
+    <span>© {{ currentYear }} Grifo La Perricholi</span>
+  </div>
+
+  <!-- Consultar Puntos Modal -->
+  <p-dialog [(visible)]="mostrarModalPuntos" [modal]="true" [style]="{width: '90vw', maxWidth: '440px'}"
+    [draggable]="false" [resizable]="false" [showHeader]="false" [closeOnEscape]="true" [dismissableMask]="true"
+    styleClass="elegant-dialog">
+
+    <div class="elegant-dialog-content">
+      <button class="custom-close-btn" (click)="mostrarModalPuntos = false">
+        <i class="pi pi-times"></i>
+      </button>
+
+      <div class="elegant-header">
+        <h2 class="elegant-title">Consultar Puntos</h2>
+        <p class="elegant-subtitle">Ingresa tu DNI para ver tu saldo acumulado</p>
+      </div>
+
+      <div class="search-section">
+        <label class="dni-label">Número de DNI</label>
+        <div class="elegant-input-group" [class.has-error]="mensajeError">
+          <i class="pi pi-id-card input-icon"></i>
+          <input id="dniConsulta" type="text" [(ngModel)]="dniConsulta" placeholder="Ej: 12345678" maxlength="8"
+            (keyup.enter)="consultarPuntos()" [disabled]="cargando" class="elegant-input">
+          <button class="elegant-submit-btn" (click)="consultarPuntos()"
+            [disabled]="cargando || dniConsulta.length !== 8 || enCooldown">
+            <i class="pi pi-search" *ngIf="!cargando && !enCooldown"></i>
+            <i class="pi pi-spinner pi-spin" *ngIf="cargando"></i>
+            <span *ngIf="enCooldown">{{ segundosCooldown }}s</span>
+          </button>
+        </div>
+
+        <div class="error-wrapper" *ngIf="mensajeError">
+          <i class="pi pi-exclamation-circle"></i>
+          <span>{{ mensajeError }}</span>
+        </div>
+      </div>
+
+      <!-- Premium Result Card -->
+      <div class="result-section premium-result-wrapper" *ngIf="puntosCliente !== null">
+        <div class="premium-result-card">
+          <!-- Decorative Background Elements -->
+          <div class="card-bg-glow"></div>
+          <div class="card-bg-pattern"></div>
+
+          <div class="card-content">
+            <div class="card-header">
+              <span class="card-brand">Grifo La Perricholi</span>
+              <div class="card-badge">
+                <i class="pi pi-star-fill"></i>
+                <span>Cliente</span>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <div class="points-display">
+                <span class="points-number">{{ puntosCliente }}</span>
+                <span class="points-label">Pts</span>
+              </div>
+              <p class="points-subtitle">Disponibles para canjear</p>
+            </div>
+
+            <div class="card-footer">
+              <div class="user-info">
+                <i class="pi pi-user user-icon-glow"></i>
+                <span class="user-name">{{ nombreCliente }}</span>
+              </div>
+              <button class="action-btn-small" (click)="mostrarModalPuntos = false">Ver Catálogo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </p-dialog>
+
+  <!-- Redención Dialog -->
+  <p-dialog [(visible)]="mostrarDialogoRedencion" [modal]="true" [style]="{width: '90vw', maxWidth: '400px'}"
+    [draggable]="false" [resizable]="false" [showHeader]="false" [closeOnEscape]="true" [dismissableMask]="true"
+    styleClass="redemption-dialog">
+
+    <div class="redemption-dialog-content" *ngIf="selectedProduct">
+      <button class="custom-close-btn" (click)="cerrarDialogoRedencion()">
+        <i class="pi pi-times"></i>
+      </button>
+
+      <div class="redemption-header">
+        <i class="pi pi-check-circle redemption-icon"></i>
+        <h2 class="redemption-title">Confirmar Canje</h2>
+      </div>
+
+      <div class="redemption-details">
+        <img [src]="selectedProduct.image" [alt]="selectedProduct.name" class="redemption-image">
+        <h3 class="redemption-product-name">{{ selectedProduct.name }}</h3>
+        <p class="redemption-product-desc">{{ selectedProduct.description }}</p>
+
+        <div class="redemption-points-info">
+          <span class="redemption-points-label">Puntos a usar:</span>
+          <span class="redemption-points-value">{{ selectedProduct.pointsRequired }}</span>
+        </div>
+
+        <div class="redemption-balance-info">
+          <span class="redemption-balance-label">Puntos restantes:</span>
+          <span class="redemption-balance-value">{{ puntosActuales - selectedProduct.pointsRequired }}</span>
+        </div>
+      </div>
+
+      <div class="redemption-actions">
+        <button class="redemption-btn-cancel" (click)="cerrarDialogoRedencion()">
+          Cancelar
+        </button>
+        <button class="redemption-btn-confirm" (click)="confirmarRedencion()">
+          Confirmar Canje
+        </button>
+      </div>
+    </div>
+  </p-dialog>
+</div>
