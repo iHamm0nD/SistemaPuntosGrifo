@@ -174,7 +174,7 @@ export class DashboardEmpleadoComponent implements OnInit {
     this.mostrarConfirmacion = false;
 
     this.api.registrarConsumo({
-      nro_boleta: this.nroBoleta?.trim() ? this.nroBoleta.trim().toUpperCase() : null,
+      nro_boleta: this.nroBoleta?.trim() ? this.nroBoleta.trim().toUpperCase() : undefined,
       dni: this.dni,
       nombres: this.nombres,
       apellidos: this.apellidos,

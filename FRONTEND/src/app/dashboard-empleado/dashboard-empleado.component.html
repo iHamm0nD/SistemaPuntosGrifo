@@ -139,6 +139,7 @@
             </label>
             <div style="position: relative;">
               <input id="nroBoleta" type="text" class="form-input" [(ngModel)]="nroBoleta" name="nroBoleta"
+                #boletaRef="ngModel" placeholder="Ingresa n° de comprobante" (input)="intentoSubmit = false"
                 [style.border-color]="(boletaRef.invalid && intentoSubmit) ? '#D84F34' : null" 
                 style="padding-left: 45px; text-transform: uppercase;">
 
