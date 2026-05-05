@@ -84,7 +84,7 @@ class Cliente(models.Model):
 
 
 class RegistroConsumo(models.Model):
-    nro_boleta = models.CharField(max_length=50, unique=True,
+    nro_boleta = models.CharField(max_length=50, unique=True, null=True, blank=True,
                                    help_text="Número de boleta o factura emitida (único por registro)")
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name='consumos')
     empleado = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True,

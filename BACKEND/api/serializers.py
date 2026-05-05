@@ -137,7 +137,7 @@ class RegistroConsumoReadSerializer(serializers.ModelSerializer):
 
 class RegistrarConsumoSerializer(serializers.Serializer):
     """Serializer principal usado por la interfaz de Empleado (Front) al registrar un tanqueo."""
-    nro_boleta = serializers.CharField(max_length=50)
+    nro_boleta = serializers.CharField(max_length=50, required=False, allow_blank=True, allow_null=True)
     dni = serializers.CharField(max_length=15)
     nombres = serializers.CharField(max_length=100)
     apellidos = serializers.CharField(max_length=100)
@@ -147,9 +147,11 @@ class RegistrarConsumoSerializer(serializers.Serializer):
     tanque_lleno = serializers.BooleanField(default=False)
 
     def validate_nro_boleta(self, value):
+        if not value:
+            return None
         value = value.strip()
         if not value:
-            raise serializers.ValidationError("El número de boleta/factura es obligatorio.")
+            return None
         if models.RegistroConsumo.objects.filter(nro_boleta=value).exists():
             raise serializers.ValidationError(f"El número de boleta '{value}' ya fue registrado anteriormente.")
         return value

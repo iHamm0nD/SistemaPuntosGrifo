@@ -123,7 +123,7 @@ export class DashboardEmpleadoComponent implements OnInit {
     this.error = '';
     this.intentoSubmit = true;
 
-    if (!this.dni || !this.nombres || !this.apellidos || !this.tipoCombustibleId || !this.monto || !this.nroBoleta?.trim()) {
+    if (!this.dni || !this.nombres || !this.apellidos || !this.tipoCombustibleId || !this.monto) {
       return;
     }
 
@@ -174,7 +174,7 @@ export class DashboardEmpleadoComponent implements OnInit {
     this.mostrarConfirmacion = false;
 
     this.api.registrarConsumo({
-      nro_boleta: this.nroBoleta.trim().toUpperCase(),
+      nro_boleta: this.nroBoleta?.trim() ? this.nroBoleta.trim().toUpperCase() : null,
       dni: this.dni,
       nombres: this.nombres,
       apellidos: this.apellidos,

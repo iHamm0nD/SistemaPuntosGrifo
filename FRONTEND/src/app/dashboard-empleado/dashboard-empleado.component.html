@@ -135,12 +135,11 @@
           <div class="form-group">
             <label for="nroBoleta" class="form-label">
               <i class="pi pi-file"></i>
-              Comprobante <span class="required-star">*</span>
+              Comprobante
             </label>
             <div style="position: relative;">
               <input id="nroBoleta" type="text" class="form-input" [(ngModel)]="nroBoleta" name="nroBoleta"
-                #boletaRef="ngModel" placeholder="Ingresa n° de comprobante" (input)="intentoSubmit = false"
-                [style.border-color]="(boletaRef.invalid && intentoSubmit) ? '#D84F34' : null" required
+                [style.border-color]="(boletaRef.invalid && intentoSubmit) ? '#D84F34' : null" 
                 style="padding-left: 45px; text-transform: uppercase;">
 
               <!-- Icono dinámico según prefijo -->
@@ -166,10 +165,7 @@
               </div>
             </div>
 
-            <small *ngIf="boletaRef.invalid && intentoSubmit" class="form-error-msg">
-              <i class="pi pi-exclamation-circle"></i>
-              <span>El número de comprobante es obligatorio.</span>
-            </small>
+
             <small *ngIf="nroBoleta && !['B','F','T'].includes(nroBoleta.toUpperCase()[0])" class="form-error-msg">
               <i class="pi pi-info-circle"></i>
               <span>Debe empezar con B (Boleta), F (Factura) o T (Tarjeta).</span>
