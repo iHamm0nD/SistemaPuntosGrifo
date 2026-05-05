@@ -259,7 +259,7 @@
             <tbody>
               <tr *ngFor="let reg of registrosPaginados" style="white-space: nowrap;">
                 <td style="font-weight: 600; color: #1D2536;">{{ reg.nro_boleta || '—' }}</td>
-                <td style="font-size: 0.9em; color: #64748b;">{{ reg.fecha | date:'dd/MM/yyyy' }}</td>
+                <td style="font-size: 0.9em; color: #64748b;">{{ reg.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
                 <td>{{ reg.cliente_dni }}</td>
                 <td>{{ reg.cliente_nombre }}</td>
                 <td>S/. {{ reg.monto_total | number:'1.2-2' }}</td>
@@ -1160,7 +1160,7 @@
             </thead>
             <tbody>
               <tr *ngFor="let c of canjesPaginados" style="white-space: nowrap;">
-                <td style="font-size: 0.9em; color: #64748b;">{{ c.fecha | date:'dd/MM/yyyy' }}</td>
+                <td style="font-size: 0.9em; color: #64748b;">{{ c.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
                 <td style="font-weight: 600; color: #1D2536;">{{ c.producto_nombre || 'Canje Directo' }}</td>
                 <td>{{ c.cliente_nombre }}</td>
                 <td>{{ c.cliente_dni }}</td>

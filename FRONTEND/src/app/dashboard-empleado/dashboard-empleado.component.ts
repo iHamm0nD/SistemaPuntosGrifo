@@ -184,8 +184,12 @@ export class DashboardEmpleadoComponent implements OnInit {
     }).subscribe({
       next: (res) => {
         this.cargando = false;
-        this.fechaActual = new Date();
         this.resultadoRegistro = res.detalle;
+        if (this.resultadoRegistro.fecha) {
+          this.fechaActual = new Date(this.resultadoRegistro.fecha);
+        } else {
+          this.fechaActual = new Date();
+        }
         this.mostrarResultado = true;
         this.limpiarFormulario();
       },

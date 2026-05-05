@@ -216,6 +216,7 @@ class RegistrarConsumoView(APIView):
                     'puntos_otorgados': registro.puntos_otorgados,
                     'puntos_acumulados': registro.cliente.puntos_acumulados,
                     'nro_boleta': registro.nro_boleta,
+                    'fecha': registro.fecha,
                 }
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
