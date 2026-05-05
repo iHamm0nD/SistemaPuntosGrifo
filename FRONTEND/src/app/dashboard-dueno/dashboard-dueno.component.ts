@@ -39,6 +39,15 @@ export class DashboardDuenoComponent implements OnInit {
   cargandoRegistros = false;
   searchSubject: Subject<string> = new Subject<string>();
 
+  // Registro de Canjes
+  mostrarModalRegistroCanjes = false;
+  canjesPaginados: any[] = [];
+  paginaActualCanjes = 1;
+  totalPaginasCanjes = 1;
+  busquedaCanje = '';
+  cargandoCanjes = false;
+  searchCanjeSubject: Subject<string> = new Subject<string>();
+
   // Gestión de Empleados
   mostrarModalEmpleados = false;
   mostrarModalAgregarEmpleado = false;
@@ -95,6 +104,12 @@ export class DashboardDuenoComponent implements OnInit {
   configMensajeOk = '';
   configMensajeError = '';
   idsDestacados: Set<number> = new Set();
+  
+  // Configuración — Puntos por Combustible
+  mostrarModalPuntosConfig = false;
+  guardandoPuntosConfig = false;
+  puntosConfigMensajeOk = '';
+  puntosConfigMensajeError = '';
 
   // Verificación de credenciales extra
   mostrarModalVerificarPassword = false;
@@ -107,7 +122,7 @@ export class DashboardDuenoComponent implements OnInit {
   // Productos Canjeables
   mostrarModalProductos = false;
   productosLista: any[] = [];
-  nuevoProducto: any = { nombre: '', descripcion: '', puntos_requeridos: null, stock: 0, categoria: 'General' };
+  nuevoProducto: any = { nombre: '', descripcion: '', puntos_requeridos: null, stock: 0 };
   imagenSeleccionada: File | null = null;
   guardandoProducto = false;
   productoEditando: any = null;
@@ -161,6 +176,13 @@ export class DashboardDuenoComponent implements OnInit {
     ).subscribe((valor) => {
       this.cargarRegistros(1);
     });
+
+    this.searchCanjeSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe((valor) => {
+      this.cargarCanjes(1);
+    });
   }
 
   cargarDashboard(mostrarLoader: boolean = true) {
@@ -213,7 +235,8 @@ export class DashboardDuenoComponent implements OnInit {
     this.mensajeModal = '';
     this.api.getTiposCombustible().subscribe({
       next: (data) => {
-        this.tiposCombustible = data;
+        // Filtramos el registro interno de canje para que no sea editable
+        this.tiposCombustible = data.filter(t => t.nombre !== 'CANJE DE PUNTOS');
         this.mostrarModalPrecios = true;
       },
       error: () => {
@@ -254,11 +277,11 @@ export class DashboardDuenoComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
-  // ===== Paginación de Registros =====
+  // ===== Paginación de Registros (SOLO CONSUMOS) =====
   cargarRegistros(page: number = 1) {
     this.cargandoRegistros = true;
     this.paginaActual = page;
-    this.api.getRegistrosConsumo(page, this.busquedaRegistro).subscribe({
+    this.api.getRegistrosConsumo(page, this.busquedaRegistro, 'consumo').subscribe({
       next: (data) => {
         this.registrosPaginados = data.results || data;
         let count = data.count || this.registrosPaginados.length;
@@ -270,6 +293,41 @@ export class DashboardDuenoComponent implements OnInit {
         this.registrosPaginados = [];
       }
     });
+  }
+
+  // ===== Paginación de Canjes =====
+  cargarCanjes(page: number = 1) {
+    this.cargandoCanjes = true;
+    this.paginaActualCanjes = page;
+    this.api.getRegistrosConsumo(page, this.busquedaCanje, 'canje').subscribe({
+      next: (data) => {
+        this.canjesPaginados = data.results || data;
+        let count = data.count || this.canjesPaginados.length;
+        this.totalPaginasCanjes = Math.ceil(count / 25) || 1;
+        this.cargandoCanjes = false;
+      },
+      error: () => {
+        this.cargandoCanjes = false;
+        this.canjesPaginados = [];
+      }
+    });
+  }
+
+  abrirModalRegistroCanjes() {
+    this.mostrarModalRegistroCanjes = true;
+    this.cargarCanjes(1);
+  }
+
+  onSearchCanjeChange(valor: string) {
+    this.busquedaCanje = valor;
+    this.searchCanjeSubject.next(valor);
+  }
+
+  cambiarPaginaCanjes(delta: number) {
+    let nuevaPagina = this.paginaActualCanjes + delta;
+    if (nuevaPagina >= 1 && nuevaPagina <= this.totalPaginasCanjes) {
+      this.cargarCanjes(nuevaPagina);
+    }
   }
 
   buscarRegistros() {
@@ -629,7 +687,10 @@ export class DashboardDuenoComponent implements OnInit {
       },
       error: (err: any) => {
         this.canjeando = false;
-        this.canjeMensajeError = err.error?.error || 'Error al procesar el canje.';
+        this.toastMensaje = err.error?.error || 'Error al procesar el canje.';
+        this.toastTipo = 'error';
+        this.mostrarToastCanje = true;
+        setTimeout(() => this.mostrarToastCanje = false, 8000);
       }
     });
   }
@@ -669,7 +730,7 @@ export class DashboardDuenoComponent implements OnInit {
     formData.append('nombre', this.nuevoProducto.nombre);
     formData.append('descripcion', this.nuevoProducto.descripcion || '');
     formData.append('puntos_requeridos', this.nuevoProducto.puntos_requeridos.toString());
-    formData.append('categoria', this.nuevoProducto.categoria || 'General');
+    // Categoria eliminada
     formData.append('stock', (this.nuevoProducto.stock ?? 0).toString());
     formData.append('activo', 'true'); // Explicitly set to true to ensure it shows publicly
     if (this.imagenSeleccionada) {
@@ -712,7 +773,7 @@ export class DashboardDuenoComponent implements OnInit {
       descripcion: prod.descripcion,
       puntos_requeridos: prod.puntos_requeridos,
       stock: prod.stock ?? 0,
-      categoria: prod.categoria
+      // Categoria eliminada
     };
     this.imagenSeleccionada = null;
   }
@@ -777,6 +838,48 @@ export class DashboardDuenoComponent implements OnInit {
       error: (err: any) => {
         this.guardandoConfig = false;
         this.configMensajeError = err.error?.error || 'Error al guardar.';
+      }
+    });
+  }
+
+  // ─── Configuración de Puntos por Combustible ───
+  abrirModalPuntosConfig() {
+    this.mostrarModalPuntosConfig = true;
+    this.puntosConfigMensajeOk = '';
+    this.puntosConfigMensajeError = '';
+    
+    this.api.getTiposCombustible().subscribe({
+      next: (data) => {
+        // Filtramos el registro interno de canje para que no sea editable
+        this.tiposCombustible = data.filter(t => t.nombre !== 'CANJE DE PUNTOS');
+      },
+      error: () => {
+        this.puntosConfigMensajeError = 'Error al cargar tipos de combustible.';
+      }
+    });
+  }
+
+  guardarPuntosConfig() {
+    this.guardandoPuntosConfig = true;
+    this.puntosConfigMensajeOk = '';
+    this.puntosConfigMensajeError = '';
+
+    const observables = this.tiposCombustible.map(tipo => 
+      this.api.patchTipoCombustible(tipo.id, {
+        precio_referencial: tipo.precio_referencial,
+        puntos_por_diez_soles: tipo.puntos_por_diez_soles
+      })
+    );
+
+    forkJoin(observables).subscribe({
+      next: () => {
+        this.guardandoPuntosConfig = false;
+        this.puntosConfigMensajeOk = 'Configuración de puntos guardada correctamente.';
+        setTimeout(() => this.puntosConfigMensajeOk = '', 3000);
+      },
+      error: (err) => {
+        this.guardandoPuntosConfig = false;
+        this.puntosConfigMensajeError = 'Error al guardar la configuración.';
       }
     });
   }

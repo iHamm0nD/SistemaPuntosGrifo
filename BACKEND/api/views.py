@@ -171,8 +171,16 @@ class RegistroConsumoViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         search = self.request.query_params.get('search', None)
+        tipo = self.request.query_params.get('tipo', None)
+        
         if search:
             queryset = queryset.filter(cliente__dni__icontains=search)
+            
+        if tipo == 'consumo':
+            queryset = queryset.exclude(tipo_combustible__nombre='CANJE DE PUNTOS')
+        elif tipo == 'canje':
+            queryset = queryset.filter(tipo_combustible__nombre='CANJE DE PUNTOS')
+            
         return queryset
 
     def get_serializer_class(self):
@@ -207,6 +215,7 @@ class RegistrarConsumoView(APIView):
                     'monto_total': str(registro.monto_total),
                     'puntos_otorgados': registro.puntos_otorgados,
                     'puntos_acumulados': registro.cliente.puntos_acumulados,
+                    'nro_boleta': registro.nro_boleta,
                 }
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -415,6 +424,7 @@ class CanjearPuntosView(APIView):
             cliente=cliente,
             empleado=request.user,
             tipo_combustible=tipo_canje,
+            producto_canjeado=producto,
             galones=0,
             monto_total=0,
             puntos_otorgados=-puntos_a_canjear_decimal

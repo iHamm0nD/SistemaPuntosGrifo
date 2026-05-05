@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../service/api.service';
+import { MessageService } from 'primeng/api';
 import { AuthService } from '../../service/auth.service';
 import { Router } from '@angular/router';
 import { TipoCombustible } from '../../models/combustible.models';
@@ -19,7 +20,6 @@ export class DashboardEmpleadoComponent implements OnInit {
   monto: number | null = null;
   tipoCombustibleId: number | null = null;
   nroBoleta = '';
-  tipoComprobante: 'BO' | 'FA' = 'BO';
 
   // Datos del sistema
   tiposCombustible: TipoCombustible[] = [];
@@ -46,7 +46,8 @@ export class DashboardEmpleadoComponent implements OnInit {
   constructor(
     private api: ApiService,
     private auth: AuthService,
-    private router: Router
+    private router: Router,
+    private messageService: MessageService
   ) { }
 
   ngOnInit() {
@@ -57,7 +58,8 @@ export class DashboardEmpleadoComponent implements OnInit {
   cargarCombustibles() {
     this.api.getTiposCombustible().subscribe({
       next: (data) => {
-        this.tiposCombustible = data;
+        // Filtramos para que no aparezca "Canje de Puntos" u opciones similares en el registro de consumo
+        this.tiposCombustible = data.filter(t => !t.nombre.toLowerCase().includes('canje'));
       },
       error: () => {
         this.error = 'Error al cargar tipos de combustible';
@@ -133,6 +135,10 @@ export class DashboardEmpleadoComponent implements OnInit {
       return;
     }
 
+    if (this.nroBoleta && !['B', 'F', 'T'].includes(this.nroBoleta.trim().toUpperCase()[0])) {
+      return;
+    }
+
     this.nombres = this.nombres.trim().toUpperCase();
     this.apellidos = this.apellidos.trim().toUpperCase();
 
@@ -168,7 +174,7 @@ export class DashboardEmpleadoComponent implements OnInit {
     this.mostrarConfirmacion = false;
 
     this.api.registrarConsumo({
-      nro_boleta: `${this.tipoComprobante}-${this.nroBoleta.trim()}`,
+      nro_boleta: this.nroBoleta.trim().toUpperCase(),
       dni: this.dni,
       nombres: this.nombres,
       apellidos: this.apellidos,
@@ -197,6 +203,15 @@ export class DashboardEmpleadoComponent implements OnInit {
   }
 
   cerrarResultado() {
+    // Mostrar notificación tipo Toast al cerrar el modal de éxito
+    if (this.resultadoRegistro) {
+      this.messageService.add({
+        severity: 'success',
+        summary: '¡Éxito!',
+        detail: 'Consumo registrado correctamente',
+        life: 3000
+      });
+    }
     this.mostrarResultado = false;
     this.resultadoRegistro = null;
   }
@@ -210,7 +225,6 @@ export class DashboardEmpleadoComponent implements OnInit {
     this.tipoCombustibleId = null;
     this.tanqueLleno = false;
     this.nroBoleta = '';
-    this.tipoComprobante = 'BO';
     this.error = '';
   }
 

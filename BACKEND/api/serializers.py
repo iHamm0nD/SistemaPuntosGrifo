@@ -9,7 +9,7 @@ class ProductoCanjeableSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.ProductoCanjeable
-        fields = ['id', 'nombre', 'descripcion', 'puntos_requeridos', 'imagen', 'imagen_url', 'categoria', 'stock', 'activo', 'destacado', 'fecha_creacion']
+        fields = ['id', 'nombre', 'descripcion', 'puntos_requeridos', 'imagen', 'imagen_url', 'stock', 'activo', 'destacado', 'fecha_creacion']
         extra_kwargs = {'imagen': {'required': False}}
 
     def get_imagen_url(self, obj):
@@ -111,12 +111,18 @@ class RegistroConsumoReadSerializer(serializers.ModelSerializer):
     cliente_nombre = serializers.SerializerMethodField()
     cliente_puntos = serializers.DecimalField(source='cliente.puntos_acumulados', max_digits=10, decimal_places=2, read_only=True)
     tipo_combustible_nombre = serializers.CharField(source='tipo_combustible.nombre', read_only=True)
+    producto_nombre = serializers.SerializerMethodField()
+
+    def get_producto_nombre(self, obj):
+        if obj.producto_canjeado:
+            return obj.producto_canjeado.nombre
+        return "Canje Directo"
     empleado_nombre = serializers.SerializerMethodField()
 
     class Meta:
         model = models.RegistroConsumo
         fields = ['id', 'nro_boleta', 'cliente', 'cliente_dni', 'cliente_nombre', 'cliente_puntos', 'empleado', 'empleado_nombre',
-                  'tipo_combustible', 'tipo_combustible_nombre', 'galones',
+                  'tipo_combustible', 'tipo_combustible_nombre', 'producto_canjeado', 'producto_nombre', 'galones',
                   'monto_total', 'puntos_otorgados', 'fecha']
 
     def get_cliente_nombre(self, obj):
@@ -172,13 +178,10 @@ class RegistrarConsumoSerializer(serializers.Serializer):
         # Calcula indirectamente la cantidad de galones según el precio tarifario
         galones = monto / tipo_combustible.precio_referencial
         
+        tramos_de_10 = int(monto // 10)
+        
         from decimal import Decimal
-        is_premium = 'premium' in tipo_combustible.nombre.lower()
-        
-        # Calcular los bloques de 10 soles completados (ej: 18 soles = 1 bloque, 20 soles = 2 bloques)
-        tramos_de_10 = int(monto // Decimal('10.0'))
-        
-        base_points = Decimal(str(tramos_de_10)) * (Decimal('2.5') if is_premium else Decimal('2.0'))
+        base_points = Decimal(str(tramos_de_10)) * tipo_combustible.puntos_por_diez_soles
         puntos = base_points + (Decimal('2.0') if tanque_lleno else Decimal('0.0'))
         puntos = round(puntos, 2)
 

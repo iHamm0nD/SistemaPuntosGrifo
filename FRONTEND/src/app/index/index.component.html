@@ -48,7 +48,7 @@
             <p class="product-description">{{ product.description }}</p>
             <div class="points-required">
               <div class="points-display">
-                <span class="points-value">{{ product.pointsRequired }}</span>
+                <span class="points-value">{{ product.pointsRequired | number:'1.0-0' }}</span>
                 <span class="points-label">puntos</span>
               </div>
             </div>
@@ -67,7 +67,7 @@
     </div>
 
     <!-- Toggle button -->
-    <div class="show-all-wrapper">
+    <div id="catalogo-completo" class="show-all-wrapper">
       <button class="show-all-btn" (click)="toggleVerTodos()">
         <i class="pi" [ngClass]="verTodos ? 'pi-chevron-up' : 'pi-grid'"></i>
         <span>{{ verTodos ? 'Ocultar' : 'Ver todos los productos' }}</span>
@@ -84,7 +84,7 @@
         <div class="all-product-body">
           <p class="all-product-name">{{ product.name }}</p>
           <div class="all-price-block">
-            <span class="all-pts-number">{{ product.pointsRequired }}</span>
+            <span class="all-pts-number">{{ product.pointsRequired | number:'1.0-0' }}</span>
             <span class="all-pts-word"> puntos</span>
           </div>
           <div class="stock-badge" [class.stock-disponible]="product.stock > 0" [class.stock-agotado]="product.stock === 0">
@@ -193,7 +193,7 @@
 
             <div class="card-body">
               <div class="points-display">
-                <span class="points-number">{{ puntosCliente }}</span>
+                <span class="points-number">{{ puntosCliente | number:'1.0-0' }}</span>
                 <span class="points-label">Pts</span>
               </div>
               <p class="points-subtitle">Disponibles para canjear</p>
@@ -204,7 +204,7 @@
                 <i class="pi pi-user user-icon-glow"></i>
                 <span class="user-name">{{ nombreCliente }}</span>
               </div>
-              <button class="action-btn-small" (click)="mostrarModalPuntos = false">Ver Catálogo</button>
+              <button class="action-btn-small" (click)="irACatalogo()">Ver Catálogo</button>
             </div>
           </div>
         </div>
@@ -239,7 +239,7 @@
 
         <div class="redemption-balance-info">
           <span class="redemption-balance-label">Puntos restantes:</span>
-          <span class="redemption-balance-value">{{ puntosActuales - selectedProduct.pointsRequired }}</span>
+          <span class="redemption-balance-value">{{ (puntosActuales - selectedProduct.pointsRequired) | number:'1.0-0' }}</span>
         </div>
       </div>
 

@@ -3,4 +3,5 @@ export interface TipoCombustible {
     nombre: string;
     precio_referencial: number;
     puntos_por_galon: number;
+    puntos_por_diez_soles?: number;
 }

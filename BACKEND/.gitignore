@@ -1,0 +1,24 @@
+# Entornos virtuales
+venv/
+env/
+.env
+
+# Cache de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Archivos multimedia subidos localmente
+media/
+!media/.keep
+
+# Bases de datos SQLite locales (En Render usaremos Postgres)
+db.sqlite3
+*.sqlite3
+
+# Archivos de entorno y SO
+.DS_Store
+Thumbs.db
+.vscode/
+
+staticfiles/

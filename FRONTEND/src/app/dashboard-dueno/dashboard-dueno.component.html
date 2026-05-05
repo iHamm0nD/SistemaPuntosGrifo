@@ -27,9 +27,17 @@
         <i class="pi pi-gift"></i>
         <span>Canjear Productos</span>
       </button>
+      <button class="sidebar-item" (click)="abrirModalRegistroCanjes(); menuAbierto = false">
+        <i class="pi pi-history"></i>
+        <span>Registro de Canjes</span>
+      </button>
+      <button class="sidebar-item" (click)="abrirModalPuntosConfig(); menuAbierto = false">
+        <i class="pi pi-bolt"></i>
+        <span>Configuración de Puntos</span>
+      </button>
       <button class="sidebar-item" (click)="abrirModalConfiguracion(); menuAbierto = false">
         <i class="pi pi-sliders-h"></i>
-        <span>Configuración</span>
+        <span>Configuración General</span>
       </button>
     </nav>
   </div>
@@ -83,7 +91,7 @@
           <i class="pi pi-star-fill"></i>
         </div>
         <div class="stat-info">
-          <span class="stat-value">{{ totalPuntos | number }}</span>
+          <span class="stat-value">{{ totalPuntos | number:'1.0-0' }}</span>
           <span class="stat-label">Puntos Otorgados</span>
         </div>
       </div>
@@ -97,43 +105,54 @@
           <span class="stat-label">Consumos Registrados</span>
         </div>
       </div>
+
+
     </div>
 
     <!-- Grid Layout -->
     <div class="dashboard-grid">
       <!-- Ranking de Clientes -->
       <div class="panel ranking-panel">
-        <div class="panel-header">
-          <h2 class="panel-title">
-            <i class="pi pi-trophy"></i>
-            Ranking de Clientes
-            <button class="btn-ver-todos" (click)="abrirModalRanking()"
-              style="margin-left: 10px; font-size: 0.8rem; padding: 5px 10px; border-radius: 4px; border: 1px solid #64748b; background: transparent; color: #64748b; cursor: pointer;">
-              Ver todos
-            </button>
-          </h2>
+        <div class="panel-header premium-header">
+          <div class="premium-header-title">
+            <div class="premium-icon-wrapper"><i class="pi pi-trophy"></i></div>
+            <div>
+              <h2 class="panel-title" style="margin-bottom: 2px;">Ranking de Clientes</h2>
+              <span style="font-size: 0.8rem; color: #94a3b8;">Top clientes por puntos acumulados</span>
+            </div>
+          </div>
+          <button class="btn-premium-action" (click)="abrirModalRanking()">
+            <span>Ver todos</span>
+            <i class="pi pi-arrow-right"></i>
+          </button>
         </div>
         <div class="panel-body">
-          <div class="ranking-list" *ngIf="topClientes.length > 0">
-            <div class="ranking-item" *ngFor="let cliente of topClientes; let i = index" [class.top-1]="i === 0"
-              [class.top-2]="i === 1" [class.top-3]="i === 2">
-              <div class="ranking-position">
-                <span class="position-badge" [style.background]="getMedalColor(i)">
-                  {{ i + 1 }}
-                </span>
+          <div class="premium-ranking-list" *ngIf="topClientes.length > 0">
+            <div class="premium-ranking-card" *ngFor="let cliente of topClientes; let i = index" 
+                 [ngClass]="{'gold-card': i === 0, 'silver-card': i === 1, 'bronze-card': i === 2}">
+              
+              <div class="premium-rank-badge">
+                <i *ngIf="i === 0" class="pi pi-crown"></i>
+                <span *ngIf="i !== 0">#{{ i + 1 }}</span>
               </div>
-              <div class="ranking-info">
-                <span class="ranking-name">{{ cliente.nombres }} {{ cliente.apellidos }}</span>
-                <span class="ranking-dni">DNI: {{ cliente.dni }}</span>
+              
+              <div class="premium-rank-avatar">
+                {{ cliente.nombres.charAt(0) }}{{ cliente.apellidos.charAt(0) }}
               </div>
-              <div class="ranking-points">
-                <span class="points-value">{{ cliente.puntos_acumulados | number }}</span>
-                <span class="points-label">puntos</span>
+
+              <div class="premium-rank-info">
+                <span class="premium-rank-name">{{ cliente.nombres }} {{ cliente.apellidos }}</span>
+                <span class="premium-rank-dni">DNI: {{ cliente.dni }}</span>
+              </div>
+              
+              <div class="premium-rank-score">
+                <span class="score-val">{{ cliente.puntos_acumulados | number:'1.0-0' }}</span>
+                <span class="score-lbl">pts</span>
               </div>
             </div>
           </div>
-          <div class="empty-state" *ngIf="topClientes.length === 0">
-            <i class="pi pi-inbox"></i>
+          <div class="premium-empty-state" *ngIf="topClientes.length === 0">
+            <div class="empty-icon-ring"><i class="pi pi-users"></i></div>
             <p>No hay clientes registrados aún</p>
           </div>
         </div>
@@ -213,7 +232,7 @@
       <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center;">
         <h2 class="panel-title">
           <i class="pi pi-clock"></i>
-          Últimos Registros
+          Últimos Consumos
         </h2>
         <div class="search-bar" style="display: flex; gap: 10px;">
           <input type="text" [ngModel]="busquedaRegistro" (ngModelChange)="onSearchChange($event)"
@@ -240,7 +259,7 @@
             <tbody>
               <tr *ngFor="let reg of registrosPaginados" style="white-space: nowrap;">
                 <td style="font-weight: 600; color: #1D2536;">{{ reg.nro_boleta || '—' }}</td>
-                <td style="font-size: 0.9em; color: #64748b;">{{ reg.fecha | date:'yyyy/MM/dd HH:mm:ss' }}</td>
+                <td style="font-size: 0.9em; color: #64748b;">{{ reg.fecha | date:'dd/MM/yyyy' }}</td>
                 <td>{{ reg.cliente_dni }}</td>
                 <td>{{ reg.cliente_nombre }}</td>
                 <td>S/. {{ reg.monto_total | number:'1.2-2' }}</td>
@@ -248,7 +267,7 @@
                   <span class="badge-fuel">{{ reg.tipo_combustible_nombre }}</span>
                 </td>
                 <td>
-                  <span class="badge-points">+{{ reg.puntos_otorgados }}</span>
+                  <span class="badge-points">+{{ reg.puntos_otorgados | number:'1.0-0' }}</span>
                 </td>
                 <td style="color: #1D2536;">{{ reg.empleado_nombre }}</td>
                 <td>
@@ -297,7 +316,7 @@
         <div class="price-item" *ngFor="let tipo of tiposCombustible">
           <div class="price-info">
             <span class="price-name">{{ tipo.nombre }}</span>
-            <span class="price-points">{{ tipo.puntos_por_galon }} pts / gal</span>
+            <span class="price-points">{{ tipo.puntos_por_galon | number:'1.0-0' }} pts / gal</span>
           </div>
           <div class="price-inputs">
             <div class="input-group">
@@ -315,9 +334,8 @@
 
   <!-- Modal de Agregar Nuevo Empleado -->
   <!-- Modal de Agregar Nuevo Empleado (Rediseño Premium) -->
-  <p-dialog [(visible)]="mostrarModalAgregarEmpleado" [modal]="true"
-    [style]="{width: '95vw', maxWidth: '460px'}" [closable]="true" [draggable]="false"
-    [showHeader]="false" [closeOnEscape]="true" [dismissableMask]="true">
+  <p-dialog [(visible)]="mostrarModalAgregarEmpleado" [modal]="true" [style]="{width: '95vw', maxWidth: '460px'}"
+    [closable]="true" [draggable]="false" [showHeader]="false" [closeOnEscape]="true" [dismissableMask]="true">
 
     <div class="add-emp-modal-wrapper">
       <!-- Header -->
@@ -334,19 +352,19 @@
 
       <!-- Form Content -->
       <div class="add-emp-form">
-        <p class="add-emp-intro">Rellena los datos para registrar la cuenta. Los campos con <span style="color: #D84F34;">*</span> son obligatorios.</p>
+        <p class="add-emp-intro">Rellena los datos para registrar la cuenta. Los campos con <span
+            style="color: #D84F34;">*</span> son obligatorios.</p>
 
         <div class="add-emp-field">
           <label class="add-emp-label">DNI del Empleado <span class="required-star">*</span></label>
           <div class="add-emp-input-wrap">
             <input type="text" [(ngModel)]="nuevoEmpleado.dni" (input)="limpiarDniEmpleado()" maxlength="9"
-              minlength="8" placeholder="Ingresa DNI del empleado" class="add-emp-input"
-              [disabled]="buscandoDni">
+              minlength="8" placeholder="Ingresa DNI del empleado" class="add-emp-input" [disabled]="buscandoDni">
             <i *ngIf="buscandoDni" class="pi pi-spinner pi-spin add-emp-loading"></i>
           </div>
-          <p *ngIf="errorDni" class="add-emp-error-text">{{ errorDni }} <a
-              href="https://apis.net.pe" target="_blank" style="color: #D84F34; text-decoration: underline;"
-              *ngIf="errorDni.includes('Token')">Obtener token gratis</a></p>
+          <p *ngIf="errorDni" class="add-emp-error-text">{{ errorDni }} <a href="https://apis.net.pe" target="_blank"
+              style="color: #D84F34; text-decoration: underline;" *ngIf="errorDni.includes('Token')">Obtener token
+              gratis</a></p>
         </div>
 
         <div class="add-emp-field">
@@ -362,7 +380,8 @@
         </div>
 
         <div class="add-emp-field">
-          <label class="add-emp-label">Teléfono <span style="color:#94a3b8; font-weight:normal;">(Opcional)</span></label>
+          <label class="add-emp-label">Teléfono <span
+              style="color:#94a3b8; font-weight:normal;">(Opcional)</span></label>
           <input type="text" [(ngModel)]="nuevoEmpleado.telefono" placeholder="Número de celular" class="add-emp-input">
         </div>
       </div>
@@ -422,9 +441,8 @@
   </p-dialog>
 
   <!-- Modal de Gestión de Empleados (Rediseño Premium) -->
-  <p-dialog [(visible)]="mostrarModalEmpleados" [modal]="true"
-    [style]="{width: '95vw', maxWidth: '750px'}" [closable]="true" [draggable]="false"
-    [showHeader]="false" [closeOnEscape]="true" [dismissableMask]="true">
+  <p-dialog [(visible)]="mostrarModalEmpleados" [modal]="true" [style]="{width: '95vw', maxWidth: '750px'}"
+    [closable]="true" [draggable]="false" [showHeader]="false" [closeOnEscape]="true" [dismissableMask]="true">
 
     <div class="emp-mgmt-wrapper">
       <!-- Header -->
@@ -468,11 +486,13 @@
                       <i class="pi pi-user-edit"></i>
                     </button>
                     <!-- Botón Ver Credenciales -->
-                    <button (click)="toggleCredenciales(emp)" title="Ver credenciales" class="emp-action-btn credentials-btn">
+                    <button (click)="toggleCredenciales(emp)" title="Ver credenciales"
+                      class="emp-action-btn credentials-btn">
                       <i class="pi pi-eye"></i>
                     </button>
                     <!-- Botón Eliminar -->
-                    <button (click)="eliminarEmpleado(emp.id)" title="Eliminar empleado" class="emp-action-btn delete-btn">
+                    <button (click)="eliminarEmpleado(emp.id)" title="Eliminar empleado"
+                      class="emp-action-btn delete-btn">
                       <i class="pi pi-trash"></i>
                     </button>
                   </div>
@@ -540,36 +560,59 @@
     </ng-template>
   </p-dialog>
 
-  <!-- Modal de Ranking de Clientes (Ver Todos) -->
-  <p-dialog header="Ranking Completo de Clientes" [(visible)]="mostrarModalRanking" [modal]="true"
-    [style]="{width: '95vw', maxWidth: '500px'}" [closable]="true" [draggable]="false">
+  <!-- Modal de Ranking de Clientes (Ver Todos) - Rediseño Premium -->
+  <p-dialog [(visible)]="mostrarModalRanking" [modal]="true"
+    [style]="{width: '95vw', maxWidth: '560px'}" [closable]="true" [draggable]="false"
+    [showHeader]="false" [closeOnEscape]="true" [dismissableMask]="true">
 
-    <div class="ranking-content" style="max-height: 400px; overflow-y: auto;">
-      <div class="ranking-list" *ngIf="todosClientes.length > 0">
-        <div class="ranking-item" *ngFor="let cliente of todosClientes; let i = index" [class.top-1]="i === 0"
-          [class.top-2]="i === 1" [class.top-3]="i === 2"
-          style="display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #e0e0e0;">
-          <div class="ranking-position" style="width: 40px;">
-            <span class="position-badge" [style.background]="getMedalColor(i)"
-              style="color: #1D2536; padding: 4px 8px; border-radius: 50%; font-weight: bold;">
-              {{ i + 1 }}
-            </span>
+    <div class="premium-modal-wrapper">
+      <!-- Header con Degradado -->
+      <div class="premium-modal-header" style="background: linear-gradient(135deg, #1D2536 0%, #334155 100%);">
+        <div class="modal-header-icon" style="background: rgba(251, 191, 36, 0.15); color: #FBBF24;">
+          <i class="pi pi-star-fill"></i>
+        </div>
+        <div class="modal-header-text">
+          <h2>Ranking Completo</h2>
+          <p>Listado de todos los clientes fidelizados</p>
+        </div>
+        <button class="modal-close-btn" (click)="mostrarModalRanking = false">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <div class="premium-modal-body" style="padding: 0; background: #f8fafc;">
+        <!-- Lista Scrolleable -->
+        <div class="full-ranking-container" style="max-height: 500px; overflow-y: auto; padding: 20px;">
+          <div class="premium-ranking-list" *ngIf="todosClientes.length > 0">
+            <div class="premium-ranking-card list-mode" *ngFor="let cliente of todosClientes; let i = index" 
+                 [ngClass]="{'gold-card': i === 0, 'silver-card': i === 1, 'bronze-card': i === 2}">
+              
+              <div class="premium-rank-badge">
+                <i *ngIf="i === 0" class="pi pi-crown"></i>
+                <span *ngIf="i !== 0">#{{ i + 1 }}</span>
+              </div>
+              
+              <div class="premium-rank-avatar">
+                {{ cliente.nombres.charAt(0) }}{{ cliente.apellidos.charAt(0) }}
+              </div>
+
+              <div class="premium-rank-info">
+                <span class="premium-rank-name">{{ cliente.nombres }} {{ cliente.apellidos }}</span>
+                <span class="premium-rank-dni"><i class="pi pi-id-card" style="font-size: 0.7rem;"></i> {{ cliente.dni }}</span>
+              </div>
+              
+              <div class="premium-rank-score">
+                <span class="score-val">{{ cliente.puntos_acumulados | number:'1.0-0' }}</span>
+                <span class="score-lbl">pts</span>
+              </div>
+            </div>
           </div>
-          <div class="ranking-info" style="flex: 1;">
-            <span class="ranking-name" style="font-weight: bold; color: #1D2536; display: block;">{{ cliente.nombres }}
-              {{ cliente.apellidos }}</span>
-            <span class="ranking-dni" style="font-size: 0.8em; color: #64748b;">DNI: {{ cliente.dni }}</span>
-          </div>
-          <div class="ranking-points" style="text-align: right;">
-            <span class="points-value" style="font-size: 1.1em; font-weight: bold; color: #1D2536;">{{
-              cliente.puntos_acumulados | number }}</span>
-            <span class="points-label" style="font-size: 0.8em; color: #64748b; display: block;">puntos</span>
+          
+          <div class="premium-empty-state" *ngIf="todosClientes.length === 0">
+            <div class="empty-icon-ring"><i class="pi pi-users"></i></div>
+            <p>No hay clientes registrados aún.</p>
           </div>
         </div>
-      </div>
-      <div class="empty-state" *ngIf="todosClientes.length === 0"
-        style="text-align: center; color: #64748b; padding: 20px;">
-        No hay clientes registrados aún.
       </div>
     </div>
   </p-dialog>
@@ -731,7 +774,7 @@
               }}</span>
             <span class="canje-client-pts">
               <i class="pi pi-star-fill" style="font-size:10px;"></i>
-              {{ canjeClienteEncontrado.puntos_acumulados | number:'1.0-2' }} puntos disponibles
+              {{ canjeClienteEncontrado.puntos_acumulados | number:'1.0-0' }} puntos disponibles
             </span>
           </div>
           <i class="pi pi-check-circle canje-client-check"></i>
@@ -755,7 +798,8 @@
             [alt]="productoSeleccionadoCanje.nombre" class="canje-preview-img">
           <div class="canje-preview-info">
             <span class="canje-preview-name">{{ productoSeleccionadoCanje.nombre }}</span>
-            <span class="canje-preview-pts">{{ productoSeleccionadoCanje.puntos_requeridos }} pts</span>
+            <span class="canje-preview-pts">{{ productoSeleccionadoCanje.puntos_requeridos | number:'1.0-0' }}
+              pts</span>
           </div>
           <button class="canje-preview-remove" (click)="seleccionarProductoCanje(productoSeleccionadoCanje)"
             title="Quitar selección">
@@ -782,30 +826,27 @@
           </div>
 
           <div class="canje-products-list" *ngIf="!cargandoProductosCanje">
-            <div *ngFor="let prod of productosParaCanje"
-              class="canje-list-row"
+            <div *ngFor="let prod of productosParaCanje" class="canje-list-row"
               [class.canje-list-selected]="productoSeleccionadoCanje?.id === prod.id"
-              [class.canje-list-agotado]="prod.stock === 0"
-              (click)="prod.stock > 0 && seleccionarProductoCanje(prod)">
+              [class.canje-list-agotado]="prod.stock === 0" (click)="prod.stock > 0 && seleccionarProductoCanje(prod)">
 
               <!-- Imagen -->
               <div class="canje-list-img-wrap">
-                <img [src]="prod.imagen_url || 'assets/images/placeholder.png'" [alt]="prod.nombre" class="canje-list-img">
+                <img [src]="prod.imagen_url || 'assets/images/placeholder.png'" [alt]="prod.nombre"
+                  class="canje-list-img">
               </div>
 
               <!-- Nombre + categoría -->
               <div class="canje-list-info">
                 <span class="canje-list-name">{{ prod.nombre }}</span>
-                <span class="canje-list-cat">{{ prod.categoria || prod.descripcion || '—' }}</span>
+                <span class="canje-list-cat">{{ prod.descripcion || '—' }}</span>
               </div>
 
               <!-- Puntos + stock -->
               <div class="canje-list-meta">
-                <span class="canje-list-pts">{{ prod.puntos_requeridos }}</span>
+                <span class="canje-list-pts">{{ prod.puntos_requeridos | number:'1.0-0' }}</span>
                 <span class="canje-list-pts-label">puntos</span>
-                <span class="canje-list-stock"
-                  [class.stock-ok]="prod.stock > 0"
-                  [class.stock-out]="prod.stock === 0">
+                <span class="canje-list-stock" [class.stock-ok]="prod.stock > 0" [class.stock-out]="prod.stock === 0">
                   <i class="pi" [ngClass]="prod.stock > 0 ? 'pi-box' : 'pi-times-circle'" style="font-size:10px;"></i>
                   {{ prod.stock > 0 ? prod.stock + ' en stock' : 'Agotado' }}
                 </span>
@@ -831,16 +872,15 @@
       </p>
 
       <!-- Footer / Confirmar -->
-      <div class="canje-modal-footer">
-        <div class="canje-summary" *ngIf="productoSeleccionadoCanje && canjeClienteEncontrado">
+      <div class="canje-modal-footer" *ngIf="productoSeleccionadoCanje">
+        <div class="canje-summary" *ngIf="canjeClienteEncontrado">
           <span>Puntos a descontar:</span>
-          <strong style="color:#D84F34;">{{ productoSeleccionadoCanje.puntos_requeridos }}</strong>
+          <strong style="color:#D84F34;">{{ productoSeleccionadoCanje.puntos_requeridos | number:'1.0-0' }}</strong>
           <span style="margin-left:12px;">Restantes:</span>
-          <strong>{{ canjeClienteEncontrado.puntos_acumulados - productoSeleccionadoCanje.puntos_requeridos |
-            number:'1.0-2' }}</strong>
+          <strong>{{ (canjeClienteEncontrado.puntos_acumulados - productoSeleccionadoCanje.puntos_requeridos) |
+            number:'1.0-0' }}</strong>
         </div>
-        <button class="canje-confirm-btn"
-          [disabled]="!canjeClienteEncontrado || !productoSeleccionadoCanje || canjeando" (click)="ejecutarCanje()">
+        <button class="canje-confirm-btn" [disabled]="!canjeClienteEncontrado || canjeando" (click)="ejecutarCanje()">
           <i class="pi" [ngClass]="canjeando ? 'pi-spin pi-spinner' : 'pi-check'"></i>
           {{ canjeando ? 'Procesando...' : 'Confirmar Canje' }}
         </button>
@@ -849,84 +889,47 @@
     </div>
   </p-dialog>
 
-  <!-- Overlay + Toast premium de canje exitoso -->
-  <div *ngIf="mostrarToastCanje" style="position: fixed; inset: 0; z-index: 9999;
-           background: rgba(0,0,0,0.6);
-           display: flex; align-items: center; justify-content: center;
-           animation: slideInToast 0.3s ease;">
+  <!-- Overlay + Toast premium de canje (Éxito o Error) -->
+  <div *ngIf="mostrarToastCanje" class="canje-success-overlay" [class.toast-error]="toastTipo === 'error'">
 
-    <div style="background: linear-gradient(145deg, #ffffff, #ffffff);
-                border: 1px solid rgba(29, 37, 54, 0.25);
-                border-radius: 24px;
-                padding: 40px 36px 32px;
-                width: 90%; max-width: 400px;
-                box-shadow: 0 24px 64px rgba(0,0,0,0.7),
-                            0 0 0 1px rgba(255,255,255,0.04),
-                            0 0 80px rgba(74,222,128,0.06);
-                display: flex; flex-direction: column; align-items: center;
-                text-align: center; position: relative; overflow: hidden;">
+    <div class="canje-success-card">
+      <div class="card-glow" [class.glow-error]="toastTipo === 'error'"></div>
 
-      <!-- Brillo decorativo superior -->
-      <div style="position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
-                  width: 200px; height: 120px;
-                  background: radial-gradient(ellipse, rgba(74,222,128,0.12) 0%, transparent 70%);
-                  pointer-events: none;"></div>
-
-      <!-- Ícono principal con anillo -->
-      <div style="position: relative; margin-bottom: 20px;">
-        <div style="width: 76px; height: 76px; border-radius: 50%;
-                    background: rgba(29, 37, 54, 0.08);
-                    border: 1.5px solid rgba(29, 37, 54, 0.3);
-                    display: flex; align-items: center; justify-content: center;
-                    box-shadow: 0 0 30px rgba(74,222,128,0.18), inset 0 0 20px rgba(74,222,128,0.05);">
-          <div style="width: 52px; height: 52px; border-radius: 50%;
-                      background: linear-gradient(135deg, rgba(74,222,128,0.18), rgba(34,197,94,0.1));
-                      border: 1px solid rgba(74,222,128,0.4);
-                      display: flex; align-items: center; justify-content: center;">
-            <i class="pi pi-check" style="color: #64748b; font-size: 22px; font-weight: 900;"></i>
-          </div>
+      <div class="success-icon-wrapper" [class.icon-error]="toastTipo === 'error'">
+        <div class="success-icon-ring" [class.ring-error]="toastTipo === 'error'"></div>
+        <div class="success-icon-inner" [class.inner-error]="toastTipo === 'error'">
+          <i class="pi" [ngClass]="toastTipo === 'ok' ? 'pi-check' : 'pi-exclamation-triangle'"></i>
         </div>
       </div>
 
-      <!-- Badge -->
-      <span style="background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.25);
-                   color: #64748b; font-size: 11px; font-weight: 700;
-                   letter-spacing: 1.5px; text-transform: uppercase;
-                   padding: 4px 12px; border-radius: 20px; margin-bottom: 14px;">
-        Operación exitosa
-      </span>
-
-      <!-- Título -->
-      <h3 style="margin: 0 0 10px; color: #1D2536;
-                 font-family: 'Manrope', sans-serif;
-                 font-size: 22px; font-weight: 800; letter-spacing: -0.5px;">
-        ¡Canje Completado!
-      </h3>
-
-      <!-- Mensaje del backend -->
-      <p style="margin: 0 0 24px; color: #64748b;
-                font-size: 14px; line-height: 1.6; max-width: 300px;">
-        {{ toastMensaje }}
-      </p>
-
-      <!-- Barra de progreso auto-cierre -->
-      <div style="width: 100%; height: 6px; background: rgba(0,0,0,0.1);
-                  border-radius: 99px; margin-bottom: 22px; overflow: hidden;">
-        <div style="width: 100%; height: 100%; border-radius: 99px;
-                    background: linear-gradient(90deg, #64748b, #D84F34);
-                    transform-origin: left center;
-                    will-change: transform;
-                    animation: shrinkBar 15s linear forwards;"></div>
+      <div class="success-content">
+        <span class="success-badge" [class.badge-error]="toastTipo === 'error'">
+          {{ toastTipo === 'ok' ? 'Operación Exitosa' : 'Atención' }}
+        </span>
+        <h3 class="success-title">{{ toastTipo === 'ok' ? '¡Canje Completado!' : 'No se pudo realizar' }}</h3>
+        <p class="success-message">{{ toastMensaje }}</p>
       </div>
 
-      <!-- Botón cerrar -->
-      <button (click)="mostrarToastCanje = false" style="background: rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.1);
-               color: #1D2536; cursor: pointer; padding: 10px 32px;
-               border-radius: 12px; font-size: 14px; font-weight: 600;
-               transition: all 0.2s ease; letter-spacing: 0.3px;"
-        onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.borderColor='rgba(255,255,255,0.15)'"
-        onmouseout="this.style.background='rgba(0,0,0,0.05)'; this.style.borderColor='rgba(0,0,0,0.1)'">
-        Cerrar
+      <!-- Detalle del cliente (Solo en éxito) -->
+      <div class="success-detail" *ngIf="toastTipo === 'ok' && canjeClienteEncontrado">
+        <div class="detail-item">
+          <span class="detail-label">Cliente</span>
+          <span class="detail-value">{{ canjeClienteEncontrado.nombres }}</span>
+        </div>
+        <div class="detail-divider"></div>
+        <div class="detail-item">
+          <span class="detail-label">Puntos Actuales</span>
+          <span class="detail-value">{{ canjeClienteEncontrado.puntos_acumulados | number:'1.0-0' }} pts</span>
+        </div>
+      </div>
+
+      <div class="success-progress-container">
+        <div class="success-progress-bar" [class.bar-error]="toastTipo === 'error'"></div>
+      </div>
+
+      <button class="success-close-btn" (click)="mostrarToastCanje = false" [class.btn-error]="toastTipo === 'error'">
+        <span>{{ toastTipo === 'ok' ? 'Entendido' : 'Reintentar' }}</span>
+        <i class="pi" [ngClass]="toastTipo === 'ok' ? 'pi-arrow-right' : 'pi-refresh'"></i>
       </button>
     </div>
   </div>
@@ -966,13 +969,7 @@
             <input type="text" [(ngModel)]="nuevoProducto.descripcion" placeholder="Breve descripción del producto"
               style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(29,37,54,0.15); background: #fff; color: #1D2536; outline: none;">
           </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
-            <div>
-              <label
-                style="color: #1D2536; font-size: 12px; font-weight: 600; margin-bottom: 4px; display: block;">Categoría</label>
-              <input type="text" [(ngModel)]="nuevoProducto.categoria" placeholder="Ej: Ropa, Automotriz"
-                style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(29,37,54,0.15); background: #fff; color: #1D2536; outline: none;">
-            </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
             <div>
               <label
                 style="color: #1D2536; font-size: 12px; font-weight: 600; margin-bottom: 4px; display: block;">Stock
@@ -1017,8 +1014,8 @@
             <span style="font-size: 12px; color: #64748b;">{{ prod.descripcion || 'Sin descripción' }}</span>
           </div>
           <div style="text-align: right; flex-shrink: 0;">
-            <span style="display: block; font-weight: 800; color: #D84F34; font-size: 15px;">{{ prod.puntos_requeridos
-              }}</span>
+            <span style="display: block; font-weight: 800; color: #D84F34; font-size: 15px;">{{ prod.puntos_requeridos |
+              number:'1.0-0' }}</span>
             <span style="font-size: 11px; color: #64748b;">puntos</span>
             <span style="display: block; margin-top: 4px; font-size: 11px; font-weight: 700;"
               [style.color]="prod.stock > 0 ? '#16a34a' : '#D84F34'">
@@ -1048,9 +1045,8 @@
   </p-dialog>
 
   <!-- Modal Configuración — Productos Destacados -->
-  <p-dialog [(visible)]="mostrarModalConfiguracion" [modal]="true"
-    [style]="{width: '95vw', maxWidth: '560px'}" [closable]="true" [draggable]="false"
-    [showHeader]="false" [closeOnEscape]="true" [dismissableMask]="true">
+  <p-dialog [(visible)]="mostrarModalConfiguracion" [modal]="true" [style]="{width: '95vw', maxWidth: '560px'}"
+    [closable]="true" [draggable]="false" [showHeader]="false" [closeOnEscape]="true" [dismissableMask]="true">
 
     <div class="config-modal-wrapper">
 
@@ -1073,9 +1069,7 @@
           {{ idsDestacados.size }} de 6 seleccionados
         </span>
         <div class="config-counter-dots">
-          <span *ngFor="let n of [1,2,3,4,5,6]"
-            class="config-dot"
-            [class.filled]="n <= idsDestacados.size"
+          <span *ngFor="let n of [1,2,3,4,5,6]" class="config-dot" [class.filled]="n <= idsDestacados.size"
             [class.required]="n <= 4"></span>
         </div>
         <span style="font-size:11px; color:#94a3b8;">mínimo 4</span>
@@ -1083,10 +1077,8 @@
 
       <!-- Lista de productos -->
       <div class="config-products-list" *ngIf="!cargandoConfig">
-        <div *ngFor="let prod of productosConfig"
-          class="config-prod-row"
-          [class.config-prod-selected]="idsDestacados.has(prod.id)"
-          (click)="toggleDestacado(prod.id)">
+        <div *ngFor="let prod of productosConfig" class="config-prod-row"
+          [class.config-prod-selected]="idsDestacados.has(prod.id)" (click)="toggleDestacado(prod.id)">
 
           <div class="config-prod-img-wrap">
             <img [src]="prod.imagen_url || 'assets/images/placeholder.png'" [alt]="prod.nombre" class="config-prod-img">
@@ -1095,7 +1087,7 @@
           <div class="config-prod-info">
             <span class="config-prod-name">{{ prod.nombre }}</span>
             <span class="config-prod-sub">
-              {{ prod.puntos_requeridos }} pts &nbsp;·&nbsp;
+              {{ prod.puntos_requeridos | number:'1.0-0' }} pts &nbsp;·&nbsp;
               <span [style.color]="prod.stock > 0 ? '#16a34a' : '#D84F34'">
                 {{ prod.stock > 0 ? prod.stock + ' en stock' : 'Agotado' }}
               </span>
@@ -1118,13 +1110,13 @@
       </div>
 
       <p class="config-msg-ok" *ngIf="configMensajeOk"><i class="pi pi-check-circle"></i> {{ configMensajeOk }}</p>
-      <p class="config-msg-err" *ngIf="configMensajeError"><i class="pi pi-exclamation-circle"></i> {{ configMensajeError }}</p>
+      <p class="config-msg-err" *ngIf="configMensajeError"><i class="pi pi-exclamation-circle"></i> {{
+        configMensajeError }}</p>
 
       <!-- Footer -->
       <div class="config-modal-footer">
         <span style="font-size:12px; color:#94a3b8; flex:1;">Los cambios se aplican al instante en el inicio</span>
-        <button class="config-save-btn"
-          [disabled]="idsDestacados.size < 4 || idsDestacados.size > 6 || guardandoConfig"
+        <button class="config-save-btn" [disabled]="idsDestacados.size < 4 || idsDestacados.size > 6 || guardandoConfig"
           (click)="guardarDestacados()">
           <i class="pi" [ngClass]="guardandoConfig ? 'pi-spin pi-spinner' : 'pi-save'"></i>
           {{ guardandoConfig ? 'Guardando...' : 'Guardar Cambios' }}
@@ -1134,4 +1126,155 @@
     </div>
   </p-dialog>
 
-</div>
+  <!-- Modal de Registro de Canjes — Rediseño Premium -->
+  <p-dialog [(visible)]="mostrarModalRegistroCanjes" [modal]="true" [style]="{width: '95vw', maxWidth: '1000px'}"
+    [closable]="true" [draggable]="false" [showHeader]="false" [closeOnEscape]="true" [dismissableMask]="true">
+
+    <div class="canje-modal-wrapper">
+      <!-- Header dark -->
+      <div class="canje-modal-header">
+        <div
+          style="width: 48px; height: 48px; border-radius: 12px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 20px;">
+          <i class="pi pi-history"></i>
+        </div>
+        <div>
+          <h2 class="canje-modal-title">Registro de Canjes</h2>
+          <p class="canje-modal-subtitle">Historial completo de productos entregados</p>
+        </div>
+        <button class="canje-close-btn" (click)="mostrarModalRegistroCanjes = false">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <div class="canje-section" style="padding: 20px;">
+        <div class="table-container" *ngIf="canjesPaginados.length > 0">
+          <table class="data-table">
+            <thead>
+              <tr style="white-space: nowrap;">
+                <th>Fecha y Hora</th>
+                <th>Nombre del Producto</th>
+                <th>Canjeado por:</th>
+                <th>DNI del cliente</th>
+                <th>Puntos restados</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let c of canjesPaginados" style="white-space: nowrap;">
+                <td style="font-size: 0.9em; color: #64748b;">{{ c.fecha | date:'dd/MM/yyyy' }}</td>
+                <td style="font-weight: 600; color: #1D2536;">{{ c.producto_nombre || 'Canje Directo' }}</td>
+                <td>{{ c.cliente_nombre }}</td>
+                <td>{{ c.cliente_dni }}</td>
+                <td>
+                  <span class="badge-points" style="background: #fee2e2; color: #ef4444; font-weight: bold;">
+                    {{ c.puntos_otorgados | number:'1.0-0' }} pts
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Paginación Canjes -->
+        <div class="pagination-controls" *ngIf="totalPaginasCanjes > 1"
+          style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 15px;">
+          <button (click)="cambiarPaginaCanjes(-1)" [disabled]="paginaActualCanjes === 1" class="btn-manage"
+            [style.opacity]="paginaActualCanjes === 1 ? '0.5' : '1'">
+            <i class="pi pi-chevron-left"></i> Anterior
+          </button>
+          <span style="color: #1D2536;">Página {{ paginaActualCanjes }} de {{ totalPaginasCanjes }}</span>
+          <button (click)="cambiarPaginaCanjes(1)" [disabled]="paginaActualCanjes === totalPaginasCanjes"
+            class="btn-manage" [style.opacity]="paginaActualCanjes === totalPaginasCanjes ? '0.5' : '1'">
+            Siguiente <i class="pi pi-chevron-right"></i>
+          </button>
+        </div>
+
+        <div class="empty-state" *ngIf="canjesPaginados.length === 0 && !cargandoCanjes"
+          style="padding: 40px; text-align: center;">
+          <i class="pi pi-inbox" style="font-size: 3rem; opacity: 0.2; margin-bottom: 10px; display: block;"></i>
+          <p>No hay canjes registrados aún</p>
+        </div>
+
+        <div *ngIf="cargandoCanjes" style="text-align: center; padding: 50px;">
+          <i class="pi pi-spinner pi-spin" style="font-size: 2.5rem; color: #D84F34;"></i>
+          <p style="margin-top: 15px; color: #64748b;">Cargando historial...</p>
+        </div>
+      </div>
+
+      <div class="canje-modal-footer" style="padding: 15px 20px;">
+        <p style="margin: 0; color: #64748b; font-size: 12px;">
+          <i class="pi pi-info-circle"></i> Este registro muestra todos los productos canjeados por los clientes
+          mediante sus puntos acumulados.
+        </p>
+      </div>
+    </div>
+  </p-dialog>
+
+  <!-- Modal de Configuración de Puntos por Combustible (Rediseño Premium) -->
+  <p-dialog [(visible)]="mostrarModalPuntosConfig" [modal]="true" [style]="{width: '95vw', maxWidth: '520px'}"
+    [closable]="true" [draggable]="false" [showHeader]="false" [closeOnEscape]="true" [dismissableMask]="true">
+
+    <div class="puntos-config-wrapper">
+      <!-- Header con Degradado -->
+      <div class="puntos-config-header">
+        <div class="header-main-icon">
+          <i class="pi pi-bolt"></i>
+        </div>
+        <div class="header-text">
+          <h2 class="puntos-config-title">Configuración de Recompensas</h2>
+          <p class="puntos-config-subtitle">Define cuántos puntos ganan tus clientes por su consumo</p>
+        </div>
+        <button class="puntos-config-close" (click)="mostrarModalPuntosConfig = false">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <div class="puntos-config-body">
+        <div class="config-info-banner">
+          <i class="pi pi-info-circle"></i>
+          <span>La distribución actual es por cada <strong>S/. 10.00</strong> de consumo.</span>
+        </div>
+
+        <div class="fuel-config-list">
+          <div class="fuel-config-card" *ngFor="let tipo of tiposCombustible">
+            <div class="fuel-card-icon"
+              [style.background]="tipo.nombre.toLowerCase().includes('premium') ? 'rgba(216, 79, 52, 0.1)' : 'rgba(29, 37, 54, 0.05)'">
+              <i class="pi" [ngClass]="tipo.nombre.toLowerCase().includes('premium') ? 'pi-star-fill' : 'pi-tag'"></i>
+            </div>
+
+            <div class="fuel-card-info">
+              <span class="fuel-card-name">{{ tipo.nombre }}</span>
+            </div>
+
+            <div class="fuel-card-input">
+              <div class="points-input-wrapper">
+                <input type="number" [(ngModel)]="tipo.puntos_por_diez_soles" step="0.5" min="0">
+                <span class="points-label">pts</span>
+              </div>
+              <span class="input-hint">por S/. 10</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alertas de Estado -->
+        <div class="config-status-alert success" *ngIf="puntosConfigMensajeOk">
+          <i class="pi pi-check-circle"></i>
+          <span>{{ puntosConfigMensajeOk }}</span>
+        </div>
+        <div class="config-status-alert error" *ngIf="puntosConfigMensajeError">
+          <i class="pi pi-exclamation-circle"></i>
+          <span>{{ puntosConfigMensajeError }}</span>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="puntos-config-footer">
+        <button class="btn-puntos-cancel" (click)="mostrarModalPuntosConfig = false">Cerrar</button>
+        <button class="btn-puntos-save" [disabled]="guardandoPuntosConfig" (click)="guardarPuntosConfig()">
+          <i class="pi" [ngClass]="guardandoPuntosConfig ? 'pi-spin pi-spinner' : 'pi-save'"></i>
+          <span>{{ guardandoPuntosConfig ? 'Guardando...' : 'Guardar Cambios' }}</span>
+        </button>
+      </div>
+    </div>
+  </p-dialog>
+
+</div>

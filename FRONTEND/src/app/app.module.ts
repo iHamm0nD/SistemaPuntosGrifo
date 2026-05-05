@@ -12,6 +12,8 @@ import { InputTextModule }   from 'primeng/inputtext';
 import { RecaptchaModule } from 'ng-recaptcha';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DialogModule } from 'primeng/dialog';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { providePrimeNG } from 'primeng/config';
@@ -50,10 +52,12 @@ import { DashboardDuenoComponent } from './dashboard-dueno/dashboard-dueno.compo
     DropdownModule,
     RecaptchaModule,
     BrowserAnimationsModule,
-    DialogModule
+    DialogModule,
+    ToastModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },
+    MessageService,
     provideAnimations(),
     providePrimeNG({
       theme: {

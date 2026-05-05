@@ -215,6 +215,29 @@ export class IndexComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  irACatalogo(): void {
+    this.mostrarModalPuntos = false;
+    if (!this.verTodos) {
+      this.toggleVerTodos();
+    }
+    
+    // Pequeño delay para que el DOM se actualice y el scroll sea preciso
+    setTimeout(() => {
+      const element = document.getElementById('catalogo-completo');
+      if (element) {
+        // Offset de ~150px por el header pegajoso (sticky)
+        const headerOffset = 160; 
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+    }, 200);
+  }
+
   cerrarDialogoRedencion(): void {
     this.mostrarDialogoRedencion = false;
     this.selectedProduct = null;

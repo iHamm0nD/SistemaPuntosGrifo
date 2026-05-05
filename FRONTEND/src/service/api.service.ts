@@ -62,6 +62,14 @@ export class ApiService {
         );
     }
 
+    public patchTipoCombustible(id: number | undefined, data: any): Observable<any> {
+        return this.http.patch<any>(
+            this.ApiUrl + 'tipo-combustible/' + id + '/',
+            data,
+            this.httpOptions
+        );
+    }
+
     // =============================== CLIENTE ================================
     public getClientes(): Observable<Cliente[]> {
         return this.http.get<Cliente[]>(this.ApiUrl + 'cliente/');
@@ -84,10 +92,13 @@ export class ApiService {
         );
     }
 
-    public getRegistrosConsumo(page: number = 1, search: string = ''): Observable<any> {
+    public getRegistrosConsumo(page: number = 1, search: string = '', tipo: string = ''): Observable<any> {
         let url = this.ApiUrl + 'registro-consumo/?page=' + page;
         if (search) {
             url += '&search=' + search;
+        }
+        if (tipo) {
+            url += '&tipo=' + tipo;
         }
         return this.http.get<any>(url);
     }

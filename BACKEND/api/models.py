@@ -54,7 +54,10 @@ class TipoCombustible(models.Model):
     precio_referencial = models.DecimalField(max_digits=6, decimal_places=2,
                                               help_text="Precio referencial por galón en S/.")
     puntos_por_galon = models.IntegerField(
-        help_text="Puntos que otorga por cada galón consumido")
+        help_text="Puntos que otorga por cada galón consumido", default=0)
+    puntos_por_diez_soles = models.DecimalField(
+        max_digits=5, decimal_places=2, default=2.00,
+        help_text="Puntos que otorga por cada 10 soles consumidos")
 
     def __str__(self):
         return f"{self.nombre} - {self.puntos_por_galon} pts/gal"
@@ -92,6 +95,7 @@ class RegistroConsumo(models.Model):
     monto_total = models.DecimalField(max_digits=10, decimal_places=2,
                                        help_text="Monto total de la compra en S/.")
     puntos_otorgados = models.DecimalField(max_digits=10, decimal_places=2, help_text="Puntos otorgados por esta transacción")
+    producto_canjeado = models.ForeignKey('ProductoCanjeable', on_delete=models.SET_NULL, null=True, blank=True, related_name='canjes_realizados')
     fecha = models.DateTimeField(default=timezone.now)
 
     def save(self, *args, **kwargs):
@@ -135,7 +139,6 @@ class ProductoCanjeable(models.Model):
     descripcion = models.TextField(blank=True, default='')
     puntos_requeridos = models.IntegerField(help_text="Puntos necesarios para canjear este producto")
     imagen = models.ImageField(upload_to='productos/', blank=True, null=True)
-    categoria = models.CharField(max_length=50, blank=True, default='General')
     stock = models.IntegerField(default=0, help_text="Unidades disponibles en stock")
     activo = models.BooleanField(default=True)
     destacado = models.BooleanField(default=False, help_text="Aparece en productos destacados del inicio")
