@@ -253,6 +253,7 @@
                 <th>Combustible</th>
                 <th>Ptos</th>
                 <th>EMPLEADO</th>
+                <th>LUGAR</th>
                 <th>Acción</th>
               </tr>
             </thead>
@@ -270,6 +271,14 @@
                   <span class="badge-points">+{{ reg.puntos_otorgados | number:'1.0-0' }}</span>
                 </td>
                 <td style="color: #1D2536;">{{ reg.empleado_nombre }}</td>
+                <td style="color: #1D2536;">
+                   <span *ngIf="reg.empleado_sucursal" 
+                         [style.color]="reg.empleado_sucursal === 'Huánuco' ? '#D84F34' : '#1D2536'"
+                         style="font-weight: 600;">
+                     {{ reg.empleado_sucursal }}
+                   </span>
+                   <span *ngIf="!reg.empleado_sucursal">—</span>
+                </td>
                 <td>
                   <button (click)="eliminarRegistro(reg.id)"
                     style="background: #D84F34; color: #FFFFFF; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;"
@@ -380,9 +389,16 @@
         </div>
 
         <div class="add-emp-field">
-          <label class="add-emp-label">Teléfono <span
-              style="color:#94a3b8; font-weight:normal;">(Opcional)</span></label>
           <input type="text" [(ngModel)]="nuevoEmpleado.telefono" placeholder="Número de celular" class="add-emp-input">
+        </div>
+
+        <div class="add-emp-field">
+          <label class="add-emp-label">Sucursal <span class="required-star">*</span></label>
+          <select [(ngModel)]="nuevoEmpleado.sucursal" class="add-emp-input" style="background: #ffffff; cursor: pointer;">
+            <option value="" disabled selected>Selecciona sucursal</option>
+            <option value="Huánuco">Huánuco</option>
+            <option value="Huachipa">Huachipa</option>
+          </select>
         </div>
       </div>
 
@@ -467,6 +483,7 @@
                 <th>Nombres</th>
                 <th>Apellidos</th>
                 <th>Teléfono</th>
+                <th>Sucursal</th>
                 <th style="text-align: center;">Acciones</th>
               </tr>
             </thead>
@@ -479,6 +496,7 @@
                   [ngStyle]="{'color': emp.telefono ? '#1D2536' : '#94a3b8', 'font-style': emp.telefono ? 'normal' : 'italic'}">
                   {{ emp.telefono || 'No añadido' }}
                 </td>
+                <td class="emp-td-sucursal" style="font-weight: 600;">{{ emp.sucursal || '—' }}</td>
                 <td class="emp-td-actions">
                   <div class="emp-action-buttons">
                     <!-- Botón Editar -->
@@ -541,10 +559,18 @@
             style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #ffffff; color: #1D2536; outline: none;">
         </div>
         <div>
-          <label style="color: #D84F34; font-size: 13px; margin-bottom: 5px; display: block;">Teléfono
-            (Opcional)</label>
           <input type="text" [(ngModel)]="empleadoEditando.telefono" placeholder="Número de celular" class="form-input"
             style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #ffffff; color: #1D2536; outline: none;">
+        </div>
+        <div>
+          <label style="color: #D84F34; font-size: 13px; margin-bottom: 5px; display: block;">Sucursal <span
+              style="color: #D84F34;">*</span></label>
+          <select [(ngModel)]="empleadoEditando.sucursal" class="form-input"
+            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(72, 72, 71, 0.3); background: #ffffff; color: #1D2536; outline: none; cursor: pointer;">
+            <option value="" disabled>Selecciona sucursal</option>
+            <option value="Huánuco">Huánuco</option>
+            <option value="Huachipa">Huachipa</option>
+          </select>
         </div>
         <p *ngIf="errorEdicionEmpleado" style="color: #D84F34; font-size: 13px; margin: 0;">{{ errorEdicionEmpleado }}
         </p>

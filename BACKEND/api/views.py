@@ -86,9 +86,9 @@ class UsuarioViewsets(viewsets.ModelViewSet):
     def get_queryset(self):
         # Filtrado de seguridad: si un empleado logra consultar este endpoint, solo vera su info
         if self.request.user.tipo_usuario == 'empleado':
-            return self.queryset.filter(id=self.request.user.id)
+            return self.queryset.filter(id=self.request.user.id, is_active=True)
         
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().filter(is_active=True)
         tipo = self.request.query_params.get('tipo', None)
         
         # Filtra si la lista es de empleados o de dueños
@@ -102,6 +102,25 @@ class UsuarioViewsets(viewsets.ModelViewSet):
         if self.action == 'create':
             return serializers.EmpleadoRegistroSerializer
         return serializers.UsuarioSerializers
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        # Soft delete: desactivar usuario en lugar de borrarlo
+        instance.is_active = False
+        instance.set_unusable_password()
+        
+        # Alterar el DNI y username para liberar la restricción UNIQUE y permitir re-registrar al mismo empleado
+        import time
+        suffix = str(int(time.time()))[-5:]
+        instance.dni = f"X{suffix}{instance.dni[-8:]}"[:15]
+        instance.username = f"del_{instance.id}_{instance.username}"[:150]
+        instance.save()
+        
+        # Borrar el token para cerrar su sesión inmediatamente
+        from rest_framework.authtoken.models import Token
+        Token.objects.filter(user=instance).delete()
+        
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class TipoCombustibleViewSet(viewsets.ModelViewSet):
@@ -234,7 +253,7 @@ class CambiarPasswordView(APIView):
             return Response({'error': 'Faltan datos requeridos.'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            usuario = models.Usuario.objects.get(id=usuario_id)
+            usuario = models.Usuario.objects.get(id=usuario_id, is_active=True)
             
             # Seguridad extra: Un Dueño no puede cambiar la clave de un Dev 
             # (opcional, pero recomendado)

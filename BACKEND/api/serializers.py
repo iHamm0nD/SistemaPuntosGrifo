@@ -38,7 +38,7 @@ class UsuarioSerializers(serializers.ModelSerializer):
 class PerfilUsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Usuario
-        fields = ['id', 'nombre', 'apellido', 'dni', 'telefono', 'tipo_usuario']
+        fields = ['id', 'nombre', 'apellido', 'dni', 'telefono', 'tipo_usuario', 'sucursal']
 
     def update(self, instance, validated_data):
         # Sobrescribimos el método update para guardar cambios de perfil
@@ -46,6 +46,7 @@ class PerfilUsuarioSerializer(serializers.ModelSerializer):
         instance.apellido = validated_data.get('apellido', instance.apellido)
         instance.dni = validated_data.get('dni', instance.dni)
         instance.telefono = validated_data.get('telefono', instance.telefono)
+        instance.sucursal = validated_data.get('sucursal', instance.sucursal)
         instance.save()
         return instance
 
@@ -56,7 +57,7 @@ class EmpleadoRegistroSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Usuario
-        fields = ['id', 'username', 'password', 'nombre', 'apellido', 'dni', 'telefono', 'tipo_usuario']
+        fields = ['id', 'username', 'password', 'nombre', 'apellido', 'dni', 'telefono', 'tipo_usuario', 'sucursal']
 
     def create(self, validated_data):
         return models.Usuario.objects.create_user(**validated_data)
@@ -118,10 +119,11 @@ class RegistroConsumoReadSerializer(serializers.ModelSerializer):
             return obj.producto_canjeado.nombre
         return "Canje Directo"
     empleado_nombre = serializers.SerializerMethodField()
+    empleado_sucursal = serializers.CharField(source='empleado.sucursal', read_only=True)
 
     class Meta:
         model = models.RegistroConsumo
-        fields = ['id', 'nro_boleta', 'cliente', 'cliente_dni', 'cliente_nombre', 'cliente_puntos', 'empleado', 'empleado_nombre',
+        fields = ['id', 'nro_boleta', 'cliente', 'cliente_dni', 'cliente_nombre', 'cliente_puntos', 'empleado', 'empleado_nombre', 'empleado_sucursal',
                   'tipo_combustible', 'tipo_combustible_nombre', 'producto_canjeado', 'producto_nombre', 'galones',
                   'monto_total', 'puntos_otorgados', 'fecha']
 
@@ -152,8 +154,13 @@ class RegistrarConsumoSerializer(serializers.Serializer):
         value = value.strip()
         if not value:
             return None
-        if models.RegistroConsumo.objects.filter(nro_boleta=value).exists():
-            raise serializers.ValidationError(f"El número de boleta '{value}' ya fue registrado anteriormente.")
+        empleado = self.context.get('empleado')
+        if empleado and empleado.sucursal:
+            if models.RegistroConsumo.objects.filter(nro_boleta=value, empleado__sucursal=empleado.sucursal).exists():
+                raise serializers.ValidationError(f"El comprobante '{value}' ya fue registrado anteriormente en la sucursal {empleado.sucursal}.")
+        else:
+            if models.RegistroConsumo.objects.filter(nro_boleta=value).exists():
+                raise serializers.ValidationError(f"El comprobante '{value}' ya fue registrado.")
         return value
 
     def create(self, validated_data):

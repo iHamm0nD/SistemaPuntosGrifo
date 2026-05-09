@@ -68,7 +68,7 @@ export class DashboardDuenoComponent implements OnInit {
   cargandoEmpleados = false;
   buscandoDni = false;
   errorDni = '';
-  nuevoEmpleado: any = { username: '', password: '', nombre: '', apellido: '', dni: '', email: 'empleado@grifo.com', telefono: '', tipo_usuario: 'empleado' };
+  nuevoEmpleado: any = { username: '', password: '', nombre: '', apellido: '', dni: '', email: 'empleado@grifo.com', telefono: '', tipo_usuario: 'empleado', sucursal: '' };
 
   // Ranking Modal
   mostrarModalRanking = false;
@@ -378,7 +378,7 @@ export class DashboardDuenoComponent implements OnInit {
   // ===== Gestión de Empleados =====
   abrirModalAgregarEmpleado() {
     this.mostrarModalAgregarEmpleado = true;
-    this.nuevoEmpleado = { username: '', password: '', nombre: '', apellido: '', dni: '', email: 'empleado@grifo.com', telefono: '', tipo_usuario: 'empleado' };
+    this.nuevoEmpleado = { username: '', password: '', nombre: '', apellido: '', dni: '', email: 'empleado@grifo.com', telefono: '', tipo_usuario: 'empleado', sucursal: '' };
   }
 
   cerrarResumenEmpleado() {
@@ -492,8 +492,8 @@ export class DashboardDuenoComponent implements OnInit {
   }
 
   guardarEmpleado() {
-    if (!this.nuevoEmpleado.dni || !this.nuevoEmpleado.nombre || !this.nuevoEmpleado.apellido) {
-      alert("Por favor, complete los campos obligatorios: Nombres, Apellidos y DNI.");
+    if (!this.nuevoEmpleado.dni || !this.nuevoEmpleado.nombre || !this.nuevoEmpleado.apellido || !this.nuevoEmpleado.sucursal) {
+      alert("Por favor, complete los campos obligatorios: Nombres, Apellidos, DNI y Sucursal.");
       return;
     }
     
@@ -533,7 +533,7 @@ export class DashboardDuenoComponent implements OnInit {
         this.resumenEmpleadoConstruido = { ...this.nuevoEmpleado };
         this.mostrarModalAgregarEmpleado = false;
         this.mostrarResumenNuevoEmpleado = true;
-        this.nuevoEmpleado = { username: '', password: '', nombre: '', apellido: '', dni: '', email: 'empleado@grifo.com', telefono: '', tipo_usuario: 'empleado' };
+        this.nuevoEmpleado = { username: '', password: '', nombre: '', apellido: '', dni: '', email: 'empleado@grifo.com', telefono: '', tipo_usuario: 'empleado', sucursal: '' };
       },
       error: (err) => {
         alert('Error al crear empleado. Verifique si el DNI ya existe.');
@@ -562,8 +562,8 @@ export class DashboardDuenoComponent implements OnInit {
     this.errorEdicionEmpleado = '';
     this.okEdicionEmpleado = '';
 
-    if (!this.empleadoEditando.dni || !this.empleadoEditando.nombre || !this.empleadoEditando.apellido) {
-      this.errorEdicionEmpleado = 'DNI, Nombres y Apellidos son obligatorios.';
+    if (!this.empleadoEditando.dni || !this.empleadoEditando.nombre || !this.empleadoEditando.apellido || !this.empleadoEditando.sucursal) {
+      this.errorEdicionEmpleado = 'DNI, Nombres, Apellidos y Sucursal son obligatorios.';
       return;
     }
     if (this.empleadoEditando.dni.length < 8 || this.empleadoEditando.dni.length > 9) {

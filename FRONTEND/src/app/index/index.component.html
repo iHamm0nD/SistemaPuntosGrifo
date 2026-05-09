@@ -37,8 +37,7 @@
       </button>
 
       <div class="carousel-track" #carouselTrack (scroll)="onCarouselScroll()" (mousedown)="onDragStart($event)"
-        (mousemove)="onDragMove($event)" (mouseup)="onDragEnd()" (mouseleave)="onDragEnd()"
-        (touchstart)="onTouchStart($event)" (touchmove)="onTouchMove($event)" (touchend)="onDragEnd()">
+        (mousemove)="onDragMove($event)" (mouseup)="onDragEnd()" (mouseleave)="onDragEnd()">
         <div class="product-card" *ngFor="let product of loopedProducts">
           <div class="product-image">
             <img [src]="product.image" [alt]="product.name">
