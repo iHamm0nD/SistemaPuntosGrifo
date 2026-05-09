@@ -1115,6 +1115,23 @@
 }
 
 @media (max-width: 768px) {
+  .header {
+    height: auto;
+    padding: 12px 15px;
+  }
+  .header-logo-img {
+    height: 80px;
+  }
+  .logo-text {
+    font-size: 2rem;
+  }
+  .header-points-btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    border-radius: 12px;
+  }
+
   .catalog-title {
     font-size: 1.8rem;
   }
@@ -1143,6 +1160,27 @@
 }
 
 @media (max-width: 480px) {
+  .header {
+    padding: 10px;
+  }
+  .header-content {
+    gap: 5px;
+  }
+  .header-logo-img {
+    height: 60px;
+  }
+  .logo-text {
+    font-size: 1.4rem;
+  }
+  .header-points-btn {
+    padding: 0.5rem 0.6rem;
+    font-size: 0.75rem;
+    gap: 0.4rem;
+  }
+  .header-points-btn i {
+    font-size: 0.9rem;
+  }
+
   .main-container {
     padding: 1rem;
   }
@@ -1154,11 +1192,6 @@
 
   .all-products-grid {
     grid-template-columns: 1fr;
-  }
-
-  .header-points-btn {
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
   }
 
   .elegant-dialog-content {
