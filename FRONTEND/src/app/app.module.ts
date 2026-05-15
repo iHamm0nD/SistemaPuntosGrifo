@@ -14,6 +14,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+import { DatePickerModule } from 'primeng/datepicker';
 
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { providePrimeNG } from 'primeng/config';
@@ -53,7 +54,8 @@ import { DashboardDuenoComponent } from './dashboard-dueno/dashboard-dueno.compo
     RecaptchaModule,
     BrowserAnimationsModule,
     DialogModule,
-    ToastModule
+    ToastModule,
+    DatePickerModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },
@@ -63,6 +65,7 @@ import { DashboardDuenoComponent } from './dashboard-dueno/dashboard-dueno.compo
       theme: {
           preset: Lara,
           options: {
+            darkModeSelector: false,
             colorScheme: 'light',
             primaryColor: '#D84F34',
           }

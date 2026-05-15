@@ -6,3 +6,93 @@
   font-weight: normal;
   font-style: normal;
 }
+
+/* === Override PrimeNG Datepicker Popup === */
+.custom-calendar-popup {
+  background: #fdf6f0 !important;
+  border: 1px solid #ebd8cd !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  padding: 10px !important;
+}
+
+/* Header (Mes, Año, Flechas) */
+.custom-calendar-popup .p-datepicker-header {
+  background: #fdf6f0 !important;
+  border-bottom: 1px solid #ebd8cd !important;
+  padding-bottom: 10px !important;
+  color: #4a352a !important;
+}
+
+.custom-calendar-popup .p-datepicker-title,
+.custom-calendar-popup .p-datepicker-title button,
+.custom-calendar-popup .p-datepicker-title span {
+  color: #4a352a !important;
+  font-weight: 600 !important;
+}
+
+.custom-calendar-popup .p-datepicker-prev,
+.custom-calendar-popup .p-datepicker-next {
+  color: #8a6c5f !important;
+  background: transparent !important;
+}
+
+.custom-calendar-popup .p-datepicker-prev:hover,
+.custom-calendar-popup .p-datepicker-next:hover {
+  background: #f8ded0 !important;
+  color: #D84F34 !important;
+}
+
+/* Nombres de los días de la semana */
+.custom-calendar-popup table th {
+  color: #8a6c5f !important;
+  font-weight: 600 !important;
+  padding: 8px !important;
+  background: #fdf6f0 !important;
+}
+
+/* Días (Números) */
+.custom-calendar-popup table td {
+  background: #fdf6f0 !important;
+  padding: 4px !important;
+}
+
+.custom-calendar-popup table td > span {
+  color: #4a352a !important;
+  background: transparent !important;
+  border-radius: 8px !important;
+  width: 32px !important;
+  height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+}
+
+/* Hover de días */
+.custom-calendar-popup table td > span:not(.p-disabled):not(.p-highlight):hover {
+  background: #fdeee9 !important;
+  color: #D84F34 !important;
+}
+
+/* Día seleccionado */
+.custom-calendar-popup table td > span.p-highlight {
+  background: #D84F34 !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 6px -1px rgba(216, 79, 52, 0.3) !important;
+}
+
+/* Día actual (Hoy) */
+.custom-calendar-popup table td.p-datepicker-today > span:not(.p-highlight) {
+  background: transparent !important;
+  border: 1px solid #D84F34 !important;
+  color: #D84F34 !important;
+  font-weight: 600 !important;
+}
+
+/* Ocultar elementos de dark mode que PrimeNG pudiera inyectar */
+.custom-calendar-popup::before,
+.custom-calendar-popup::after {
+  display: none !important;
+}

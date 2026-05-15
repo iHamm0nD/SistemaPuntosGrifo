@@ -46,6 +46,7 @@ export class DashboardDuenoComponent implements OnInit {
   totalPaginasCanjes = 1;
   busquedaCanje = '';
   fechaCanje = '';
+  fechaCanjeObj: Date | null = null;
   cargandoCanjes = false;
   searchCanjeSubject: Subject<string> = new Subject<string>();
 
@@ -318,6 +319,7 @@ export class DashboardDuenoComponent implements OnInit {
     this.mostrarModalRegistroCanjes = true;
     this.busquedaCanje = '';
     this.fechaCanje = '';
+    this.fechaCanjeObj = null;
     this.cargarCanjes(1);
   }
 
@@ -326,14 +328,23 @@ export class DashboardDuenoComponent implements OnInit {
     this.searchCanjeSubject.next(valor);
   }
 
-  onFechaCanjeChange(valor: string) {
-    this.fechaCanje = valor;
+  onFechaCanjeChange(valor: any) {
+    this.fechaCanjeObj = valor;
+    if (valor instanceof Date) {
+      const year = valor.getFullYear();
+      const month = ('0' + (valor.getMonth() + 1)).slice(-2);
+      const day = ('0' + valor.getDate()).slice(-2);
+      this.fechaCanje = `${year}-${month}-${day}`;
+    } else {
+      this.fechaCanje = valor || '';
+    }
     this.cargarCanjes(1);
   }
 
   limpiarFiltrosCanjes() {
     this.busquedaCanje = '';
     this.fechaCanje = '';
+    this.fechaCanjeObj = null;
     this.cargarCanjes(1);
   }
 
