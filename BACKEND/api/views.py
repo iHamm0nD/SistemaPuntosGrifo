@@ -191,9 +191,13 @@ class RegistroConsumoViewSet(viewsets.ModelViewSet):
         queryset = super().get_queryset()
         search = self.request.query_params.get('search', None)
         tipo = self.request.query_params.get('tipo', None)
+        fecha = self.request.query_params.get('fecha', None)
         
         if search:
             queryset = queryset.filter(cliente__dni__icontains=search)
+            
+        if fecha:
+            queryset = queryset.filter(fecha__date=fecha)
             
         if tipo == 'consumo':
             queryset = queryset.exclude(tipo_combustible__nombre='CANJE DE PUNTOS')

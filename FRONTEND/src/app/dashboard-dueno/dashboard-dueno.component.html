@@ -1173,6 +1173,31 @@
       </div>
 
       <div class="canje-section" style="padding: 20px;">
+        <div style="display: flex; gap: 15px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid rgba(148, 163, 184, 0.2);">
+          
+          <div style="position: relative; flex: 1; min-width: 200px; max-width: 280px;">
+            <i class="pi pi-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b;"></i>
+            <input type="text" [ngModel]="busquedaCanje" (ngModelChange)="onSearchCanjeChange($event)"
+              placeholder="Buscar por DNI..." class="form-input"
+              style="padding: 10px 12px 10px 35px; border-radius: 8px; border: 1px solid rgba(148, 163, 184, 0.4); background: #ffffff; color: #1D2536; width: 100%; font-size: 14px; outline: none; transition: border-color 0.2s;"
+              onfocus="this.style.borderColor='#D84F34'" onblur="this.style.borderColor='rgba(148, 163, 184, 0.4)'">
+          </div>
+
+          <div style="position: relative; flex: 1; min-width: 200px; max-width: 250px;">
+            <i class="pi pi-calendar" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b;"></i>
+            <input type="date" [ngModel]="fechaCanje" (ngModelChange)="onFechaCanjeChange($event)" class="form-input"
+              style="padding: 10px 12px 10px 35px; border-radius: 8px; border: 1px solid rgba(148, 163, 184, 0.4); background: #ffffff; color: #1D2536; width: 100%; font-size: 14px; outline: none; transition: border-color 0.2s;"
+              onfocus="this.style.borderColor='#D84F34'" onblur="this.style.borderColor='rgba(148, 163, 184, 0.4)'">
+          </div>
+
+          <button *ngIf="busquedaCanje || fechaCanje" (click)="limpiarFiltrosCanjes()"
+            title="Limpiar filtros"
+            style="padding: 10px 16px; border-radius: 8px; border: 1px solid transparent; background: #fee2e2; color: #ef4444; cursor: pointer; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; transition: all 0.2s; white-space: nowrap;"
+            onmouseover="this.style.background='#f87171'; this.style.color='#fff'" onmouseout="this.style.background='#fee2e2'; this.style.color='#ef4444'">
+            <i class="pi pi-filter-slash"></i> Limpiar
+          </button>
+          
+        </div>
         <div class="table-container" *ngIf="canjesPaginados.length > 0">
           <table class="data-table">
             <thead>

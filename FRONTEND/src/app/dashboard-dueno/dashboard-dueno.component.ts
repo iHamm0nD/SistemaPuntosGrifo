@@ -45,6 +45,7 @@ export class DashboardDuenoComponent implements OnInit {
   paginaActualCanjes = 1;
   totalPaginasCanjes = 1;
   busquedaCanje = '';
+  fechaCanje = '';
   cargandoCanjes = false;
   searchCanjeSubject: Subject<string> = new Subject<string>();
 
@@ -299,7 +300,7 @@ export class DashboardDuenoComponent implements OnInit {
   cargarCanjes(page: number = 1) {
     this.cargandoCanjes = true;
     this.paginaActualCanjes = page;
-    this.api.getRegistrosConsumo(page, this.busquedaCanje, 'canje').subscribe({
+    this.api.getRegistrosConsumo(page, this.busquedaCanje, 'canje', this.fechaCanje).subscribe({
       next: (data) => {
         this.canjesPaginados = data.results || data;
         let count = data.count || this.canjesPaginados.length;
@@ -315,12 +316,25 @@ export class DashboardDuenoComponent implements OnInit {
 
   abrirModalRegistroCanjes() {
     this.mostrarModalRegistroCanjes = true;
+    this.busquedaCanje = '';
+    this.fechaCanje = '';
     this.cargarCanjes(1);
   }
 
   onSearchCanjeChange(valor: string) {
     this.busquedaCanje = valor;
     this.searchCanjeSubject.next(valor);
+  }
+
+  onFechaCanjeChange(valor: string) {
+    this.fechaCanje = valor;
+    this.cargarCanjes(1);
+  }
+
+  limpiarFiltrosCanjes() {
+    this.busquedaCanje = '';
+    this.fechaCanje = '';
+    this.cargarCanjes(1);
   }
 
   cambiarPaginaCanjes(delta: number) {

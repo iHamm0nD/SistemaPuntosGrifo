@@ -92,13 +92,16 @@ export class ApiService {
         );
     }
 
-    public getRegistrosConsumo(page: number = 1, search: string = '', tipo: string = ''): Observable<any> {
+    public getRegistrosConsumo(page: number = 1, search: string = '', tipo: string = '', fecha: string = ''): Observable<any> {
         let url = this.ApiUrl + 'registro-consumo/?page=' + page;
         if (search) {
             url += '&search=' + search;
         }
         if (tipo) {
             url += '&tipo=' + tipo;
+        }
+        if (fecha) {
+            url += '&fecha=' + fecha;
         }
         return this.http.get<any>(url);
     }
